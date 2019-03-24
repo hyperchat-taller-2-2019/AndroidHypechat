@@ -18,6 +18,8 @@ public class MainActivity extends AppCompatActivity {
     public void login (View view){
         String email = this.textoEmail.getText().toString();
         String password = this.textoPassword.getText().toString();
+        this.textoEmail.setText("");
+        this.textoPassword.setText("");
 
         Toast.makeText(this, "Email: " + email + "\n" + "Password: " + password, Toast.LENGTH_LONG).show();
 
