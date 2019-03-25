@@ -12,6 +12,7 @@ import android.widget.Toast;
 public class Registro extends AppCompatActivity {
 
     private EditText textName, textDisplayName, textEmail, textPass;
+    private ValidadorDeCampos validador;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -21,6 +22,7 @@ public class Registro extends AppCompatActivity {
         this.textDisplayName = (EditText) findViewById(R.id.displayName_registro);
         this.textEmail = (EditText) findViewById(R.id.email_registro);
         this.textPass = (EditText) findViewById(R.id.pass_registro);
+        this.validador = new ValidadorDeCampos();
 
 
     }
@@ -31,7 +33,11 @@ public class Registro extends AppCompatActivity {
     }
 
     public void registrarse (View view){
-        if(textName.getText().toString().isEmpty()){
+        if (this.validador.areValidRegisterFields(this.textName.getText().toString(),this.textDisplayName.getText().toString(),this.textEmail.getText().toString(),this.textPass.getText().toString(),this)){
+            Toast.makeText(this, "Todos los Campos OK! ", Toast.LENGTH_SHORT).show();
+        }
+
+        /*if(textName.getText().toString().isEmpty()){
             Toast.makeText(this,"Name field cannot be empty",Toast.LENGTH_LONG).show();
         }else{
             if(textDisplayName.getText().toString().isEmpty()){
@@ -52,7 +58,7 @@ public class Registro extends AppCompatActivity {
                 }
             }
 
-        }
+        }*/
     }
 
 }
