@@ -13,16 +13,21 @@ public class MainActivity extends AppCompatActivity {
 
     private EditText textoEmail;
     private EditText textoPassword;
+    private ValidadorDeCampos validador;
 
-
-    //Este es un ejemplo de una request simple GET hecha con el singleton de la clase HttpConexionSingleton
     public void login (View view){
         String email = this.textoEmail.getText().toString();
         String password = this.textoPassword.getText().toString();
         this.textoEmail.setText("");
         this.textoPassword.setText("");
 
-        Toast.makeText(this, "Email: " + email + "\n" + "Password: " + password, Toast.LENGTH_LONG).show();
+
+
+        if (this.validador.areValidLoginFields(email,password,this)){
+            Toast.makeText(this, "Email: " + email + "\n" + "Password: " + password, Toast.LENGTH_LONG).show();
+            // SE PUEDE HACER EL REQUEST AL SERVER PARA LOGUEARSE !
+        }
+
 
     }
 
@@ -40,7 +45,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        
+
+        this.validador = new ValidadorDeCampos();
         this.textoEmail = (EditText) findViewById(R.id.et_email);
         this.textoPassword = (EditText) findViewById(R.id.et_password);
 
