@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
+import android.content.Intent;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -30,8 +31,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void registro (View view){
-        Toast.makeText(this, "Aca te deberias Registrar!", Toast.LENGTH_SHORT).show();
+        Intent launchactivity= new Intent(this,Registro.class);
+        startActivity(launchactivity);
     }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,5 +45,8 @@ public class MainActivity extends AppCompatActivity {
         this.textoPassword = (EditText) findViewById(R.id.et_password);
 
     }
+
+
+
 
 }
