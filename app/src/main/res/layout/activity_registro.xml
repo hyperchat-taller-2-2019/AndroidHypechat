@@ -119,7 +119,6 @@
             android:layout_weight="10"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
-
             android:background="@drawable/textview_border"
             android:ems="10"
             android:gravity="center"
@@ -144,9 +143,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="10"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
             android:background="@drawable/textview_border"
             android:ems="10"
-            android:inputType="textPassword" />
+            android:gravity="center"
+            android:hint="Contraseña"
+            android:inputType="textPassword"
+            android:textSize="20sp"/>
 
         <Button
             android:id="@+id/r_registro"

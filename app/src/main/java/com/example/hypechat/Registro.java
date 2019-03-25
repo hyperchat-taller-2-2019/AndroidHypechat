@@ -37,28 +37,6 @@ public class Registro extends AppCompatActivity {
             Toast.makeText(this, "Todos los Campos OK! ", Toast.LENGTH_SHORT).show();
         }
 
-        /*if(textName.getText().toString().isEmpty()){
-            Toast.makeText(this,"Name field cannot be empty",Toast.LENGTH_LONG).show();
-        }else{
-            if(textDisplayName.getText().toString().isEmpty()){
-                Toast.makeText(this,"Display name field cannot be empty",Toast.LENGTH_LONG).show();
-            }else {
-                if(textEmail.getText().toString().isEmpty()){
-                    Toast.makeText(this,"Email field cannot be empty",Toast.LENGTH_LONG).show();
-                }else if(!isValidEmail(textEmail.getText().toString())){
-                    Toast.makeText(this,"Not a valid email",Toast.LENGTH_LONG).show();
-                } else{
-                    if(textPass.getText().toString().isEmpty()){
-                        Toast.makeText(this,"Password field cannot be empty",Toast.LENGTH_LONG).show();
-                    }else if(textPass.getText().toString().length() < 8){
-                        Toast.makeText(this,"Passwords must be at least 8 characters long",Toast.LENGTH_LONG).show();
-                    } else {
-
-                    }
-                }
-            }
-
-        }*/
     }
 
 }
