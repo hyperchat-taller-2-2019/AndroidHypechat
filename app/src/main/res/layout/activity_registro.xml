@@ -41,7 +41,7 @@
                 android:textStyle="bold" />
 
             <EditText
-                android:id="@+id/editText4"
+                android:id="@+id/name_registro"
                 style="@style/Widget.AppCompat.EditText"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
@@ -69,7 +69,7 @@
                 android:textStyle="bold" />
 
             <EditText
-                android:id="@+id/editText5"
+                android:id="@+id/displayName_registro"
                 style="@style/Widget.AppCompat.EditText"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
@@ -105,7 +105,7 @@
                 android:textStyle="bold" />
 
             <EditText
-                android:id="@+id/editText6"
+                android:id="@+id/email_registro"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:layout_centerHorizontal="true"
@@ -131,7 +131,7 @@
                 android:textStyle="bold" />
 
             <EditText
-                android:id="@+id/editText7"
+                android:id="@+id/pass_registro"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:layout_marginTop="10dp"
@@ -148,7 +148,7 @@
                 android:layout_marginTop="20dp"
                 android:background="@android:color/holo_orange_light"
                 android:gravity="center"
-                android:onClick="registro"
+                android:onClick="registrarse"
                 android:text="Registrarse"
                 android:textColor="@android:color/background_dark" />
 
