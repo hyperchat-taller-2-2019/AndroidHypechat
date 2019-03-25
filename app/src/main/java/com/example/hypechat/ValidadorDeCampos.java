@@ -19,6 +19,7 @@ public class ValidadorDeCampos {
     private boolean isValidName(String name, Context ctx) {
         if (name.isEmpty()){
             Toast.makeText(ctx, "Olvidó completar su Nombre !", Toast.LENGTH_SHORT).show();
+            return false;
         }
         return true;
     }
@@ -26,6 +27,7 @@ public class ValidadorDeCampos {
     private boolean isValidDisplayName(String display_name, Context ctx) {
         if (display_name.isEmpty()){
             Toast.makeText(ctx, "Olvidó completar su Apodo !", Toast.LENGTH_SHORT).show();
+            return false;
         }
         return true;
     }
