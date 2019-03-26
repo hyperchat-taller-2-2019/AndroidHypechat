@@ -87,18 +87,19 @@
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
-            <EditText
-                android:id="@+id/et_email"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="10"
-                android:background="@drawable/textview_border"
-                android:ems="10"
-                android:gravity="center"
-                android:hint="Ingrese email"
-                android:inputType="textEmailAddress"
-                android:textColor="@android:color/background_dark"
-                android:textSize="20sp" />
+        <EditText
+            android:id="@+id/et_email"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="10"
+            android:background="@drawable/textview_border"
+            android:ems="10"
+            android:gravity="center"
+            android:hint="Ingrese email"
+            android:inputType="textEmailAddress"
+            android:textColor="@android:color/background_dark"
+            android:textColorHint="@android:color/darker_gray"
+            android:textSize="20sp" />
 
             <TextView
                 android:id="@+id/tv_password"
@@ -111,18 +112,19 @@
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
-            <EditText
-                android:id="@+id/et_password"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="10"
-                android:background="@drawable/textview_border"
-                android:ems="10"
-                android:gravity="center"
-                android:hint="Ingrese contraseña"
-                android:inputType="textPassword"
-                android:textColor="@android:color/background_dark"
-                android:textSize="20sp" />
+        <EditText
+            android:id="@+id/et_password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="10"
+            android:background="@drawable/textview_border"
+            android:ems="10"
+            android:gravity="center"
+            android:hint="Ingrese contraseña"
+            android:inputType="textPassword"
+            android:textColor="@android:color/background_dark"
+            android:textColorHint="@android:color/darker_gray"
+            android:textSize="20sp" />
 
             <Button
                 android:id="@+id/b_login"
