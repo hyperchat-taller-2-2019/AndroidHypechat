@@ -1,6 +1,8 @@
 package com.example.hypechat;
 
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -23,6 +25,9 @@ public class MainActivity extends AppCompatActivity {
     private EditText textoEmail;
     private EditText textoPassword;
     private ValidadorDeCampos validador;
+    private SharedPreferences sharedPref;
+    private SharedPreferences.Editor sharedEditor;
+
     //ESTA DESPUES DEBERIA SER LA DIRECCION DE DONDE ESTE EL SERVER REAL Y EL ENDPOINT CORRESPONDIENTE!
     private final String url = "https://hypechat-taller2-2019.herokuapp.com/autenticacion/login";
 
@@ -43,14 +48,19 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void onResponse(JSONObject response) {
                             try{
-                            String texto = "Tu nombre es: " + response.getString("nombre") + "\nTu apodo es: "
-                                    + response.getString("apodo") + "\nTu mail es: " + response.getString("email");
-
-                            mostrarenpantalla(texto);
+                                String apodo_response = response.getString("apodo");
+                                String nombre_response = response.getString("nombre");
+                                String email_response = response.getString("email");
+                                sharedEditor.putString("apodo",apodo_response);
+                                sharedEditor.putString("nombre",nombre_response);
+                                sharedEditor.putString("email",email_response);
+                                sharedEditor.apply();
+                                goHomeActivity();
                             }
                             catch (JSONException error){
-                                mostrarenpantalla(error.getMessage());
+                                Toast.makeText(MainActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();;
                             }
+
                         }
 
                     }, new Response.ErrorListener() {
@@ -68,8 +78,9 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void mostrarenpantalla(String texto) {
-        Toast.makeText(this, texto, Toast.LENGTH_SHORT).show();
+    private void goHomeActivity() {
+        Intent intent = new Intent(this,HomeActivity.class);
+        startActivity(intent);
     }
 
     public void loginConFacebook (View view){
@@ -87,6 +98,17 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //SharedPref para almacenar datos de sesión
+        this.sharedPref = getSharedPreferences(getString(R.string.saved_data), Context.MODE_PRIVATE);
+        this.sharedEditor = sharedPref.edit();
+
+
+        //Borro data de Shared Pref
+        this.sharedEditor.clear();
+        this.sharedEditor.apply();
+
+
+        //Referencias del layout
         this.validador = new ValidadorDeCampos();
         this.textoEmail = (EditText) findViewById(R.id.et_email);
         this.textoPassword = (EditText) findViewById(R.id.et_password);

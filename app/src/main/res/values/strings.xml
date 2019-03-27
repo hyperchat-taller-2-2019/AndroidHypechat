@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">HypeChat</string>
+    <string name="saved_data" />
 </resources>
