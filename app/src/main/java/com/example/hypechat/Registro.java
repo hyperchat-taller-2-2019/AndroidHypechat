@@ -27,11 +27,6 @@ public class Registro extends AppCompatActivity {
 
     }
 
-
-    public final static boolean isValidEmail(CharSequence target) {
-        return !TextUtils.isEmpty(target) && android.util.Patterns.EMAIL_ADDRESS.matcher(target).matches();
-    }
-
     public void registrarse (View view){
         if (this.validador.areValidRegisterFields(this.textName.getText().toString(),this.textDisplayName.getText().toString(),this.textEmail.getText().toString(),this.textPass.getText().toString(),this)){
             Toast.makeText(this, "Todos los Campos OK! ", Toast.LENGTH_SHORT).show();
