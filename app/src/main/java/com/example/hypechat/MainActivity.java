@@ -31,7 +31,8 @@ public class MainActivity extends AppCompatActivity {
     private ProgressDialog progressDialog;
 
     //ESTA DESPUES DEBERIA SER LA DIRECCION DE DONDE ESTE EL SERVER REAL Y EL ENDPOINT CORRESPONDIENTE!
-    private final String url = "https://virtserver.swaggerhub.com/taller2-hypechat/Hypechat/1.0.0/login";
+    private final String URL = "https://virtserver.swaggerhub.com/taller2-hypechat/Hypechat/1.0.0/login";
+    private final Integer USUARIO_VALIDO = 1;
 
     public void login (View view){
         Log.i("INFO", "Intentando realizar el login a la app");
@@ -46,10 +47,19 @@ public class MainActivity extends AppCompatActivity {
             this.progressDialog = ProgressDialog.show(this,"Hypechat","Validando datos...",
                     true);
 
-            String URL_completa = this.url + "?email=" + email + "&contraseña=" + password;
+            //Preparo Body del POST
+            JSONObject requestBody = new JSONObject();
+            try {
+                requestBody.put("email", email);
+                requestBody.put("contraseña", password);
+            }
+            catch(JSONException except){
+                Toast.makeText(this, except.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+
             // SE PUEDE HACER EL REQUEST AL SERVER PARA LOGUEARSE !
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                    (Request.Method.GET, URL_completa, null, new Response.Listener<JSONObject>() {
+                    (Request.Method.POST, URL, requestBody, new Response.Listener<JSONObject>() {
 
                         @Override
                         public void onResponse(JSONObject response) {
@@ -78,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
     private void procesarResponse(JSONObject response) {
         try{
             //Usuario valido?
-            if (response.getInt("valido") == 0){
+            if (response.getInt("valido") == USUARIO_VALIDO){
                 String token_response = response.getString("token");
                 String apodo_response = response.getString("apodo");
                 String nombre_response = response.getString("nombre");
