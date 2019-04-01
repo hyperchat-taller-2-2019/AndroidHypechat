@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@android:color/background_light"
     android:orientation="vertical"
-    tools:context=".MainActivity"
+    tools:context=".LoginActivity"
     android:weightSum="100">
 
 
@@ -137,16 +137,17 @@
                 android:text="Log In"
                 android:textColor="@android:color/background_dark" />
 
-            <Button
+            <com.facebook.login.widget.LoginButton
                 android:id="@+id/b_facebook"
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="5"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:paddingTop="15dp"
+                android:paddingBottom="15dp"
                 android:layout_marginTop="20dp"
-                android:background="@android:color/holo_blue_bright"
-                android:onClick="loginConFacebook"
-                android:text="Log in con Facebook"
-                android:textColor="@android:color/background_dark" />
+                />
 
             <Button
                 android:id="@+id/b_registro"

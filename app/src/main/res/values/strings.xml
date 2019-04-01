@@ -1,4 +1,10 @@
 <resources>
     <string name="app_name">HypeChat</string>
     <string name="saved_data" />
+    <string name="facebook_app_id">270931140488443</string>
+    <string name="fb_login_protocol_scheme">fb270931140488443</string>
+
+
+    <string name="cancel_login">Se cancelo la operacion</string>
+    <string name="error_login">Ocurrio un error al ingresar</string>
 </resources>

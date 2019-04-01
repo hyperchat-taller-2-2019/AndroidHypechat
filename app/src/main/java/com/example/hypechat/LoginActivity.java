@@ -20,8 +20,15 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
 
-public class MainActivity extends AppCompatActivity {
+
+
+public class LoginActivity extends AppCompatActivity {
 
     private EditText textoEmail;
     private EditText textoPassword;
@@ -29,6 +36,8 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferences sharedPref;
     private SharedPreferences.Editor sharedEditor;
     private ProgressDialog progressDialog;
+    private CallbackManager callbackManager;
+    private LoginButton facebookLogin;
 
     //ESTA DESPUES DEBERIA SER LA DIRECCION DE DONDE ESTE EL SERVER REAL Y EL ENDPOINT CORRESPONDIENTE!
     private final String URL = "https://virtserver.swaggerhub.com/taller2-hypechat/Hypechat/1.0.0/login";
@@ -72,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void onErrorResponse(VolleyError error) {
                             progressDialog.dismiss();
-                            Toast.makeText(MainActivity.this,
+                            Toast.makeText(LoginActivity.this,
                                     "No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
 
                         }
@@ -101,12 +110,12 @@ public class MainActivity extends AppCompatActivity {
                 goHomeActivity();
             }
             else{
-                Toast.makeText(MainActivity.this,
+                Toast.makeText(LoginActivity.this,
                         "Usuario o Contraseña Invalidos!", Toast.LENGTH_LONG).show();
             }
         }
         catch (JSONException error){
-            Toast.makeText(MainActivity.this,
+            Toast.makeText(LoginActivity.this,
                     "Hubo un error con el Json de Respuesta", Toast.LENGTH_SHORT).show();;
         }
     }
@@ -129,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_login);
         Log.i("INFO","Se esta iniciando la aplicación");
 
         //SharedPref para almacenar datos de sesión
@@ -147,8 +156,33 @@ public class MainActivity extends AppCompatActivity {
         this.textoEmail = (EditText) findViewById(R.id.et_email);
         this.textoPassword = (EditText) findViewById(R.id.et_password);
 
+        callbackManager = CallbackManager.Factory.create();
+        facebookLogin = (LoginButton) findViewById(R.id.b_facebook);
+
+        facebookLogin.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                goHomeActivity();
+            }
+
+            @Override
+            public void onCancel() {
+                Toast.makeText(getApplicationContext(), R.string.cancel_login, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+                Toast.makeText(getApplicationContext(), R.string.error_login, Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        callbackManager.onActivityResult(requestCode, resultCode, data);
+    }
 
 
 
