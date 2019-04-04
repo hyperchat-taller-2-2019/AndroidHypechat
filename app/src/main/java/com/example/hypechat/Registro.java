@@ -23,7 +23,7 @@ public class Registro extends AppCompatActivity {
     private ProgressDialog progress;
 
     //CONSTANTES!!!
-    private final String URL_REGISTRO = "https://virtserver.swaggerhub.com/taller2-hypechat/Hypechat/1.0.0/registro";
+    private final String URL_REGISTRO = "https://secure-plateau-18239.herokuapp.com/registro";
     private final Integer REGISTRO_EXITOSO = 1;
 
 

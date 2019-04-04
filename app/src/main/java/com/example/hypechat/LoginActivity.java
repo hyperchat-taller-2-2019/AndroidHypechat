@@ -39,7 +39,7 @@ public class LoginActivity extends AppCompatActivity {
     private LoginButton facebookLogin;
 
     //ESTA DESPUES DEBERIA SER LA DIRECCION DE DONDE ESTE EL SERVER REAL Y EL ENDPOINT CORRESPONDIENTE!
-    private final String URL_LOGIN = "https://virtserver.swaggerhub.com/taller2-hypechat/Hypechat/1.0.0/login";
+    private final String URL_LOGIN = "https://secure-plateau-18239.herokuapp.com/login";
     private final String URL_LOGIN_FACE = "https://virtserver.swaggerhub.com/taller2-hypechat/Hypechat/1.0.0/logFacebook";
     private final Integer USUARIO_VALIDO = 1;
 
