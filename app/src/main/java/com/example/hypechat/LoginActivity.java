@@ -39,7 +39,8 @@ public class LoginActivity extends AppCompatActivity {
     private LoginButton facebookLogin;
 
     //ESTA DESPUES DEBERIA SER LA DIRECCION DE DONDE ESTE EL SERVER REAL Y EL ENDPOINT CORRESPONDIENTE!
-    private final String URL = "https://virtserver.swaggerhub.com/taller2-hypechat/Hypechat/1.0.0/login";
+    private final String URL_LOGIN = "https://virtserver.swaggerhub.com/taller2-hypechat/Hypechat/1.0.0/login";
+    private final String URL_LOGIN_FACE = "https://virtserver.swaggerhub.com/taller2-hypechat/Hypechat/1.0.0/logFacebook";
     private final Integer USUARIO_VALIDO = 1;
 
     public void login (View view){
@@ -65,32 +66,41 @@ public class LoginActivity extends AppCompatActivity {
                 Toast.makeText(this, except.getMessage(), Toast.LENGTH_SHORT).show();
             }
 
-            // SE PUEDE HACER EL REQUEST AL SERVER PARA LOGUEARSE !
-            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                    (Request.Method.POST, URL, requestBody, new Response.Listener<JSONObject>() {
+            JsonRequest_login(URL_LOGIN, requestBody);
 
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            progressDialog.dismiss();
-                            procesarResponse(response);
-                        }
-
-                    }, new Response.ErrorListener() {
-
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            progressDialog.dismiss();
-                            Toast.makeText(LoginActivity.this,
-                                    "No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
-
-                        }
-                    });
-
-            //Agrego la request a la cola para que se conecte con el server!
-            HttpConexionSingleton.getInstance(this).addToRequestQueue(jsonObjectRequest);
         }
 
 
+    }
+
+    public void JsonRequest_login(String URL, JSONObject requestBody) {
+        // SE PUEDE HACER EL REQUEST AL SERVER PARA LOGUEARSE !
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.POST, URL, requestBody, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        System.out.println("11111111111111/n");
+                        progressDialog.dismiss();
+                        System.out.println("HOlLAAAAAA/n");
+                        System.out.println(response);
+                        procesarResponse(response);
+
+                    }
+
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        progressDialog.dismiss();
+                        Toast.makeText(LoginActivity.this,
+                                "No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
+
+                    }
+                });
+
+        //Agrego la request a la cola para que se conecte con el server!
+        HttpConexionSingleton.getInstance(this).addToRequestQueue(jsonObjectRequest);
     }
 
     private void procesarResponse(JSONObject response) {
@@ -122,6 +132,27 @@ public class LoginActivity extends AppCompatActivity {
     private void goHomeActivity() {
         Intent intent = new Intent(this,HomeActivity.class);
         startActivity(intent);
+    }
+
+
+
+
+    public void loginConFacebook (){
+
+        this.progressDialog = ProgressDialog.show(this,"Hypechat","Validando datos...",
+                true);
+        JSONObject requestBody = new JSONObject();
+        try {
+            requestBody.put("token", AccessToken.getCurrentAccessToken().getToken());
+
+        }
+        catch(JSONException except){
+            Toast.makeText(this, except.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+
+        JsonRequest_login(URL_LOGIN_FACE,requestBody);
+
+
     }
 
     public void registro (View view){
@@ -157,11 +188,7 @@ public class LoginActivity extends AppCompatActivity {
         facebookLogin.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-                sharedEditor.putString("token", AccessToken.getCurrentAccessToken().getToken());
-                sharedEditor.apply();
-                if( AccessToken.getCurrentAccessToken() != null){
-                    goHomeActivity();;
-                }
+                loginConFacebook();
             }
 
             @Override
@@ -172,6 +199,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onError(FacebookException error) {
                 Toast.makeText(getApplicationContext(), error.toString(), Toast.LENGTH_SHORT).show();
+
             }
         });
 
