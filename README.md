@@ -6,5 +6,5 @@ Aplicación android desarrollada para la materia 75.52 "Taller de Programación 
 Autores:
 
 - Martins Forgan, Diego - dmforgan89@gmail.com
-- Perez, Victoria - 
+- Perez Bustos, Victoria - vickyperezbustos@gmail.com
 
