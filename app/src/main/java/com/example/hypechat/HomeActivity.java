@@ -26,9 +26,6 @@ public class HomeActivity extends AppCompatActivity {
         this.sharedEditor = sharedPref.edit();
 
 
-        sharedEditor.putString("token",AccessToken.getCurrentAccessToken().getToken());
-        sharedEditor.apply();
-
         //Obtengo datos de shared preferences para ponerlos en la vista del layout
         String nombre = this.sharedPref.getString("nombre","No Name");
         String apodo = this.sharedPref.getString("apodo","No NickName");
@@ -46,10 +43,7 @@ public class HomeActivity extends AppCompatActivity {
         tokenText.setText(token);
 
 
-        if( AccessToken.getCurrentAccessToken() == null){
 
-            goLoginScreen();
-        }
 
     }
 
