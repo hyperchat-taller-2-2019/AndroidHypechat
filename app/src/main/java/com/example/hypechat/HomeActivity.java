@@ -33,7 +33,7 @@ public class HomeActivity extends AppCompatActivity {
         String email = this.sharedPref.getString("email","No Email");
         String token = this.sharedPref.getString("token","No Token");
 
-        /*TextView nameText = (TextView) findViewById(R.id.nameText);
+        TextView nameText = (TextView) findViewById(R.id.nameText);
         TextView nickText = (TextView) findViewById(R.id.nickText);
         TextView emailText = (TextView) findViewById(R.id.emailText);
         TextView tokenText = (TextView) findViewById(R.id.tokenText);
@@ -41,7 +41,7 @@ public class HomeActivity extends AppCompatActivity {
         nameText.setText(nombre);
         nickText.setText(apodo);
         emailText.setText(email);
-        tokenText.setText(token);*/
+        tokenText.setText(token);
 
 
 
