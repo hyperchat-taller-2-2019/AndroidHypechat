@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
         <ImageView
-            android:src="@android:drawable/ic_menu_gallery"
+            android:src="@drawable/user"
             android:layout_width="96dp"
             android:layout_height="96dp"
             android:layout_gravity="center"
@@ -23,7 +23,8 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:layout_gravity="center_vertical"
-            android:text="Nombre"/>
+            android:text="Nombre"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"/>
 
     </LinearLayout>
 
