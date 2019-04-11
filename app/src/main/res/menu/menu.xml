@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item android:title="Organizaciones"
+            android:id="@+id/organizaciones"
+            android:icon="@drawable/ic_channel"></item>
+        <item android:title="Mensajes Privados"
+            android:id="@+id/msj_privados"
+            android:icon="@drawable/ic_message"></item>
+
+    </group>
+    <item android:title="Ajustes">
+        <menu>
+            <item android:title="Mi Perfil"
+                android:id="@+id/perfil"
+                android:icon="@drawable/ic_profile"></item>
+            <item android:title="Configuracion"
+                android:id="@+id/config"
+                android:icon="@drawable/ic_build"></item>
+        </menu>
+    </item>
+
+</menu>

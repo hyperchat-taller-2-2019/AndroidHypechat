@@ -6,8 +6,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.TextView;
-
 import com.facebook.login.LoginManager;
 
 public class HomeActivity extends AppCompatActivity {
@@ -42,6 +40,8 @@ public class HomeActivity extends AppCompatActivity {
         nickText.setText(apodo);
         emailText.setText(email);
         tokenText.setText(token);*/
+
+
 
 
 
