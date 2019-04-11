@@ -1,22 +1,18 @@
 package com.example.hypechat;
 
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
+import android.view.MenuItem;
 
-import com.facebook.login.LoginManager;
+public class HomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
-public class HomeActivity extends AppCompatActivity {
 
-    private SharedPreferences sharedPref;
-    private SharedPreferences.Editor sharedEditor;
     private DrawerLayout drawer;
 
     @Override
@@ -24,28 +20,7 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        //SharedPref para almacenar datos de sesión
-        this.sharedPref = getSharedPreferences(getString(R.string.saved_data), Context.MODE_PRIVATE);
-        this.sharedEditor = sharedPref.edit();
 
-
-
-
-        //Obtengo datos de shared preferences para ponerlos en la vista del layout
-        String nombre = this.sharedPref.getString("nombre","No Name");
-        String apodo = this.sharedPref.getString("apodo","No NickName");
-        String email = this.sharedPref.getString("email","No Email");
-        String token = this.sharedPref.getString("token","No Token");
-
-        /*TextView nameText = (TextView) findViewById(R.id.nameText);
-        TextView nickText = (TextView) findViewById(R.id.nickText);
-        TextView emailText = (TextView) findViewById(R.id.emailText);
-        TextView tokenText = (TextView) findViewById(R.id.tokenText);
-
-        nameText.setText(nombre);
-        nickText.setText(apodo);
-        emailText.setText(email);
-        tokenText.setText(token);*/
 
 
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -53,12 +28,41 @@ public class HomeActivity extends AppCompatActivity {
 
         drawer = findViewById(R.id.drawer_layout);
 
+
+        NavigationView navigationView = findViewById(R.id.navView);
+        navigationView.setNavigationItemSelectedListener(this);
+
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this,drawer,toolbar,R.string.navigation_drawer_open,R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
+        if(savedInstanceState == null){
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,new PPrincipal()).commit();
+            navigationView.setCheckedItem(R.id.pag_ppal);
+        }
 
 
+
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+        switch (menuItem.getItemId()){
+            case R.id.pag_ppal:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,new PPrincipal()).commit();
+                break;
+            case R.id.organizaciones:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,new Organizaciones()).commit();
+                break;
+            case R.id.msj_privados:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,new MensajesPrivados()).commit();
+                break;
+            case R.id.perfil:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,new Perfil()).commit();
+                break;
+        }
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
     }
 
     @Override
@@ -71,16 +75,7 @@ public class HomeActivity extends AppCompatActivity {
 
     }
 
-    private void goLoginScreen() {
 
-        Intent intent = new Intent(this, LoginActivity.class);
-        startActivity(intent);
-    }
-
-    public void logout(View view){
-        LoginManager.getInstance().logOut();
-        goLoginScreen();
-    }
 
 
 }

@@ -4,6 +4,9 @@
     tools:showIn="navigation_view">
 
     <group android:checkableBehavior="single">
+        <item android:title="Pagina principal"
+            android:id="@+id/pag_ppal"
+            android:icon="@drawable/ic_home"></item>
         <item android:title="Organizaciones"
             android:id="@+id/organizaciones"
             android:icon="@drawable/ic_channel"></item>
