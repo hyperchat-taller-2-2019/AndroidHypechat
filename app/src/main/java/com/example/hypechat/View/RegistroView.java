@@ -1,4 +1,4 @@
-package com.example.hypechat;
+package com.example.hypechat.View;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -8,7 +8,11 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-public class RegistroView extends AppCompatActivity implements Registro.View{
+import com.example.hypechat.R;
+import com.example.hypechat.Model.Registro;
+import com.example.hypechat.Presenter.RegistroPresenter;
+
+public class RegistroView extends AppCompatActivity implements Registro.View {
 
     private EditText textName, textDisplayName, textEmail, textPass;
     private ProgressDialog progress;
@@ -45,7 +49,7 @@ public class RegistroView extends AppCompatActivity implements Registro.View{
 
     @Override
     public void showHome() {
-        Intent intent = new Intent(this,HomeActivity.class);
+        Intent intent = new Intent(this, HomeActivity.class);
         startActivity(intent);
     }
 

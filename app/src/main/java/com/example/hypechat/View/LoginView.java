@@ -1,4 +1,4 @@
-package com.example.hypechat;
+package com.example.hypechat.View;
 
 
 import android.app.ProgressDialog;
@@ -12,6 +12,9 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.hypechat.Model.Login;
+import com.example.hypechat.Presenter.LoginPresenter;
+import com.example.hypechat.R;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
@@ -19,7 +22,7 @@ import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
 
-public class LoginView extends AppCompatActivity implements Login.View{
+public class LoginView extends AppCompatActivity implements Login.View {
 
     private EditText textoEmail;
     private EditText textoPassword;
@@ -48,7 +51,7 @@ public class LoginView extends AppCompatActivity implements Login.View{
 
 
     private void goHomeActivity() {
-        Intent intent = new Intent(this,HomeActivity.class);
+        Intent intent = new Intent(this, HomeActivity.class);
         startActivity(intent);
     }
 

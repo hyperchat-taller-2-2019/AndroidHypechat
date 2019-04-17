@@ -1,4 +1,4 @@
-package com.example.hypechat;
+package com.example.hypechat.Model;
 
 public class ValidadorDeCampos {
 
@@ -6,7 +6,7 @@ public class ValidadorDeCampos {
 
 
 
-    public boolean isValidName(String name,ErrorMsg error) {
+    public boolean isValidName(String name, ErrorMsg error) {
         if (name.isEmpty()){
             error.showErrorMgs("Olvidó completar su Nombre !");
             return false;

@@ -1,8 +1,12 @@
-package com.example.hypechat;
+package com.example.hypechat.Presenter;
 
 import android.content.Context;
 
-public class RegistroPresenter implements Registro.Presenter{
+import com.example.hypechat.Model.Registro;
+import com.example.hypechat.Model.RegistroModel;
+import com.example.hypechat.View.RegistroView;
+
+public class RegistroPresenter implements Registro.Presenter {
 
     private RegistroView view;
     private RegistroModel model;

@@ -1,4 +1,4 @@
-package com.example.hypechat;
+package com.example.hypechat.Model;
 
 import android.content.Context;
 import android.graphics.Bitmap;

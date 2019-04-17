@@ -1,6 +1,10 @@
-package com.example.hypechat;
+package com.example.hypechat.Presenter;
 
 import android.content.Context;
+
+import com.example.hypechat.Model.Login;
+import com.example.hypechat.Model.LoginModel;
+import com.example.hypechat.View.LoginView;
 
 public class LoginPresenter implements Login.Presenter {
 

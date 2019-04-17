@@ -1,4 +1,4 @@
-package com.example.hypechat;
+package com.example.hypechat.Model;
 
 import android.content.Context;
 
@@ -13,7 +13,7 @@ public interface Login {
         void guardarDato(String nombre, String dato);
     }
 
-    interface Presenter extends ErrorMsg{
+    interface Presenter extends ErrorMsg {
         void showHome();
         void showErrorMgs(String error);
         void login(String email, String password,Context ctx);

@@ -6,7 +6,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:fitsSystemWindows="true"
     android:id="@+id/drawer_layout"
-    tools:context="com.example.hypechat.HomeActivity"
+    tools:context="com.example.hypechat.View.HomeActivity"
     tools:openDrawer="start">
 
     <LinearLayout

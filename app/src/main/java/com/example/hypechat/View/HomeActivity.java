@@ -1,4 +1,4 @@
-package com.example.hypechat;
+package com.example.hypechat.View;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -14,6 +14,7 @@ import com.example.hypechat.Fragments.MensajesPrivados;
 import com.example.hypechat.Fragments.Organizaciones;
 import com.example.hypechat.Fragments.PPrincipal;
 import com.example.hypechat.Fragments.Perfil;
+import com.example.hypechat.R;
 
 public class HomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 

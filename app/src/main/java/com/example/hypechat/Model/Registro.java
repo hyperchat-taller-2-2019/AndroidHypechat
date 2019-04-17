@@ -1,4 +1,4 @@
-package com.example.hypechat;
+package com.example.hypechat.Model;
 
 import android.content.Context;
 
@@ -11,7 +11,7 @@ public interface Registro {
         void limpiarProcessDialog();
     }
 
-    interface Presenter extends ErrorMsg{
+    interface Presenter extends ErrorMsg {
         void registrarUsuario(String nombre, String apodo, String email, String contraseña, Context ctx);
         void showErrorMgs(String error);
         void mostrarProcessDialog(String titulo, String mensaje);

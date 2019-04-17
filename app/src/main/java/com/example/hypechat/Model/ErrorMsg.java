@@ -1,4 +1,4 @@
-package com.example.hypechat;
+package com.example.hypechat.Model;
 
 interface ErrorMsg {
 
