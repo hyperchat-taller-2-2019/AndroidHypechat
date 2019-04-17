@@ -10,6 +10,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
+import com.example.hypechat.Fragments.MensajesPrivados;
+import com.example.hypechat.Fragments.Organizaciones;
+import com.example.hypechat.Fragments.PPrincipal;
+import com.example.hypechat.Fragments.Perfil;
+
 public class HomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
 

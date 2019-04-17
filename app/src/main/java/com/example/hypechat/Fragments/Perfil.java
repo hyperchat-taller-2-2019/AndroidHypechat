@@ -1,4 +1,4 @@
-package com.example.hypechat;
+package com.example.hypechat.Fragments;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -8,12 +8,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class MensajesPrivados extends Fragment {
+import com.example.hypechat.R;
+
+public class Perfil extends Fragment {
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.mensajes_privados,container,false);
+        return inflater.inflate(R.layout.perfil,container,false);
 
     }
 }

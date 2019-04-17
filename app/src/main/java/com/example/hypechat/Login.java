@@ -2,25 +2,29 @@ package com.example.hypechat;
 
 import android.content.Context;
 
-public interface Registro {
+public interface Login {
+
 
     interface View{
         void showHome();
         void showErrorMgs(String error);
         void mostrarProcessDialog(String titulo, String mensaje);
         void limpiarProcessDialog();
+        void guardarDato(String nombre, String dato);
     }
 
     interface Presenter extends ErrorMsg{
-        void registrarUsuario(String nombre, String apodo, String email, String contraseña, Context ctx);
+        void showHome();
         void showErrorMgs(String error);
+        void login(String email, String password,Context ctx);
         void mostrarProcessDialog(String titulo, String mensaje);
         void limpiarProcessDialog();
-        void showHome();
-
+        void loginConFacebook(Context ctx);
+        void guardarDato(String nombre, String dato);
     }
 
     interface Model{
-        void registrarUsuario(String nombre, String apodo, String email, String contraseña, Context ctx);
+        void login(String email, String password,Context ctx);
+        void loginConFacebook(Context ctx);
     }
 }
