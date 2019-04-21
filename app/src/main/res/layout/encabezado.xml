@@ -19,12 +19,13 @@
             android:layout_marginBottom="10dp"/>
 
         <TextView
+            android:id="@+id/header_user_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
             android:layout_gravity="center_vertical"
+            android:gravity="center"
             android:text="Nombre"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1"/>
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
     </LinearLayout>
 
