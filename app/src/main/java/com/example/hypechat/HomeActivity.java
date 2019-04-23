@@ -5,19 +5,23 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 
 public class HomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
 
     private DrawerLayout drawer;
+    private NavigationView navigationView;
     private View header;
     private SharedPreferences sharedPref;
     private SharedPreferences.Editor sharedEditor;
@@ -38,8 +42,8 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         drawer = findViewById(R.id.drawer_layout);
 
 
-        NavigationView navigationView = findViewById(R.id.navView);
-        navigationView.setNavigationItemSelectedListener(this);
+        this.navigationView = findViewById(R.id.navView);
+        this.navigationView.setNavigationItemSelectedListener(this);
 
         //Setea el header de la navigation bar para que tenga el nombre de usuario (podria ser apodo o mail)
         this.header = navigationView.getHeaderView(0);
@@ -54,30 +58,46 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,new PPrincipal()).commit();
             navigationView.setCheckedItem(R.id.pag_ppal);
         }
-
-
-
     }
 
     @Override
+    //"Configuraciones" y "Mi perfil" no muestran la opcion seleccionada en el navigationview
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         switch (menuItem.getItemId()){
             case R.id.pag_ppal:
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,new PPrincipal()).commit();
+                this.navigationView.setCheckedItem(R.id.pag_ppal);
                 break;
             case R.id.organizaciones:
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,new Organizaciones()).commit();
+                this.navigationView.setCheckedItem(R.id.organizaciones);
                 break;
             case R.id.msj_privados:
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,new MensajesPrivados()).commit();
+                this.navigationView.setCheckedItem(R.id.msj_privados);
                 break;
             case R.id.perfil:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,new Perfil()).commit();
+                setProfileFragment();
+                this.navigationView.setCheckedItem(R.id.perfil);
                 break;
         }
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+    private void setProfileFragment() {
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,new Perfil()).commit();
+        //Linea clave para que el fragmento termine de ponerse si o si en la activity y poder editarla!
+        getSupportFragmentManager().executePendingTransactions();
+
+
+        //Me traigo el fragmento sabiendo que es el de perfil para cargarle la información
+        Perfil perfil = (Perfil) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        perfil.completarDatosPerfil(this.sharedPref.getString("nombre","no name"),this.sharedPref.getString("apodo","no nickname"),
+                this.sharedPref.getString("email", "no email"),this.sharedPref.getString("contraseña","no password"));
+
+    }
+
 
     @Override
     public void onBackPressed() {
