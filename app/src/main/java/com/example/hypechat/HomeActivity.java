@@ -5,16 +5,13 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.TextView;
 
 public class HomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -96,6 +93,10 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         perfil.completarDatosPerfil(this.sharedPref.getString("nombre","no name"),this.sharedPref.getString("apodo","no nickname"),
                 this.sharedPref.getString("email", "no email"),this.sharedPref.getString("contraseña","no password"));
 
+    }
+
+    public void irAMiPerfil(View view){
+        this.setProfileFragment();
     }
 
 
