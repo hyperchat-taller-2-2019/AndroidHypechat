@@ -58,12 +58,27 @@ public class Perfil extends Fragment {
         this.setNombrePerfil(nombre);
         this.setApodoPerfil(apodo);
         this.setEmailPerfil(email);
+
         if (soy_yo){
             mostrarBotones();
+            setEditTextNormales();
         }
         else{
             ocultarBotones();
+            setearEditTextComoNoEditables();
         }
+    }
+
+    private void setearEditTextComoNoEditables() {
+        this.nombre_perfil.setEnabled(false);
+        this.apodo_perfil.setEnabled(false);
+        this.email_perfil.setEnabled(false);
+    }
+
+    private void setEditTextNormales() {
+        this.nombre_perfil.setEnabled(true);
+        this.apodo_perfil.setEnabled(true);
+        this.email_perfil.setEnabled(true);
     }
 
     private void mostrarBotones() {
