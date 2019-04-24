@@ -94,15 +94,15 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                 this.navigationView.setCheckedItem(R.id.msj_privados);
                 break;
             case R.id.perfil:
-                goToProfile();
+                goToProfile(this.sharedPref.getString("email","no email"));
                 break;
         }
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
-    private void goToProfile() {
-        getProfileData(this.sharedPref.getString("email","no email"));
+    private void goToProfile(String email_del_perfil) {
+        getProfileData(email_del_perfil);
         this.navigationView.setCheckedItem(R.id.perfil);
     }
 
@@ -122,7 +122,6 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                         //Por ahora siempre busca los datos en la base y siempre los guarda en SharedPref para
                         //armar la vista en "setProfileFragment()"
                         procesarDatosDeUsuarioRecibidos(response);
-                        setProfileFragment();
                     }
 
                 }, new Response.ErrorListener() {
@@ -139,18 +138,31 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     private void procesarDatosDeUsuarioRecibidos(JSONObject response) {
         try {
             Log.i("INFO",response.toString());
-            this.sharedEditor.putString("email", response.getString("email"));
-            this.sharedEditor.putString("nombre", response.getString("nombre"));
-            this.sharedEditor.putString("apodo", response.getString("apodo"));
-            this.sharedEditor.putString("foto", response.getString("foto"));
-            this.sharedEditor.apply();
+            String email = this.sharedPref.getString("email","");
+            String nombre = this.sharedPref.getString("nombre","");
+            String apodo = this.sharedPref.getString("apodo","");
+            String contraseña = this.sharedPref.getString("contraseña","");
+            Boolean soy_yo = false;
+
+            if (response.getString("email").equals(email)){
+                Log.i("INFO","Consultas tu perfil!");
+                soy_yo = true;
+            }
+            else{
+                Log.i("INFO", "perfil de otro usuario");
+                email = response.getString("email");
+                nombre = response.getString("nombre");
+                apodo = response.getString("apodo");
+            }
+
+            setProfileFragment(nombre,apodo,email,contraseña,soy_yo);
         }
         catch (JSONException exception){
             Toast.makeText(this, exception.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 
-    private void setProfileFragment() {
+    private void setProfileFragment(String nombre, String apodo, String email, String contrasenia,Boolean soy_yo) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.fragment_container,new Perfil());
@@ -162,13 +174,12 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
         //Me traigo el fragmento sabiendo que es el de perfil para cargarle la información
         Perfil perfil = (Perfil) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-        perfil.completarDatosPerfil(this.sharedPref.getString("nombre","no name"),this.sharedPref.getString("apodo","no nickname"),
-                this.sharedPref.getString("email", "no email"),this.sharedPref.getString("contraseña","no password"));
+        perfil.completarDatosPerfil(nombre,apodo,email,contrasenia,soy_yo);
 
     }
 
     public void irAMiPerfil(View view){
-        this.goToProfile();
+        this.goToProfile(this.sharedPref.getString("email","no email"));
     }
 
 

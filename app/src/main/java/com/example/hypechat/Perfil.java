@@ -18,6 +18,7 @@ public class Perfil extends Fragment {
     private View vista;
 
     private EditText nombre_perfil, apodo_perfil, email_perfil, contraseña_perfil;
+    private Button cambiarContraseña, modificarPerfil;
 
     @Nullable
     @Override
@@ -25,11 +26,21 @@ public class Perfil extends Fragment {
 
         View view = inflater.inflate(R.layout.perfil,container,false);
 
-        Button modificar = (Button)view.findViewById(R.id.boton_modificar_perfil);
-        modificar.setOnClickListener(new View.OnClickListener() {
+        modificarPerfil = (Button)view.findViewById(R.id.boton_modificar_perfil);
+        cambiarContraseña = (Button) view.findViewById(R.id.boton_cambiar_contraseña);
+
+        modificarPerfil.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i("INFO","Apretaste el boton");
+                Log.i("INFO","Apretaste para modificar perfil");
+
+            }
+        });
+
+        cambiarContraseña.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i("INFO","Apretaste para cambiar contraseña");
             }
         });
 
@@ -37,22 +48,32 @@ public class Perfil extends Fragment {
         this.nombre_perfil = (EditText) view.findViewById(R.id.nombre_perfil);
         this.apodo_perfil = (EditText) view.findViewById(R.id.apodo_perfil);
         this.email_perfil = (EditText) view.findViewById(R.id.email_perfil);
-        this.contraseña_perfil = (EditText) view.findViewById(R.id.contraseña_perfil);
-
+        //this.contraseña_perfil = (EditText) view.findViewById(R.id.contraseña_perfil);
 
         return view;
 
     }
 
-    public void completarDatosPerfil(String nombre, String apodo, String email, String contraseña){
+    public void completarDatosPerfil(String nombre, String apodo, String email, String contraseña, Boolean  soy_yo){
         this.setNombrePerfil(nombre);
         this.setApodoPerfil(apodo);
         this.setEmailPerfil(email);
-        this.setContraseñaPerfil(contraseña);
+        if (soy_yo){
+            mostrarBotones();
+        }
+        else{
+            ocultarBotones();
+        }
     }
 
-    private void setContraseñaPerfil(String contraseña) {
-        this.contraseña_perfil.setText(contraseña);
+    private void mostrarBotones() {
+        this.modificarPerfil.setVisibility(View.VISIBLE);
+        this.cambiarContraseña.setVisibility(View.VISIBLE);
+    }
+
+    private void ocultarBotones() {
+        this.modificarPerfil.setVisibility(View.GONE);
+        this.cambiarContraseña.setVisibility(View.GONE);
     }
 
     private void setEmailPerfil(String email) {
