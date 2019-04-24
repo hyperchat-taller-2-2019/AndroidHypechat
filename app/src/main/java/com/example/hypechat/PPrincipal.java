@@ -17,28 +17,7 @@ public class PPrincipal extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        //SharedPref para almacenar datos de sesión
-       // this.sharedPref = getSharedPreferences(getString(R.string.saved_data), Context.MODE_PRIVATE);
-        //this.sharedEditor = sharedPref.edit();
 
-
-
-
-        //Obtengo datos de shared preferences para ponerlos en la vista del layout
-       // String nombre = this.sharedPref.getString("nombre","No Name");
-        //String apodo = this.sharedPref.getString("apodo","No NickName");
-        //String email = this.sharedPref.getString("email","No Email");
-        //String token = this.sharedPref.getString("token","No Token");
-
-        /*TextView nameText = (TextView) findViewById(R.id.nameText);
-        TextView nickText = (TextView) findViewById(R.id.nickText);
-        TextView emailText = (TextView) findViewById(R.id.emailText);
-        TextView tokenText = (TextView) findViewById(R.id.tokenText);
-
-        nameText.setText(nombre);
-        nickText.setText(apodo);
-        emailText.setText(email);
-        tokenText.setText(token);*/
         return inflater.inflate(R.layout.pag_ppal,container,false);
 
     }

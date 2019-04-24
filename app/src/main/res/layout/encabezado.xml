@@ -2,8 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="200dp"
+    android:background="@color/colorBar"
     android:gravity="bottom"
-    android:background="@color/colorPrimary"
     android:orientation="vertical"
     android:padding="16dp">
 
@@ -11,23 +11,24 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
+
         <ImageView
-            android:src="@drawable/user"
             android:layout_width="96dp"
             android:layout_height="96dp"
             android:layout_gravity="center"
-            android:layout_marginBottom="10dp"/>
+            android:layout_marginBottom="10dp"
+            android:src="@drawable/user" />
 
         <TextView
+            android:id="@+id/header_user_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
             android:layout_gravity="center_vertical"
+            android:gravity="center"
             android:text="Nombre"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1"/>
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
     </LinearLayout>
 
 
-    
 </LinearLayout>

@@ -60,7 +60,7 @@ public class LoginActivity extends AppCompatActivity {
             JSONObject requestBody = new JSONObject();
             try {
                 requestBody.put("email", email);
-                requestBody.put("contraseña", password);
+                requestBody.put("psw", password);
             }
             catch(JSONException except){
                 Toast.makeText(this, except.getMessage(), Toast.LENGTH_SHORT).show();
@@ -106,6 +106,7 @@ public class LoginActivity extends AppCompatActivity {
     private void procesarResponse(JSONObject response) {
         try{
             //Usuario valido?
+            Log.i("INFO",response.toString());
             if (response.getInt("valido") == USUARIO_VALIDO){
                 String token_response = response.getString("token");
                 String apodo_response = response.getString("apodo");
@@ -124,6 +125,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         }
         catch (JSONException error){
+            Log.i("INFO",error.getMessage());
             Toast.makeText(LoginActivity.this,
                     "Hubo un error con el Json de Respuesta", Toast.LENGTH_SHORT).show();;
         }

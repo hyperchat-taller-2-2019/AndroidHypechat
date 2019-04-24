@@ -150,6 +150,7 @@
                             android:id="@+id/imageView15"
                             android:layout_width="wrap_content"
                             android:layout_height="82dp"
+                            android:onClick="irAMiPerfil"
                             app:srcCompat="@drawable/profile" />
 
                         <TextView
