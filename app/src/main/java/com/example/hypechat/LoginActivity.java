@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -75,14 +76,16 @@ public class LoginActivity extends AppCompatActivity {
 
     public void JsonRequest_login(String URL, JSONObject requestBody) {
         // SE PUEDE HACER EL REQUEST AL SERVER PARA LOGUEARSE !
+        Log.i("INFO", "Json Request login, check http status codes");
+
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.POST, URL, requestBody, new Response.Listener<JSONObject>() {
 
                     @Override
                     public void onResponse(JSONObject response) {
-                        System.out.println("11111111111111/n");
+                        System.out.println("11111111111111\n");
                         progressDialog.dismiss();
-                        System.out.println("HOlLAAAAAA/n");
+                        System.out.println("HOlLAAAAAA\n");
                         System.out.println(response);
                         procesarResponse(response);
 
@@ -93,6 +96,8 @@ public class LoginActivity extends AppCompatActivity {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         progressDialog.dismiss();
+                        System.out.println("ERRORRRRR>\n");
+                        System.out.println(error.networkResponse.statusCode);
                         Toast.makeText(LoginActivity.this,
                                 "No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
 
@@ -107,7 +112,7 @@ public class LoginActivity extends AppCompatActivity {
         try{
             //Usuario valido?
             Log.i("INFO",response.toString());
-            if (response.getInt("valido") == USUARIO_VALIDO){
+            if ((response.getInt("valido") == USUARIO_VALIDO)){
                 String token_response = response.getString("token");
                 String apodo_response = response.getString("apodo");
                 String nombre_response = response.getString("nombre");

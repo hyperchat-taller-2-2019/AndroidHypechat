@@ -23,7 +23,7 @@ public class Registro extends AppCompatActivity {
     private ProgressDialog progress;
 
     //CONSTANTES!!!
-    private final String URL_REGISTRO = "https://secure-plateau-18239.herokuapp.com/registro";
+    private final String URL_REGISTRO = "https://secure-plateau-18239.herokuapp.com/signup";
     private final Integer REGISTRO_EXITOSO = 1;
 
 
@@ -71,6 +71,8 @@ public class Registro extends AppCompatActivity {
 
                         @Override
                         public void onResponse(JSONObject response) {
+                            System.out.println("REGISTRO HOlLAAAAAA\n");
+                            System.out.println(response);
                             progress.dismiss();
                             procesarResponseDeRegistro(response);
                         }
