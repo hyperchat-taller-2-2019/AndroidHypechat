@@ -85,7 +85,7 @@ public class LoginActivity extends AppCompatActivity {
                     public void onResponse(JSONObject response) {
                         System.out.println("11111111111111\n");
                         progressDialog.dismiss();
-                        System.out.println("HOlLAAAAAA\n");
+
                         System.out.println(response);
                         procesarResponse(response);
 
@@ -96,11 +96,19 @@ public class LoginActivity extends AppCompatActivity {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         progressDialog.dismiss();
-                        System.out.println("ERRORRRRR>\n");
-                        System.out.println(error.networkResponse.statusCode);
-                        Toast.makeText(LoginActivity.this,
-                                "No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
 
+                        switch (error.networkResponse.statusCode){
+                            case (400):
+                                Toast.makeText(LoginActivity.this,
+                                        "Usuario o Contraseña Invalidos!", Toast.LENGTH_LONG).show();
+                            case (500):
+                                Toast.makeText(LoginActivity.this,
+                                        "Server error!", Toast.LENGTH_LONG).show();
+                            case (404):
+                                Toast.makeText(LoginActivity.this,
+                                        "No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
+
+                        }
                     }
                 });
 
@@ -112,22 +120,21 @@ public class LoginActivity extends AppCompatActivity {
         try{
             //Usuario valido?
             Log.i("INFO",response.toString());
-            if ((response.getInt("valido") == USUARIO_VALIDO)){
-                String token_response = response.getString("token");
-                String apodo_response = response.getString("apodo");
-                String nombre_response = response.getString("nombre");
-                String email_response = response.getString("email");
-                sharedEditor.putString("apodo",apodo_response);
-                sharedEditor.putString("nombre",nombre_response);
-                sharedEditor.putString("email",email_response);
-                sharedEditor.putString("token",token_response);
-                sharedEditor.apply();
-                goHomeActivity();
-            }
-            else{
-                Toast.makeText(LoginActivity.this,
-                        "Usuario o Contraseña Invalidos!", Toast.LENGTH_LONG).show();
-            }
+
+            String token_response = response.getString("token");
+            //String apodo_response = response.getString("nickname");
+            String nombre_response = response.getString("name");
+            String email_response = response.getString("email");
+           // String photo_url_response = response.getString("photo");
+            //sharedEditor.putString("apodo",apodo_response);
+            sharedEditor.putString("nombre",nombre_response);
+            sharedEditor.putString("email",email_response);
+            sharedEditor.putString("token",token_response);
+            //sharedEditor.putString("foto",photo_url_response);
+
+            sharedEditor.apply();
+            goHomeActivity();
+
         }
         catch (JSONException error){
             Log.i("INFO",error.getMessage());
