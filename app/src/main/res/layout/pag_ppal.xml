@@ -91,7 +91,8 @@
                             android:layout_height="82dp"
                             android:contentDescription="Crea un canal"
                             android:layout_weight="1"
-                            app:srcCompat="@drawable/add" />
+                            app:srcCompat="@drawable/add"
+                            android:onClick="crear_canal"/>
 
                         <TextView
                             android:id="@+id/textView13"
@@ -116,7 +117,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="82dp"
                             android:layout_weight="1"
-                            app:srcCompat="@drawable/chat" />
+                            app:srcCompat="@drawable/chat"
+                            android:onClick="ver_canales"/>
 
                         <TextView
                             android:id="@+id/textView14"

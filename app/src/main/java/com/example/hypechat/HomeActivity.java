@@ -183,6 +183,29 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     }
 
 
+    public void crear_canal(View view){
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_container,new CrearOrganizacion());
+        //Esta es la linea clave para que vuelva al fragmento anterior!
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
+        //Linea clave para que el fragmento termine de ponerse si o si en la activity y poder editarla!
+        fragmentManager.executePendingTransactions();
+
+    }
+
+    public void ver_canales(View view){
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_container,new Organizaciones());
+        //Esta es la linea clave para que vuelva al fragmento anterior!
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
+        //Linea clave para que el fragmento termine de ponerse si o si en la activity y poder editarla!
+        fragmentManager.executePendingTransactions();
+    }
+
     @Override
     public void onBackPressed() {
         if(drawer.isDrawerOpen(GravityCompat.START)){
