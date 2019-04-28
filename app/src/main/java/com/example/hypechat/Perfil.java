@@ -1,6 +1,7 @@
 package com.example.hypechat;
 
 
+import android.app.Dialog;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -11,6 +12,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.Toast;
 
 
 public class Perfil extends Fragment {
@@ -19,6 +22,9 @@ public class Perfil extends Fragment {
 
     private EditText nombre_perfil, apodo_perfil, email_perfil, contraseña_perfil;
     private Button cambiarContraseña, modificarPerfil;
+    private Dialog dialog_cambiar_psw;
+    private ValidadorDeCampos validador;
+    private String password;
 
     @Nullable
     @Override
@@ -26,6 +32,7 @@ public class Perfil extends Fragment {
 
         View view = inflater.inflate(R.layout.perfil,container,false);
 
+        dialog_cambiar_psw = new Dialog(getActivity());
         modificarPerfil = (Button)view.findViewById(R.id.boton_modificar_perfil);
         cambiarContraseña = (Button) view.findViewById(R.id.boton_cambiar_contraseña);
 
@@ -37,10 +44,49 @@ public class Perfil extends Fragment {
             }
         });
 
+        validador = new ValidadorDeCampos();
+
         cambiarContraseña.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.i("INFO","Apretaste para cambiar contraseña");
+                dialog_cambiar_psw.setContentView(R.layout.popup_cambiar_password);
+
+                Button b_cambiar_contrasenia = (Button) dialog_cambiar_psw.findViewById(R.id.aceptar_cambio_contrasenia);
+                ImageView b_cancelar_cambio = (ImageView) dialog_cambiar_psw.findViewById(R.id.boton_cancelar_cambio_contrasenia);
+
+                final EditText pass_viejo = (EditText) dialog_cambiar_psw.findViewById(R.id.et_password_viejo);
+                final EditText pass_nuevo = (EditText) dialog_cambiar_psw.findViewById(R.id.et_password_nuevo);
+                final EditText pass_nuevo_bis = (EditText) dialog_cambiar_psw.findViewById(R.id.et_password_nuevo_bis);
+
+                b_cancelar_cambio.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog_cambiar_psw.dismiss();
+                    }
+                });
+
+                b_cambiar_contrasenia.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Log.i("INFO: ", "Validando que los datos sean correctos!");
+                        Log.i("INFO:", "passwordActual:" + password);
+                        Log.i("INFO:", "passwordActualInsertado:" + pass_viejo.getText().toString());
+                        Log.i("INFO:", "passwordNuevoInsertado:" + pass_nuevo.getText().toString());
+                        Log.i("INFO:", "passwordNuevoRepetido:" + pass_nuevo_bis.getText().toString());
+                        if (validador.isValidPasswordChange(password,pass_viejo.getText().toString(),pass_nuevo.getText().toString(),pass_nuevo_bis.getText().toString(), getActivity())){
+
+                            Log.i("INFO: ", "Los datos son correctos!");
+                            Log.i("TO DO","hacer el request para cambiar el password!");
+
+                            Toast.makeText(getActivity(), "La contraseña ha sido modificada con Exito!", Toast.LENGTH_LONG).show();
+                            dialog_cambiar_psw.dismiss();
+                        }
+                    }
+                });
+
+
+                dialog_cambiar_psw.show();
             }
         });
 
@@ -48,7 +94,7 @@ public class Perfil extends Fragment {
         this.nombre_perfil = (EditText) view.findViewById(R.id.nombre_perfil);
         this.apodo_perfil = (EditText) view.findViewById(R.id.apodo_perfil);
         this.email_perfil = (EditText) view.findViewById(R.id.email_perfil);
-        //this.contraseña_perfil = (EditText) view.findViewById(R.id.contraseña_perfil);
+
 
         return view;
 
@@ -58,6 +104,7 @@ public class Perfil extends Fragment {
         this.setNombrePerfil(nombre);
         this.setApodoPerfil(apodo);
         this.setEmailPerfil(email);
+        this.password = contraseña;
 
         if (soy_yo){
             mostrarBotones();
