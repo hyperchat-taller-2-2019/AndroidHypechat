@@ -1,6 +1,5 @@
 package com.example.hypechat;
 
-import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -13,32 +12,45 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
-public class CrearOrganizacion extends Fragment {
+public class AgregarUsuarioOrganizacion extends Fragment {
 
-    private EditText textName;
-    private ValidadorDeCampos validador;
-    private ProgressDialog progress;
-    private Button crearOrganizacion;
+
+    private Button agregarUser;
+    private Button finalizar;
+    private EditText email;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         //return inflater.inflate(R.layout.organizaciones,container,false);
-        View view = inflater.inflate(R.layout.activity_crear_organizacion,container,false);
+        View view = inflater.inflate(R.layout.activity_add_users,container,false);
 
+        this.email = (EditText) view.findViewById(R.id.edit_email);
 
-        crearOrganizacion = (Button)view.findViewById(R.id.button_crearOrg_siguiente);
+        agregarUser = (Button)view.findViewById(R.id.r_invitar_usuario);
 
-        crearOrganizacion.setOnClickListener(new View.OnClickListener() {
+        agregarUser.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i("INFO","Apretaste para crear una organizacion");
-                //Intent launchactivity = new Intent(getActivity(),CrearOrganizacion.class);
-                //startActivity(launchactivity);
+                Log.i("INFO","Agregaste un nuevo usuario");
+                email.getText().clear();
+                Toast.makeText(getActivity(), "Usuario Agregado con exito.", Toast.LENGTH_LONG).show();
+
+
+            }
+        });
+
+        finalizar = (Button)view.findViewById(R.id.r_finalizar_creacion_organizacion);
+
+        finalizar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i("INFO","Finaliza la actividad de agregar usuarios.");
                 FragmentManager fragmentManager = getFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.fragment_container,new AgregarUsuarioOrganizacion());
+                fragmentTransaction.replace(R.id.fragment_container,new Organizaciones());
                 //Esta es la linea clave para que vuelva al fragmento anterior!
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();
@@ -52,6 +64,5 @@ public class CrearOrganizacion extends Fragment {
         return view;
 
     }
-
 
 }

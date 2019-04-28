@@ -128,7 +128,7 @@
             android:textSize="20sp"/>
 
         <Button
-            android:id="@+id/r_registro"
+            android:id="@+id/button_crearOrg_siguiente"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:layout_weight="10"
@@ -136,7 +136,6 @@
             android:layout_marginTop="20dp"
             android:background="@color/colorAzul"
             android:gravity="center"
-            android:onClick="crear_org"
             android:text="Siguiente"
             android:textColor="@android:color/background_dark" />
 
