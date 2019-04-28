@@ -22,7 +22,7 @@ public class Organizaciones extends Fragment {
         //return inflater.inflate(R.layout.organizaciones,container,false);
         View view = inflater.inflate(R.layout.organizaciones,container,false);
 
-        crearOrganizacion = (Button)view.findViewById(R.id.boton_addCanal);
+        crearOrganizacion = (Button)view.findViewById(R.id.boton_addOrganizacion);
 
         crearOrganizacion.setOnClickListener(new View.OnClickListener() {
             @Override

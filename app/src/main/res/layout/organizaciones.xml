@@ -53,15 +53,15 @@
                 android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
 
             <Button
-                android:id="@+id/boton_addCanal"
+                android:id="@+id/boton_addOrganizacion"
                 android:layout_height="50dp"
                 android:layout_width="250dp"
-                android:gravity="center_horizontal"
-                android:text= "Crear un Canal"
+                android:gravity="center_vertical"
+                android:text= " Nueva Organizacion"
                 android:padding="10dp"
                 app:fontFamily="sans-serif-smallcaps"
                 android:drawableLeft="@drawable/ic_add"
-                android:textSize="20sp"
+                android:textSize="18sp"
                 android:layout_marginTop="20dp"
                 android:background="@color/colorBar"
                 android:elevation="10dp"/>
