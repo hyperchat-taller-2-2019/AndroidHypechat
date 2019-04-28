@@ -23,7 +23,7 @@ public class Registro extends AppCompatActivity {
     private ProgressDialog progress;
 
     //CONSTANTES!!!
-    private final String URL_REGISTRO = "https://secure-plateau-18239.herokuapp.com/signup";
+    private final String URL_REGISTRO = "https://secure-plateau-18239.herokuapp.com/signUp";
     private final Integer REGISTRO_EXITOSO = 1;
 
 
@@ -56,10 +56,10 @@ public class Registro extends AppCompatActivity {
             //ARMO BODY DEL REQUEST POST
             JSONObject requestBody = new JSONObject();
             try{
-                requestBody.put("nombre",nombre);
-                requestBody.put("apodo",apodo);
+                requestBody.put("name",nombre);
+                requestBody.put("nickname",apodo);
                 requestBody.put("email",email);
-                requestBody.put("contraseña",contraseña);
+                requestBody.put("psw",contraseña);
             }
             catch (JSONException except){
                 Toast.makeText(this, except.getMessage(), Toast.LENGTH_SHORT).show();
@@ -82,8 +82,15 @@ public class Registro extends AppCompatActivity {
                         @Override
                         public void onErrorResponse(VolleyError error) {
                             progress.dismiss();
-                            Toast.makeText(Registro.this,
-                                    "No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
+                            switch (error.networkResponse.statusCode){
+                                case (400):
+                                    Toast.makeText(Registro.this,
+                                            "Datos ingresados invalidos", Toast.LENGTH_LONG).show();
+                                case (500):
+                                    Toast.makeText(Registro.this,
+                                            "No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
+
+                            }
 
                         }
                     });
@@ -95,23 +102,17 @@ public class Registro extends AppCompatActivity {
     }
 
     private void procesarResponseDeRegistro(JSONObject response) {
-        try{
-            if (response.getInt("resultado") == REGISTRO_EXITOSO){
-                Toast.makeText(this, "El usuario ha sido registrado con exito!",
+
+
+        Toast.makeText(this, "El usuario ha sido registrado con exito!",
                         Toast.LENGTH_LONG).show();
 
                 //ACA VUELVE A LA PANTALLA DE LOGIN PARA QUE INGRESE CON LAS CREDENCIALES REGISTRADAS
                 //HABRIA QUE VER SI MEJOR YA LO HACEMOS ENTRAR AL SISTEMA!
-                Intent intent = new Intent(this, LoginActivity.class);
-                startActivity(intent);
-            }
-            else{
-                Toast.makeText(this, "El usuario ya existe!", Toast.LENGTH_SHORT).show();
-            }
-        }
-        catch (JSONException except){
-            Toast.makeText(this, except.getMessage(), Toast.LENGTH_LONG).show();
-        }
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
+
+
     }
 
 }
