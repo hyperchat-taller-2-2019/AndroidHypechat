@@ -42,7 +42,7 @@ public class LoginActivity extends AppCompatActivity {
     //ESTA DESPUES DEBERIA SER LA DIRECCION DE DONDE ESTE EL SERVER REAL Y EL ENDPOINT CORRESPONDIENTE!
     private final String URL_LOGIN = "https://secure-plateau-18239.herokuapp.com/login";
     private final String URL_LOGIN_FACE = "https://virtserver.swaggerhub.com/taller2-hypechat/Hypechat/1.0.0/logFacebook";
-    private final Integer USUARIO_VALIDO = 1;
+
 
     public void login (View view){
         Log.i("INFO", "Intentando realizar el login a la app");
@@ -85,7 +85,6 @@ public class LoginActivity extends AppCompatActivity {
                     public void onResponse(JSONObject response) {
                         System.out.println("11111111111111\n");
                         progressDialog.dismiss();
-
                         System.out.println(response);
                         procesarResponse(response);
 
@@ -122,14 +121,16 @@ public class LoginActivity extends AppCompatActivity {
             Log.i("INFO",response.toString());
 
             String token_response = response.getString("token");
-            //String apodo_response = response.getString("nickname");
+            String apodo_response = response.getString("nickname");
             String nombre_response = response.getString("name");
             String email_response = response.getString("email");
            // String photo_url_response = response.getString("photo");
-            //sharedEditor.putString("apodo",apodo_response);
+            sharedEditor.putString("apodo",apodo_response);
             sharedEditor.putString("nombre",nombre_response);
             sharedEditor.putString("email",email_response);
             sharedEditor.putString("token",token_response);
+            //deberia ser reemplazado por la contraseña real del usuario pero para probar pongo la mia.
+            sharedEditor.putString("contraseña","12345678");
             //sharedEditor.putString("foto",photo_url_response);
 
             sharedEditor.apply();

@@ -143,8 +143,8 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             String apodo = this.sharedPref.getString("apodo","");
             String contraseña = this.sharedPref.getString("contraseña","");
             Boolean soy_yo = false;
-
-            if (response.getString("email").equals(email)){
+            //Deberia comparar por el mail real que devuelve la API
+            if (response.getString("email").equals("string")){
                 Log.i("INFO","Consultas tu perfil!");
                 soy_yo = true;
             }
