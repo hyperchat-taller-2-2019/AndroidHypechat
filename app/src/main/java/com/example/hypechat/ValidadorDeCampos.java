@@ -82,4 +82,11 @@ public class ValidadorDeCampos {
         }
         return false;
     }
+
+    public boolean isValidProfileChange(String name, String nickname, String email, Context ctx){
+        if (this.isValidEmail(email,ctx) && this.isValidName(name,ctx) && this.isValidDisplayName(nickname,ctx)){
+            return true;
+        }
+        return false;
+    }
 }

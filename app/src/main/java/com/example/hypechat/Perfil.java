@@ -20,7 +20,7 @@ public class Perfil extends Fragment {
 
     private View vista;
 
-    private EditText nombre_perfil, apodo_perfil, email_perfil, contraseña_perfil;
+    private EditText nombre_perfil, apodo_perfil, email_perfil;
     private Button cambiarContraseña, modificarPerfil;
     private Dialog dialog_cambiar_psw;
     private ValidadorDeCampos validador;
@@ -30,21 +30,30 @@ public class Perfil extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.perfil,container,false);
+        final View view = inflater.inflate(R.layout.perfil,container,false);
 
         dialog_cambiar_psw = new Dialog(getActivity());
         modificarPerfil = (Button)view.findViewById(R.id.boton_modificar_perfil);
         cambiarContraseña = (Button) view.findViewById(R.id.boton_cambiar_contraseña);
+        validador = new ValidadorDeCampos();
 
         modificarPerfil.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.i("INFO","Apretaste para modificar perfil");
+                nombre_perfil = (EditText) view.findViewById(R.id.nombre_perfil);
+                apodo_perfil = (EditText) view.findViewById(R.id.apodo_perfil);
+                email_perfil = (EditText) view.findViewById(R.id.email_perfil);
 
+                String nombre_perfil_string = nombre_perfil.getText().toString();
+                String apodo_perfil_string = apodo_perfil.getText().toString();
+                String email_perfil_string = email_perfil.getText().toString();
+
+                if (validador.isValidProfileChange(nombre_perfil_string,apodo_perfil_string,email_perfil_string,getActivity())){
+                    Log.i("TO DO:", "Se puede mandar el request para modificar los datos del usuario!");
+                }
             }
         });
-
-        validador = new ValidadorDeCampos();
 
         cambiarContraseña.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -84,8 +93,6 @@ public class Perfil extends Fragment {
                         }
                     }
                 });
-
-
                 dialog_cambiar_psw.show();
             }
         });
