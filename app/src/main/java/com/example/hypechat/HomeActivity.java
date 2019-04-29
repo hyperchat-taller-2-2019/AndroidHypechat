@@ -86,6 +86,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                 this.navigationView.setCheckedItem(R.id.pag_ppal);
                 break;
             case R.id.organizaciones:
+
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,new Organizaciones()).commit();
                 this.navigationView.setCheckedItem(R.id.organizaciones);
                 break;
