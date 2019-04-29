@@ -55,4 +55,38 @@ public class ValidadorDeCampos {
         }
         return true;
     }
+
+    public boolean areTwoStringsEqual(String oneString, String otherString, Context ctx){
+        if (oneString.equals(otherString)){
+            return true;
+        }
+        Toast.makeText(ctx, "Los password NO coinciden!", Toast.LENGTH_SHORT).show();
+        return false;
+    }
+
+    public boolean isValidPasswordChange(String password, String pass_viejo, String pass_nuevo, String pass_nuevo_bis,Context ctx){
+        //faltan datos?
+        if (password.isEmpty() || pass_viejo.isEmpty() || pass_nuevo.isEmpty() || pass_nuevo_bis.isEmpty()){
+            Toast.makeText(ctx, "Faltan Datos para Continuar!", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        //El password viejo es correcto!
+        if (this.areTwoStringsEqual(password,pass_viejo,ctx)){
+            //El nuevo candidato es igual en los dos campos!
+            if (this.areTwoStringsEqual(pass_nuevo,pass_nuevo_bis,ctx)){
+                //El password nuevo es valido porque tiene mas de los caracteres pedidos!
+                if (isValidPassword(pass_nuevo,ctx)){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean isValidProfileChange(String name, String nickname, String email, Context ctx){
+        if (this.isValidEmail(email,ctx) && this.isValidName(name,ctx) && this.isValidDisplayName(nickname,ctx)){
+            return true;
+        }
+        return false;
+    }
 }
