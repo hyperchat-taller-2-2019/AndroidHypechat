@@ -35,6 +35,7 @@ public class Organizacion extends Fragment {
     private SharedPreferences sharedPref;
     private ImageButton crearCanal;;
     private ImageButton crearMsjPrivado;
+    private ImageButton editar_organizacion;
     private final String URL_CANALES_MSJ_PRIVADOS = "https://virtserver.swaggerhub.com/vickyperezz/hypeChatAndroid/1.0.0/getCanalesYmsjPrivados";
     //private final String URL_MSJ_PRIVADOS = "https://virtserver.swaggerhub.com/vickyperezz/hypeChatAndroid/1.0.0/getMsjPrivados";
     private SharedPreferences.Editor sharedEditor;
@@ -70,11 +71,13 @@ public class Organizacion extends Fragment {
 
         crearCanal= (ImageButton)view.findViewById(R.id.crear_canal);
         crearMsjPrivado = (ImageButton)view.findViewById(R.id.crear_msj_privado);
+        editar_organizacion = (ImageButton)view.findViewById(R.id.edit_Organizacion);
 
         crearCanal.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.i("INFO","Apretaste para crear un canal en la organizacion: "+organizacion_id);
+                Toast.makeText(getActivity(),"Crear Canal", Toast.LENGTH_LONG).show();
 
                 //FragmentManager fragmentManager = getFragmentManager();
                 //FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -92,7 +95,25 @@ public class Organizacion extends Fragment {
             @Override
             public void onClick(View v) {
                 Log.i("INFO","Apretaste para crear una conversacion privada en la organizacion: "+organizacion_id);
+                Toast.makeText(getActivity(),"Crear conversacion privada", Toast.LENGTH_LONG).show();
+                //FragmentManager fragmentManager = getFragmentManager();
+                //FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                //fragmentTransaction.replace(R.id.fragment_container,new CrearOrganizacion());
+                //Esta es la linea clave para que vuelva al fragmento anterior!
+                //fragmentTransaction.addToBackStack(null);
+                //fragmentTransaction.commit();
+                //Linea clave para que el fragmento termine de ponerse si o si en la activity y poder editarla!
+                //fragmentManager.executePendingTransactions();
 
+
+            }
+        });
+
+        editar_organizacion.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i("INFO","Apretaste para editar la organizacion: "+organizacion_id);
+                Toast.makeText(getActivity(),"Editar Organizacion", Toast.LENGTH_LONG).show();
                 //FragmentManager fragmentManager = getFragmentManager();
                 //FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                 //fragmentTransaction.replace(R.id.fragment_container,new CrearOrganizacion());

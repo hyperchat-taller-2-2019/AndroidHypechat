@@ -42,17 +42,36 @@
             android:orientation="vertical"
             android:background="@color/colorGrisClaro">
 
-            <TextView
-                android:id="@+id/titulo_organizacion"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
                 android:layout_weight="20"
-                android:gravity="center_horizontal"
-                android:text="Organizacion"
-                android:textColor="@color/colorBlanco"
-                android:textSize="30dp"
-                app:fontFamily="@font/carter_one" />
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingBottom="20dp"
+                android:weightSum="100"
+                android:paddingLeft="20dp">
+
+                <TextView
+                    android:id="@+id/titulo_organizacion"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="60"
+                    android:layout_marginTop="10dp"
+                    android:gravity="right"
+                    android:text="Organizacion"
+                    android:textColor="@color/colorBlanco"
+                    android:textSize="30dp"
+                    app:fontFamily="@font/carter_one" />
+                <ImageButton
+                    android:id="@+id/edit_Organizacion"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="40"
+                    android:gravity="left"
+                    android:src="@drawable/ic_edit" />
+
+
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
