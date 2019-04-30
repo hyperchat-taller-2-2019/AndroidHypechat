@@ -7,5 +7,7 @@
     <color name="colorNaranja">#FFC107</color>
     <color name="colorAzul">#03A9F4</color>
     <color name="colorBlack">#000000</color>
+    <color name="colorGrisClaro">#D3D1D1</color>
+    <color name="colorBlanco">#FFFFFF</color>
 
 </resources>

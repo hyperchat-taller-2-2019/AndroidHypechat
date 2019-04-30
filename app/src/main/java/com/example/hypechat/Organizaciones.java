@@ -13,9 +13,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.SimpleAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -28,6 +31,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class Organizaciones extends Fragment {
 
@@ -48,9 +53,11 @@ public class Organizaciones extends Fragment {
         //return inflater.inflate(R.layout.organizaciones,container,false);
         this.view = inflater.inflate(R.layout.organizaciones,container,false);
         this.sharedPref = getActivity().getSharedPreferences(getString(R.string.saved_data), Context.MODE_PRIVATE);
+        this.sharedEditor = sharedPref.edit();
+        System.out.printf("ESTOY EN ORGANIZACIONES CON TOKEN:     ");
 
         this.token = this.sharedPref.getString("token","no token");
-        System.out.printf(this.token.toString());
+        System.out.printf(this.token.toString()+"\n");
 
         getOrganizaciones();
 
@@ -136,21 +143,44 @@ public class Organizaciones extends Fragment {
             Log.i("INFO",response.toString());
             JSONArray organizaciones = response.getJSONArray("organizaciones");
             ListView list = (ListView) view.findViewById(R.id.lista_organizaciones);
-            ArrayList<String> array = new ArrayList<String>();
+            List<HashMap<String,String>> array = new ArrayList<>();
+            SimpleAdapter adapter = new SimpleAdapter(getActivity(),array,R.layout.text_list_orga,new String[]{"Primera","Segunda"},new int[]{R.id.textlist1,R.id.textlist2});
             for(int i=0;i< organizaciones.length();i++){
-                System.out.printf("ENTRO ACA \n");
+                HashMap<String,String> resultadoItem = new HashMap<>();
+
                 JSONObject item = organizaciones.getJSONObject(i);
                 String id = item.getString("id");
                 String name = item.getString("name");
-                System.out.printf(id+"   \n");
-                System.out.printf(name+"\n");
-                array.add(name);
-
+                resultadoItem.put("Primera",name);
+                resultadoItem.put("Segunda",id);
+                array.add(resultadoItem);
             }
 
-            ArrayAdapter<String> adapter =new ArrayAdapter<String>(getContext(), R.layout.orga_text_list, array);
+            //ArrayAdapter<String> adapter =new ArrayAdapter<String>(getContext(), R.layout.text_list_orga, array);
             list.setAdapter(adapter);
+            list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    LinearLayout lay = (LinearLayout) view;
+                    TextView text1 = (TextView)  lay.getChildAt(0);
+                    TextView text2 = (TextView)  lay.getChildAt(1);
+                    sharedEditor.putString("organizacion_name",text1.getText().toString());
+                    sharedEditor.putString("organizacion_id",text2.getText().toString());
+                    sharedEditor.apply();
 
+                    FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                    fragmentTransaction.replace(R.id.fragment_container,new Organizacion());
+                    //Esta es la linea clave para que vuelva al fragmento anterior!
+                    fragmentTransaction.addToBackStack(null);
+                    fragmentTransaction.commit();
+                    //Linea clave para que el fragmento termine de ponerse si o si en la activity y poder editarla!
+                    fragmentManager.executePendingTransactions();
+
+                   // Toast.makeText(getActivity(),text2.getText().toString(), Toast.LENGTH_LONG).show();
+
+                }
+            });
 
         } catch (JSONException e) {
             e.printStackTrace();
