@@ -62,6 +62,8 @@ public class Organizacion extends Fragment {
         this.organizacion_name = this.sharedPref.getString("organizacion_name","no name");
         System.out.printf(this.organizacion_id.toString()+"\n");
 
+        this.sharedEditor.putString("organizacion_id",organizacion_id);
+
         titulo = (TextView) view.findViewById(R.id.titulo_organizacion);
         titulo.setText(this.organizacion_name);
 

@@ -114,7 +114,7 @@
             android:textStyle="bold" />
 
         <EditText
-            android:id="@+id/pass_registro"
+            android:id="@+id/pass_Organizacion"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="10"
@@ -127,24 +127,44 @@
             android:inputType="textPassword"
             android:textSize="20sp"/>
 
-        <Button
-            android:id="@+id/button_crearOrg_siguiente"
-            android:layout_width="200dp"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="10"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="20dp"
-            android:background="@color/colorAzul"
-            android:gravity="center"
-            android:text="Siguiente"
-            android:textColor="@android:color/background_dark" />
+            android:layout_marginTop="50dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/button_crearOrg_cancelar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="10"
+                android:layout_gravity="center_horizontal"
+                android:background="@color/colorPrimary"
+                android:gravity="center"
+                android:text="Cancelar"
+                android:textColor="@android:color/background_dark"
+                android:layout_marginRight="10dp"/>
+
+
+
+            <Button
+                android:id="@+id/button_crearOrg_siguiente"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="10"
+                android:layout_gravity="center_horizontal"
+                android:background="@color/colorAzul"
+                android:gravity="center"
+                android:text="Siguiente"
+                android:layout_marginLeft="10dp"
+                android:textColor="@android:color/background_dark" />
+
+        </LinearLayout>
+
 
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="15"
-        android:orientation="horizontal"></LinearLayout>
+
 
 </LinearLayout>

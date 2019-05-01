@@ -1,5 +1,8 @@
 package com.example.hypechat;
 
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -14,12 +17,23 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class AgregarUsuarioOrganizacion extends Fragment {
 
-
+    private ValidadorDeCampos validador;
     private Button agregarUser;
     private Button finalizar;
     private EditText email;
+    private ProgressDialog progressDialog;
+    private SharedPreferences sharedPref;
+    private String URL_AGREGAR_USUARIO = "https://virtserver.swaggerhub.com/vickyperezz/hypeChatAndroid/1.0.0/agregarUsuarioOrganizacion";
 
     @Nullable
     @Override
@@ -27,17 +41,18 @@ public class AgregarUsuarioOrganizacion extends Fragment {
         //return inflater.inflate(R.layout.organizaciones,container,false);
         View view = inflater.inflate(R.layout.activity_add_users,container,false);
 
+        validador = new ValidadorDeCampos();
         this.email = (EditText) view.findViewById(R.id.edit_email);
 
         agregarUser = (Button)view.findViewById(R.id.r_invitar_usuario);
+        this.sharedPref = getActivity().getSharedPreferences(getString(R.string.saved_data), Context.MODE_PRIVATE);
 
         agregarUser.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i("INFO","Agregaste un nuevo usuario");
-                email.getText().clear();
-                Toast.makeText(getActivity(), "Usuario Agregado con exito.", Toast.LENGTH_LONG).show();
-
+                if(validFieldUser()) {
+                    agregarUsuarioOrganizacion_server();
+                }
 
             }
         });
@@ -65,4 +80,63 @@ public class AgregarUsuarioOrganizacion extends Fragment {
 
     }
 
+    private boolean validFieldUser() {
+        return validador.isValidEmail(email.getText().toString(),getContext());
+    }
+
+
+    private void agregarUsuarioOrganizacion_server(){
+
+        progressDialog = ProgressDialog.show(
+                getActivity(),"Hypechat","Agregando el usuario...",true);
+
+        JSONObject requestBody = new JSONObject();
+        try {
+            requestBody.put("id_organizacion", this.sharedPref.getString("organizacion_id","no organizacion"));
+            requestBody.put("email_usuario", this.email.getText().toString());
+        }
+        catch(JSONException except){
+            Toast.makeText(getActivity(), except.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+        Log.i("INFO", "Agrego el usuario a la organizacion en el server");
+
+
+        Log.i("INFO", "Json Request , check http status codes");
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.POST, URL_AGREGAR_USUARIO, requestBody, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        progressDialog.dismiss();
+                        System.out.println(response);
+                        Log.i("INFO", "Agregaste un nuevo usuario a la organizacion: "+sharedPref.getString("organizacion_id","no organizacion"));
+                        email.getText().clear();
+                        Toast.makeText(getActivity(), "Usuario Agregado con exito.", Toast.LENGTH_LONG).show();
+
+                    }
+
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        progressDialog.dismiss();
+                        switch (error.networkResponse.statusCode){
+                            case (400):
+                                Toast.makeText(getActivity(),"El usuario ya se ha agregado a la organizacion", Toast.LENGTH_LONG).show();
+                            case (401):
+                                Toast.makeText(getActivity(),"No existe un usuario con ese email", Toast.LENGTH_LONG).show();
+                            case (500):
+                                // Toast.makeText(LoginActivity.this,"Server error!", Toast.LENGTH_LONG).show();
+                            case (404):
+                                //Toast.makeText(LoginActivity.this,"No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
+
+                        }
+                    }
+                });
+
+        //Agrego la request a la cola para que se conecte con el server!
+        HttpConexionSingleton.getInstance(getContext()).addToRequestQueue(jsonObjectRequest);
+
+    }
 }

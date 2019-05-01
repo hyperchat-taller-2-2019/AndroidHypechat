@@ -16,17 +16,27 @@ public class ValidadorDeCampos {
         return (isValidName(name,ctx) && isValidDisplayName(display_name,ctx) && isValidEmail(email, ctx) && isValidPassword(password, ctx));
     }
 
-    private boolean isValidName(String name, Context ctx) {
+    public boolean isValidName(String name, Context ctx) {
         if (name.isEmpty()){
-            Toast.makeText(ctx, "Olvidó completar su Nombre !", Toast.LENGTH_SHORT).show();
+            Toast.makeText(ctx, "Olvidó completar el campo Nombre !", Toast.LENGTH_SHORT).show();
             return false;
         }
         return true;
     }
 
-    private boolean isValidDisplayName(String display_name, Context ctx) {
+    public boolean isNotCampoVacio(String campo, Context ctx,String nombre_campo){
+        if (campo.isEmpty()){
+            Toast.makeText(ctx, "Olvidó completar el campo "+nombre_campo+"!", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        return true;
+
+    }
+
+
+    public boolean isValidDisplayName(String display_name, Context ctx) {
         if (display_name.isEmpty()){
-            Toast.makeText(ctx, "Olvidó completar su Apodo !", Toast.LENGTH_SHORT).show();
+            Toast.makeText(ctx, "Olvidó completar el campo Apodo !", Toast.LENGTH_SHORT).show();
             return false;
         }
         return true;
@@ -34,11 +44,11 @@ public class ValidadorDeCampos {
 
     public boolean isValidPassword(String password,Context ctx){
         if (password.isEmpty()){
-            Toast.makeText(ctx, "Olvidó completar su contraseña !", Toast.LENGTH_SHORT).show();
+            Toast.makeText(ctx, "Olvidó completar el campo contraseña !", Toast.LENGTH_SHORT).show();
             return false;
         }
         else if (password.length()  < MIN_PASS_LENGTH){
-            Toast.makeText(ctx, "El password debe tener como mínimo "+ MIN_PASS_LENGTH + " caracteres !", Toast.LENGTH_SHORT).show();
+            Toast.makeText(ctx, "La contraseña debe tener como mínimo "+ MIN_PASS_LENGTH + " caracteres !", Toast.LENGTH_SHORT).show();
             return false;
         }
         return true;
@@ -46,7 +56,7 @@ public class ValidadorDeCampos {
     
     public boolean isValidEmail(String email, Context ctx){
         if (email.isEmpty()){
-            Toast.makeText(ctx, "Olvidó completar el email !", Toast.LENGTH_SHORT).show();
+            Toast.makeText(ctx, "Olvidó completar el campo email !", Toast.LENGTH_SHORT).show();
             return false;
         }
         else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()){
