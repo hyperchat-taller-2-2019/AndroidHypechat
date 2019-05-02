@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -38,6 +39,11 @@ public class Perfil extends Fragment {
     private SharedPreferences sharedPref;
     private SharedPreferences.Editor sharedEditor;
     private ProgressDialog progressDialog;
+
+
+    private View header;
+
+
     private final String URL_CAMBIAR_PASSWORD = "https://secure-plateau-18239.herokuapp.com/psw";
     private final String URL_CAMBIAR_PERFIL = "https://secure-plateau-18239.herokuapp.com/profile";
 
@@ -68,6 +74,24 @@ public class Perfil extends Fragment {
 
                 if (validador.isValidProfileChange(nombre_perfil_string,apodo_perfil_string,email_perfil_string,getActivity())){
                     Log.i("TO DO:", "Se puede mandar el request para modificar los datos del usuario!");
+
+                    JSONObject cambiar_perfil_body = new JSONObject();
+                    try{
+                        String user_token = sharedPref.getString("token","");
+
+                        cambiar_perfil_body.put("token",user_token);
+                        cambiar_perfil_body.put("name",nombre_perfil_string);
+                        cambiar_perfil_body.put("nickname",apodo_perfil_string);
+                        cambiar_perfil_body.put("email",email_perfil_string);
+
+                        //cambiar_perfil_body.put("photo","");
+                    }
+                    catch(JSONException except){
+                        Toast.makeText(getActivity(), except.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                    progressDialog = ProgressDialog.show(getContext(),"Hypechat","Modificando Perfil...",
+                            true);
+                    cambiarPerfilRequest(cambiar_perfil_body);
                 }
             }
         });
@@ -114,7 +138,7 @@ public class Perfil extends Fragment {
                             JSONObject cambiar_psw_body = new JSONObject();
                             try {
                                 cambiar_psw_body.put("token", token_usuario);
-                                cambiar_psw_body.put("newPsw", pass_nuevo.getText().toString());
+                                cambiar_psw_body.put("psw", pass_nuevo.getText().toString());
                             }
                             catch(JSONException except){
                                 Toast.makeText(getActivity(), except.getMessage(), Toast.LENGTH_SHORT).show();
@@ -141,6 +165,60 @@ public class Perfil extends Fragment {
 
     }
 
+    private void cambiarPerfilRequest(final JSONObject cambiar_perfil_body) {
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.PUT, URL_CAMBIAR_PERFIL, cambiar_perfil_body, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        progressDialog.dismiss();
+                        System.out.println(response);
+                        try{
+                            setApodoPerfil(cambiar_perfil_body.getString("nickname"));
+                            setEmailPerfil(cambiar_perfil_body.getString("email"));
+                            setNombrePerfil(cambiar_perfil_body.getString("name"));
+                            sharedEditor.putString("nombre",cambiar_perfil_body.getString("name"));
+                            sharedEditor.putString("email",cambiar_perfil_body.getString("email"));
+                            sharedEditor.putString("apodo",cambiar_perfil_body.getString("nickname"));
+                            sharedEditor.apply();
+                            TextView header_nombre_usuario = (TextView) header.findViewById(R.id.header_user_name);
+                            header_nombre_usuario.setText(cambiar_perfil_body.getString("name"));
+                            Toast.makeText(getContext(), "El perfil se modifico Correctamente!", Toast.LENGTH_LONG).show();
+                        }
+                        catch (JSONException exception){
+                            Toast.makeText(getActivity(), exception.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+
+                    }
+
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        progressDialog.dismiss();
+
+                        switch (error.networkResponse.statusCode){
+                            case (400):
+                                Toast.makeText(getActivity(),
+                                        "Usuario o Contraseña Invalidos!", Toast.LENGTH_LONG).show();
+                            case (500):
+                                Toast.makeText(getActivity(),
+                                        "Server error!", Toast.LENGTH_LONG).show();
+                            case (404):
+                                Toast.makeText(getActivity(),
+                                        "No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
+
+                        }
+                    }
+                });
+
+        //Agrego la request a la cola para que se conecte con el server!
+        HttpConexionSingleton.getInstance(getContext()).addToRequestQueue(jsonObjectRequest);
+
+    }
+
+
     private void cambiarPswRequest(final JSONObject cambiar_psw_body) {
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
@@ -153,7 +231,8 @@ public class Perfil extends Fragment {
                         progressDialog.dismiss();
 
                         try{
-                            sharedEditor.putString("contraseña",cambiar_psw_body.getString("newPsw"));
+                            sharedEditor.putString("contraseña",cambiar_psw_body.getString("psw"));
+                            sharedEditor.apply();
                             Toast.makeText(getActivity(), "La contraseña ha sido modificada con Exito!", Toast.LENGTH_LONG).show();
                         }catch (JSONException exception){
                             Log.i("INFO", exception.getMessage());
@@ -235,5 +314,7 @@ public class Perfil extends Fragment {
         this.apodo_perfil.setText(apodo);
     }
 
-
+    public void setHeader (View header_recibido){
+        this.header = header_recibido;
+    }
 }

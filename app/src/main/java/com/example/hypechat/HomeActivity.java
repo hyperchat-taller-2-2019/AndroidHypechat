@@ -177,6 +177,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         //Me traigo el fragmento sabiendo que es el de perfil para cargarle la información
         Perfil perfil = (Perfil) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
         perfil.completarDatosPerfil(nombre,apodo,email,soy_yo);
+        perfil.setHeader(this.header);
 
     }
 
