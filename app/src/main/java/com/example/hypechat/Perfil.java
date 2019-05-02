@@ -2,6 +2,9 @@ package com.example.hypechat;
 
 
 import android.app.Dialog;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -15,6 +18,14 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 
 public class Perfil extends Fragment {
 
@@ -24,7 +35,11 @@ public class Perfil extends Fragment {
     private Button cambiarContraseña, modificarPerfil;
     private Dialog dialog_cambiar_psw;
     private ValidadorDeCampos validador;
-    private String password;
+    private SharedPreferences sharedPref;
+    private SharedPreferences.Editor sharedEditor;
+    private ProgressDialog progressDialog;
+    private final String URL_CAMBIAR_PASSWORD = "https://secure-plateau-18239.herokuapp.com/psw";
+    private final String URL_CAMBIAR_PERFIL = "https://secure-plateau-18239.herokuapp.com/profile";
 
     @Nullable
     @Override
@@ -36,6 +51,8 @@ public class Perfil extends Fragment {
         modificarPerfil = (Button)view.findViewById(R.id.boton_modificar_perfil);
         cambiarContraseña = (Button) view.findViewById(R.id.boton_cambiar_contraseña);
         validador = new ValidadorDeCampos();
+        this.sharedPref = getActivity().getSharedPreferences(getString(R.string.saved_data), Context.MODE_PRIVATE);
+        this.sharedEditor = sharedPref.edit();
 
         modificarPerfil.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -78,18 +95,35 @@ public class Perfil extends Fragment {
                 b_cambiar_contrasenia.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        String password = sharedPref.getString("contraseña","");
+
                         Log.i("INFO: ", "Validando que los datos sean correctos!");
+
                         Log.i("INFO:", "passwordActual:" + password);
                         Log.i("INFO:", "passwordActualInsertado:" + pass_viejo.getText().toString());
                         Log.i("INFO:", "passwordNuevoInsertado:" + pass_nuevo.getText().toString());
                         Log.i("INFO:", "passwordNuevoRepetido:" + pass_nuevo_bis.getText().toString());
+
                         if (validador.isValidPasswordChange(password,pass_viejo.getText().toString(),pass_nuevo.getText().toString(),pass_nuevo_bis.getText().toString(), getActivity())){
 
                             Log.i("INFO: ", "Los datos son correctos!");
-                            Log.i("TO DO","hacer el request para cambiar el password!");
+                            Log.i("INFO","hacer el request para cambiar el password!");
 
-                            Toast.makeText(getActivity(), "La contraseña ha sido modificada con Exito!", Toast.LENGTH_LONG).show();
-                            dialog_cambiar_psw.dismiss();
+                            String token_usuario = sharedPref.getString("token","");
+
+                            JSONObject cambiar_psw_body = new JSONObject();
+                            try {
+                                cambiar_psw_body.put("token", token_usuario);
+                                cambiar_psw_body.put("newPsw", pass_nuevo.getText().toString());
+                            }
+                            catch(JSONException except){
+                                Toast.makeText(getActivity(), except.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+
+                            progressDialog = ProgressDialog.show(getContext(),"Hypechat","Cambiando Contraseña...",
+                                    true);
+
+                            cambiarPswRequest(cambiar_psw_body);
                         }
                     }
                 });
@@ -107,11 +141,55 @@ public class Perfil extends Fragment {
 
     }
 
-    public void completarDatosPerfil(String nombre, String apodo, String email, String contraseña, Boolean  soy_yo){
+    private void cambiarPswRequest(final JSONObject cambiar_psw_body) {
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.PUT, URL_CAMBIAR_PASSWORD, cambiar_psw_body, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.i("INFO", "La contraseña se modifico correctamente!");
+
+                        progressDialog.dismiss();
+
+                        try{
+                            sharedEditor.putString("contraseña",cambiar_psw_body.getString("newPsw"));
+                            Toast.makeText(getActivity(), "La contraseña ha sido modificada con Exito!", Toast.LENGTH_LONG).show();
+                        }catch (JSONException exception){
+                            Log.i("INFO", exception.getMessage());
+                        }
+
+                        dialog_cambiar_psw.dismiss();
+                    }
+
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        progressDialog.dismiss();
+                        switch (error.networkResponse.statusCode){
+                            case (400):
+                                Toast.makeText(getActivity(),
+                                        "Usuario o Contraseña Invalidos!", Toast.LENGTH_LONG).show();
+                            case (500):
+                                Toast.makeText(getActivity(),
+                                        "Server error!", Toast.LENGTH_LONG).show();
+                            case (404):
+                                Toast.makeText(getActivity(),
+                                        "No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
+
+                        }
+                    }
+                });
+
+        //Agrego la request a la cola para que se conecte con el server!
+        HttpConexionSingleton.getInstance(getContext()).addToRequestQueue(jsonObjectRequest);
+    }
+
+    public void completarDatosPerfil(String nombre, String apodo, String email, Boolean  soy_yo){
         this.setNombrePerfil(nombre);
         this.setApodoPerfil(apodo);
         this.setEmailPerfil(email);
-        this.password = contraseña;
 
         if (soy_yo){
             mostrarBotones();
