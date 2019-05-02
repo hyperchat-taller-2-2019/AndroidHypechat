@@ -60,6 +60,9 @@ public class LoginActivity extends AppCompatActivity {
             //Preparo Body del POST
             JSONObject requestBody = new JSONObject();
             try {
+                //como el response no entrega el password, me lo guardo aca.
+                this.sharedEditor.putString("contraseña",password);
+
                 requestBody.put("email", email);
                 requestBody.put("psw", password);
             }
@@ -130,7 +133,7 @@ public class LoginActivity extends AppCompatActivity {
             sharedEditor.putString("email",email_response);
             sharedEditor.putString("token",token_response);
             //deberia ser reemplazado por la contraseña real del usuario pero para probar pongo la mia.
-            sharedEditor.putString("contraseña","12345678");
+            //sharedEditor.putString("contraseña","12345678");
             //sharedEditor.putString("foto",photo_url_response);
 
             sharedEditor.apply();

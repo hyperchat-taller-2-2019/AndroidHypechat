@@ -36,8 +36,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     private SharedPreferences sharedPref;
     private SharedPreferences.Editor sharedEditor;
     private ProgressDialog progressDialog;
-    private final String URL_PERFIL = "https://virtserver.swaggerhub.com/taller2-hypechat/Hypechat/1.0.0/consultarPerfil/";
-    // "https://secure-plateau-18239.herokuapp.com/perfil/";
+    private final String URL_PERFIL = "https://secure-plateau-18239.herokuapp.com/profile/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,31 +138,33 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     private void procesarDatosDeUsuarioRecibidos(JSONObject response) {
         try {
             Log.i("INFO",response.toString());
+
             String email = this.sharedPref.getString("email","");
             String nombre = this.sharedPref.getString("nombre","");
             String apodo = this.sharedPref.getString("apodo","");
-            String contraseña = this.sharedPref.getString("contraseña","");
+
             Boolean soy_yo = false;
+
             //Deberia comparar por el mail real que devuelve la API
-            if (response.getString("email").equals("string")){
+            if (response.getString("email").equals(email)){
                 Log.i("INFO","Consultas tu perfil!");
                 soy_yo = true;
             }
             else{
                 Log.i("INFO", "perfil de otro usuario");
                 email = response.getString("email");
-                nombre = response.getString("nombre");
-                apodo = response.getString("apodo");
+                nombre = response.getString("name");
+                apodo = response.getString("nickname");
             }
 
-            setProfileFragment(nombre,apodo,email,contraseña,soy_yo);
+            setProfileFragment(nombre,apodo,email,soy_yo);
         }
         catch (JSONException exception){
             Toast.makeText(this, exception.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 
-    private void setProfileFragment(String nombre, String apodo, String email, String contrasenia,Boolean soy_yo) {
+    private void setProfileFragment(String nombre, String apodo, String email,Boolean soy_yo) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.fragment_container,new Perfil());
@@ -175,7 +176,8 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
         //Me traigo el fragmento sabiendo que es el de perfil para cargarle la información
         Perfil perfil = (Perfil) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-        perfil.completarDatosPerfil(nombre,apodo,email,contrasenia,soy_yo);
+        perfil.completarDatosPerfil(nombre,apodo,email,soy_yo);
+        perfil.setHeader(this.header);
 
     }
 
