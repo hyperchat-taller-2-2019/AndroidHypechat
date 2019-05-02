@@ -39,6 +39,7 @@ public class Organizaciones extends Fragment {
     private SharedPreferences sharedPref;
     private Button crearOrganizacion;
     private final String URL_ORGANIZACIONES = "https://virtserver.swaggerhub.com/vickyperezz/hypeChatAndroid/1.0.0/getOrganizaciones";
+    private final String URL_INFO_ORG = "https://virtserver.swaggerhub.com/vickyperezz/hypeChatAndroid/1.0.0/getInfoOrganizacion";
     private SharedPreferences.Editor sharedEditor;
     private String token;
     private View view;
@@ -168,14 +169,8 @@ public class Organizaciones extends Fragment {
                     sharedEditor.putString("organizacion_id",text2.getText().toString());
                     sharedEditor.apply();
 
-                    FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                    fragmentTransaction.replace(R.id.fragment_container,new Organizacion());
-                    //Esta es la linea clave para que vuelva al fragmento anterior!
-                    fragmentTransaction.addToBackStack(null);
-                    fragmentTransaction.commit();
-                    //Linea clave para que el fragmento termine de ponerse si o si en la activity y poder editarla!
-                    fragmentManager.executePendingTransactions();
+                    obtenerDatosOrganizacion(text2.getText().toString());
+
 
                    // Toast.makeText(getActivity(),text2.getText().toString(), Toast.LENGTH_LONG).show();
 
@@ -185,6 +180,83 @@ public class Organizaciones extends Fragment {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    private void obtenerDatosOrganizacion(String id){
+        Log.i("INFO", "Obteniendo datos de la organizacion");
+        this.progressDialog = ProgressDialog.show(
+                getActivity(),"Hypechat","Obteniendo organizaciones del usuario...",true);
+
+        //Preparo Body del POST
+        JSONObject requestBody = new JSONObject();
+        try {
+            requestBody.put("token", this.token);
+            requestBody.put("id_organizacion",id);
+
+        }
+        catch(JSONException except){
+            Toast.makeText(getActivity(), except.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+
+        Log.i("INFO", "Json Request getOrganizaciones, check http status codes");
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.GET, URL_INFO_ORG, requestBody, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+
+                        progressDialog.dismiss();
+                        System.out.println(response);
+                        mostrarOrganizacion(response);
+
+                    }
+
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        //progressDialog.dismiss();
+                        progressDialog.dismiss();
+                        switch (error.networkResponse.statusCode){
+                            case (400):
+                                //Toast.makeText(LoginActivity.this,"Usuario o Contraseña Invalidos!", Toast.LENGTH_LONG).show();
+                            case (500):
+                                // Toast.makeText(LoginActivity.this,"Server error!", Toast.LENGTH_LONG).show();
+                            case (404):
+                                //Toast.makeText(LoginActivity.this,"No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
+
+                        }
+                    }
+                });
+
+        //Agrego la request a la cola para que se conecte con el server!
+        HttpConexionSingleton.getInstance(getContext()).addToRequestQueue(jsonObjectRequest);
+    }
+
+    private void mostrarOrganizacion(JSONObject response) {
+        try {
+        this.sharedEditor.putString("organizacion_name",response.getString("nombre"));
+        this.sharedEditor.putString("organizacion_id",response.getString("id"));
+        this.sharedEditor.apply();
+
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_container,new Organizacion());
+        //Esta es la linea clave para que vuelva al fragmento anterior!
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
+        //Linea clave para que el fragmento termine de ponerse si o si en la activity y poder editarla!
+        fragmentManager.executePendingTransactions();
+
+        //Me traigo el fragmento sabiendo que es el de Organizacion para cargarle la información
+        Organizacion org = (Organizacion) getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+
+            org.completarInfoOrganizacion(response.getString("nombre"),response.getString("id"),response.getString("owner_email"),response.getString("password"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
     }
 
 

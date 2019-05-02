@@ -186,7 +186,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     }
 
 
-    public void crear_canal(View view){
+    public void crear_organizacion(View view){
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.fragment_container,new CrearOrganizacion());
@@ -198,7 +198,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
-    public void ver_canales(View view){
+    public void ver_organizaciones(View view){
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.fragment_container,new Organizaciones());

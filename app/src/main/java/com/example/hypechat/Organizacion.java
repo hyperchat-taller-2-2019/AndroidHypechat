@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,6 +47,9 @@ public class Organizacion extends Fragment {
     private TextView titulo;
     private View view;
     private ProgressDialog progressDialog;
+    private String owner_email;
+    private String user_email;
+    private String password;
     // private JSONArray organizaciones;
 
 
@@ -56,17 +61,15 @@ public class Organizacion extends Fragment {
         this.sharedPref = getActivity().getSharedPreferences(getString(R.string.saved_data), Context.MODE_PRIVATE);
         this.sharedEditor = sharedPref.edit();
 
-        System.out.printf("ESTOY EN ORGANIZACION CON ID:     ");
-        this.token = this.sharedPref.getString("token","no token");
-        this.organizacion_id = this.sharedPref.getString("organizacion_id","no id");
-        this.organizacion_name = this.sharedPref.getString("organizacion_name","no name");
-        System.out.printf(this.organizacion_id.toString()+"\n");
+        this.organizacion_name = sharedPref.getString("organizacion_name","no organizacion");
+        this.organizacion_id = sharedPref.getString("organizacion_id","no id");
 
-        this.sharedEditor.putString("organizacion_id",organizacion_id);
+        this.user_email = sharedPref.getString("email","no user");
+
+        this.token = this.sharedPref.getString("token","no token");
 
         titulo = (TextView) view.findViewById(R.id.titulo_organizacion);
-        titulo.setText(this.organizacion_name);
-
+        this.titulo.setText(organizacion_name);
         getCanalesYmsjPrivados();
         //getMsjPrivados();
 
@@ -115,15 +118,22 @@ public class Organizacion extends Fragment {
             @Override
             public void onClick(View v) {
                 Log.i("INFO","Apretaste para editar la organizacion: "+organizacion_id);
-                Toast.makeText(getActivity(),"Editar Organizacion", Toast.LENGTH_LONG).show();
-                //FragmentManager fragmentManager = getFragmentManager();
-                //FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                //fragmentTransaction.replace(R.id.fragment_container,new CrearOrganizacion());
+                //Toast.makeText(getActivity(),"Editar Organizacion", Toast.LENGTH_LONG).show();
+                FragmentManager fragmentManager = getFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.fragment_container,new EditarOrganizacion());
                 //Esta es la linea clave para que vuelva al fragmento anterior!
-                //fragmentTransaction.addToBackStack(null);
-                //fragmentTransaction.commit();
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
                 //Linea clave para que el fragmento termine de ponerse si o si en la activity y poder editarla!
-                //fragmentManager.executePendingTransactions();
+                fragmentManager.executePendingTransactions();
+
+                Boolean sameUser = (owner_email.equals(user_email));
+                //Me traigo el fragmento sabiendo que es el de EditarOrganizacion para cargarle la información
+                EditarOrganizacion editar_organization = (EditarOrganizacion) getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+                editar_organization.completarInformacionOrganizacion(token,organizacion_name,organizacion_id, password, owner_email,sameUser);
+
+
 
 
             }
@@ -192,50 +202,7 @@ public class Organizacion extends Fragment {
 
     }
 
-    /*private void getMsjPrivados(){
-        Log.i("INFO", "Obtengo las conversaciones privadas del usuario en la organizacion: "+organizacion_id);
-        progressDialog = ProgressDialog.show(
-                getActivity(),"Hypechat","Obteniendo msj privados del usuario...",true);
 
-        JSONObject request = get_json_Request_Body();
-
-        Log.i("INFO", "Json Request getMsjPrivados, check http status codes");
-
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.POST, URL_MSJ_PRIVADOS, request, new Response.Listener<JSONObject>() {
-
-                    @Override
-                    public void onResponse(JSONObject response) {
-
-                        progressDialog.dismiss();
-                        System.out.println(response);
-                        responseListaMsjPrivados(response);
-
-                    }
-
-                }, new Response.ErrorListener() {
-
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-
-                        progressDialog.dismiss();
-                        switch (error.networkResponse.statusCode){
-                            case (400):
-                                //Toast.makeText(LoginActivity.this,"Usuario o Contraseña Invalidos!", Toast.LENGTH_LONG).show();
-                            case (500):
-                                // Toast.makeText(LoginActivity.this,"Server error!", Toast.LENGTH_LONG).show();
-                            case (404):
-                                //Toast.makeText(LoginActivity.this,"No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
-
-                        }
-                    }
-                });
-
-        //Agrego la request a la cola para que se conecte con el server!
-        HttpConexionSingleton.getInstance(getContext()).addToRequestQueue(jsonObjectRequest);
-
-    }
-*/
 
     private void responseListaCanales(JSONObject response){
         try {
@@ -295,5 +262,13 @@ public class Organizacion extends Fragment {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    public void completarInfoOrganizacion(String nombre, String id, String owner_email, String password) {
+        this.organizacion_name = nombre;
+        this.organizacion_id = id;
+        this.owner_email = owner_email;
+        this.password = password;
+
     }
 }

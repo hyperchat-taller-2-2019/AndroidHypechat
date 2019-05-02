@@ -31,7 +31,6 @@ public class CrearOrganizacion extends Fragment {
     private ValidadorDeCampos validador;
     private ProgressDialog progress;
     private SharedPreferences sharedPref;
-    private SharedPreferences.Editor sharedEditor;
     private Button crearOrganizacion;
     private Button cancelar;
     private EditText nombre;
@@ -55,7 +54,7 @@ public class CrearOrganizacion extends Fragment {
         nombre = (EditText) view.findViewById(R.id.name_organizacion);
         id = (EditText) view.findViewById(R.id.id_organizacion);
         psw = (EditText) view.findViewById(R.id.pass_Organizacion);
-        this.sharedEditor = sharedPref.edit();
+
 
         crearOrganizacion.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -173,8 +172,7 @@ public class CrearOrganizacion extends Fragment {
                     public void onResponse(JSONObject response) {
                         progressDialog.dismiss();
                         System.out.println(response);
-                        sharedEditor.putString("organizacion_id",id.getText().toString());
-                        sharedEditor.apply();
+
                         agregarUser();
 
                     }
@@ -213,6 +211,11 @@ public class CrearOrganizacion extends Fragment {
         fragmentTransaction.commit();
         //Linea clave para que el fragmento termine de ponerse si o si en la activity y poder editarla!
         fragmentManager.executePendingTransactions();
+
+        //Me traigo el fragmento sabiendo que es el de perfil para cargarle la información
+        AgregarUsuarioOrganizacion add_Usuario = (AgregarUsuarioOrganizacion) getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        add_Usuario.completarOrganizacionID(this.id.getText().toString(),true);
+
     }
 
 
