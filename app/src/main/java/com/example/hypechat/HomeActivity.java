@@ -1,19 +1,42 @@
 package com.example.hypechat;
 
+import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.facebook.login.LoginManager;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 
-public class HomeActivity extends AppCompatActivity {
+import org.json.JSONException;
+import org.json.JSONObject;
 
+public class HomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+
+
+    private DrawerLayout drawer;
+    private NavigationView navigationView;
+    private View header;
     private SharedPreferences sharedPref;
     private SharedPreferences.Editor sharedEditor;
+    private ProgressDialog progressDialog;
+    private final String URL_PERFIL = "https://secure-plateau-18239.herokuapp.com/profile/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,38 +48,180 @@ public class HomeActivity extends AppCompatActivity {
         this.sharedEditor = sharedPref.edit();
 
 
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        drawer = findViewById(R.id.drawer_layout);
 
 
-        //Obtengo datos de shared preferences para ponerlos en la vista del layout
-        String nombre = this.sharedPref.getString("nombre","No Name");
-        String apodo = this.sharedPref.getString("apodo","No NickName");
-        String email = this.sharedPref.getString("email","No Email");
-        String token = this.sharedPref.getString("token","No Token");
+        this.navigationView = findViewById(R.id.navView);
+        this.navigationView.setNavigationItemSelectedListener(this);
 
-        TextView nameText = (TextView) findViewById(R.id.nameText);
-        TextView nickText = (TextView) findViewById(R.id.nickText);
-        TextView emailText = (TextView) findViewById(R.id.emailText);
-        TextView tokenText = (TextView) findViewById(R.id.tokenText);
+        //Setea el header de la navigation bar para que tenga el nombre de usuario (podria ser apodo o mail)
+        this.header = navigationView.getHeaderView(0);
+        setHeaderUserName(this.sharedPref.getString("nombre","No Name"));
 
-        nameText.setText(nombre);
-        nickText.setText(apodo);
-        emailText.setText(email);
-        tokenText.setText(token);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this,drawer,toolbar,R.string.navigation_drawer_open,R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
 
+        if(savedInstanceState == null){
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,new PPrincipal()).commit();
+            navigationView.setCheckedItem(R.id.pag_ppal);
+        }
+    }
 
+    private void setHeaderUserName(String name) {
+        TextView header_nombre_usuario = (TextView) this.header.findViewById(R.id.header_user_name);
+        header_nombre_usuario.setText(name);
+    }
+
+    @Override
+    //"Configuraciones" y "Mi perfil" no muestran la opcion seleccionada en el navigationview
+    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+        switch (menuItem.getItemId()){
+            case R.id.pag_ppal:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,new PPrincipal()).commit();
+                this.navigationView.setCheckedItem(R.id.pag_ppal);
+                break;
+            case R.id.organizaciones:
+
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,new Organizaciones()).commit();
+                this.navigationView.setCheckedItem(R.id.organizaciones);
+                break;
+            case R.id.msj_privados:
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,new MensajesPrivados()).commit();
+                this.navigationView.setCheckedItem(R.id.msj_privados);
+                break;
+            case R.id.perfil:
+                goToProfile(this.sharedPref.getString("email","no email"));
+                break;
+        }
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
+    private void goToProfile(String email_del_perfil) {
+        getProfileData(email_del_perfil);
+        this.navigationView.setCheckedItem(R.id.perfil);
+    }
+
+    private void getProfileData(String email) {
+        String URL = this.URL_PERFIL+email;
+        Log.i("INFO", "Se esta por consultar el perfil del mail: " + email);
+        Log.i("INFO","En la ruta: "+URL);
+        this.progressDialog = ProgressDialog.show(
+                this,"Hypechat","Obteniendo datos del perfil...",true);
+
+                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.GET, URL, null, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        progressDialog.dismiss();
+                        //Por ahora siempre busca los datos en la base y siempre los guarda en SharedPref para
+                        //armar la vista en "setProfileFragment()"
+                        procesarDatosDeUsuarioRecibidos(response);
+                    }
+
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        progressDialog.dismiss();
+                        Toast.makeText(HomeActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+        HttpConexionSingleton.getInstance(this).addToRequestQueue(jsonObjectRequest);
+    }
+
+    private void procesarDatosDeUsuarioRecibidos(JSONObject response) {
+        try {
+            Log.i("INFO",response.toString());
+
+            String email = this.sharedPref.getString("email","");
+            String nombre = this.sharedPref.getString("nombre","");
+            String apodo = this.sharedPref.getString("apodo","");
+
+            Boolean soy_yo = false;
+
+            //Deberia comparar por el mail real que devuelve la API
+            if (response.getString("email").equals(email)){
+                Log.i("INFO","Consultas tu perfil!");
+                soy_yo = true;
+            }
+            else{
+                Log.i("INFO", "perfil de otro usuario");
+                email = response.getString("email");
+                nombre = response.getString("name");
+                apodo = response.getString("nickname");
+            }
+
+            setProfileFragment(nombre,apodo,email,soy_yo);
+        }
+        catch (JSONException exception){
+            Toast.makeText(this, exception.getMessage(), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void setProfileFragment(String nombre, String apodo, String email,Boolean soy_yo) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_container,new Perfil());
+        //Esta es la linea clave para que vuelva al fragmento anterior!
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
+        //Linea clave para que el fragmento termine de ponerse si o si en la activity y poder editarla!
+        fragmentManager.executePendingTransactions();
+
+        //Me traigo el fragmento sabiendo que es el de perfil para cargarle la información
+        Perfil perfil = (Perfil) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        perfil.completarDatosPerfil(nombre,apodo,email,soy_yo);
+        perfil.setHeader(this.header);
 
     }
 
-    private void goLoginScreen() {
-
-        Intent intent = new Intent(this, LoginActivity.class);
-        startActivity(intent);
+    public void irAMiPerfil(View view){
+        this.goToProfile(this.sharedPref.getString("email","no email"));
     }
 
-    public void logout(View view){
-        LoginManager.getInstance().logOut();
-        goLoginScreen();
+
+    public void crear_organizacion(View view){
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_container,new CrearOrganizacion());
+        //Esta es la linea clave para que vuelva al fragmento anterior!
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
+        //Linea clave para que el fragmento termine de ponerse si o si en la activity y poder editarla!
+        fragmentManager.executePendingTransactions();
+
     }
+
+    public void ver_organizaciones(View view){
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_container,new Organizaciones());
+        //Esta es la linea clave para que vuelva al fragmento anterior!
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
+        //Linea clave para que el fragmento termine de ponerse si o si en la activity y poder editarla!
+        fragmentManager.executePendingTransactions();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(drawer.isDrawerOpen(GravityCompat.START)){
+            //Esta linea hace que cuando se aprete el boton "atras", se vuelva al ultimo fragmento que se encoló
+            getSupportFragmentManager().popBackStackImmediate();
+            drawer.closeDrawer(GravityCompat.START);
+        }else{
+            super.onBackPressed();
+        }
+
+    }
+
+
 
 
 }

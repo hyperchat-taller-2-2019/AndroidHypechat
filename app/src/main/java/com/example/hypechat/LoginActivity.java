@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -41,7 +42,7 @@ public class LoginActivity extends AppCompatActivity {
     //ESTA DESPUES DEBERIA SER LA DIRECCION DE DONDE ESTE EL SERVER REAL Y EL ENDPOINT CORRESPONDIENTE!
     private final String URL_LOGIN = "https://secure-plateau-18239.herokuapp.com/login";
     private final String URL_LOGIN_FACE = "https://virtserver.swaggerhub.com/taller2-hypechat/Hypechat/1.0.0/logFacebook";
-    private final Integer USUARIO_VALIDO = 1;
+
 
     public void login (View view){
         Log.i("INFO", "Intentando realizar el login a la app");
@@ -59,8 +60,11 @@ public class LoginActivity extends AppCompatActivity {
             //Preparo Body del POST
             JSONObject requestBody = new JSONObject();
             try {
+                //como el response no entrega el password, me lo guardo aca.
+                this.sharedEditor.putString("contraseña",password);
+
                 requestBody.put("email", email);
-                requestBody.put("contraseña", password);
+                requestBody.put("psw", password);
             }
             catch(JSONException except){
                 Toast.makeText(this, except.getMessage(), Toast.LENGTH_SHORT).show();
@@ -75,14 +79,15 @@ public class LoginActivity extends AppCompatActivity {
 
     public void JsonRequest_login(String URL, JSONObject requestBody) {
         // SE PUEDE HACER EL REQUEST AL SERVER PARA LOGUEARSE !
+        Log.i("INFO", "Json Request login, check http status codes");
+
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.POST, URL, requestBody, new Response.Listener<JSONObject>() {
 
                     @Override
                     public void onResponse(JSONObject response) {
-                        System.out.println("11111111111111/n");
+                        System.out.println("11111111111111\n");
                         progressDialog.dismiss();
-                        System.out.println("HOlLAAAAAA/n");
                         System.out.println(response);
                         procesarResponse(response);
 
@@ -93,9 +98,19 @@ public class LoginActivity extends AppCompatActivity {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         progressDialog.dismiss();
-                        Toast.makeText(LoginActivity.this,
-                                "No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
 
+                        switch (error.networkResponse.statusCode){
+                            case (400):
+                                Toast.makeText(LoginActivity.this,
+                                        "Usuario o Contraseña Invalidos!", Toast.LENGTH_LONG).show();
+                            case (500):
+                                Toast.makeText(LoginActivity.this,
+                                        "Server error!", Toast.LENGTH_LONG).show();
+                            case (404):
+                                Toast.makeText(LoginActivity.this,
+                                        "No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
+
+                        }
                     }
                 });
 
@@ -106,24 +121,27 @@ public class LoginActivity extends AppCompatActivity {
     private void procesarResponse(JSONObject response) {
         try{
             //Usuario valido?
-            if (response.getInt("valido") == USUARIO_VALIDO){
-                String token_response = response.getString("token");
-                String apodo_response = response.getString("apodo");
-                String nombre_response = response.getString("nombre");
-                String email_response = response.getString("email");
-                sharedEditor.putString("apodo",apodo_response);
-                sharedEditor.putString("nombre",nombre_response);
-                sharedEditor.putString("email",email_response);
-                sharedEditor.putString("token",token_response);
-                sharedEditor.apply();
-                goHomeActivity();
-            }
-            else{
-                Toast.makeText(LoginActivity.this,
-                        "Usuario o Contraseña Invalidos!", Toast.LENGTH_LONG).show();
-            }
+            Log.i("INFO",response.toString());
+
+            String token_response = response.getString("token");
+            String apodo_response = response.getString("nickname");
+            String nombre_response = response.getString("name");
+            String email_response = response.getString("email");
+           // String photo_url_response = response.getString("photo");
+            sharedEditor.putString("apodo",apodo_response);
+            sharedEditor.putString("nombre",nombre_response);
+            sharedEditor.putString("email",email_response);
+            sharedEditor.putString("token",token_response);
+            //deberia ser reemplazado por la contraseña real del usuario pero para probar pongo la mia.
+            //sharedEditor.putString("contraseña","12345678");
+            //sharedEditor.putString("foto",photo_url_response);
+
+            sharedEditor.apply();
+            goHomeActivity();
+
         }
         catch (JSONException error){
+            Log.i("INFO",error.getMessage());
             Toast.makeText(LoginActivity.this,
                     "Hubo un error con el Json de Respuesta", Toast.LENGTH_SHORT).show();;
         }
