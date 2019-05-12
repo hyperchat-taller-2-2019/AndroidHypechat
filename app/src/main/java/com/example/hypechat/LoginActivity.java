@@ -109,6 +109,8 @@ public class LoginActivity extends AppCompatActivity {
                             case (404):
                                 Toast.makeText(LoginActivity.this,
                                         "No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
+                            default:
+                                Toast.makeText(LoginActivity.this, "Ocurrio un error!!!", Toast.LENGTH_LONG).show();
 
                         }
                     }
