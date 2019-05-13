@@ -38,8 +38,9 @@ dependencies {
     implementation 'com.facebook.android:facebook-android-sdk:[4,5)'
     implementation 'com.android.support:recyclerview-v7:28.0.0'
     // Add this line
-    implementation 'com.google.firebase:firebase-core:16.0.1'
+    implementation 'com.google.firebase:firebase-core:16.0.9'
     implementation 'com.android.support:cardview-v7:28.0.0'
+    implementation 'com.google.firebase:firebase-database:17.0.0'
 }
 
 // Add to the bottom of the file
