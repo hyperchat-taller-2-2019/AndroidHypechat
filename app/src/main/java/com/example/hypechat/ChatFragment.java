@@ -22,6 +22,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 
 
 public class ChatFragment extends Fragment {
@@ -68,7 +69,7 @@ public class ChatFragment extends Fragment {
             public void onClick(View v) {
                 String texto = texto_mensaje.getText().toString();
                 if (!texto.isEmpty()) {
-                    reference.push().setValue(new ChatMensaje(sharedPref.getString("apodo", "NO NICK"),texto,"00:00","www.example.com/imagen.png"));
+                    reference.push().setValue(new ChatMensajeEnviar(sharedPref.getString("apodo", "NO NICK"),texto, ServerValue.TIMESTAMP,"www.example.com/imagen.png"));
                 }
                 else{
                     Toast.makeText(getContext(), "No podes mandar un mensaje Vacio!", Toast.LENGTH_LONG).show();
@@ -88,7 +89,7 @@ public class ChatFragment extends Fragment {
         reference.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                ChatMensaje mensaje = dataSnapshot.getValue(ChatMensaje.class);
+                ChatMensajeRecibir mensaje = dataSnapshot.getValue(ChatMensajeRecibir.class);
                 adaptador_para_chat.agregarMensaje(mensaje);
                 texto_mensaje.setText("");
             }

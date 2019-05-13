@@ -1,16 +1,15 @@
 package com.example.hypechat;
 
-public class ChatMensaje {
+public abstract class ChatMensaje {
 
-    private String nickname,texto,hora,url_foto_perfil;
+    private String nickname,texto,url_foto_perfil;
 
     public ChatMensaje() {
     }
 
-    public ChatMensaje(String nickname, String texto, String hora, String url_foto_perfil) {
+    public ChatMensaje(String nickname, String texto, String url_foto_perfil) {
         this.nickname = nickname;
         this.texto = texto;
-        this.hora = hora;
         this.url_foto_perfil = url_foto_perfil;
     }
 
@@ -28,14 +27,6 @@ public class ChatMensaje {
 
     public void setTexto(String texto) {
         this.texto = texto;
-    }
-
-    public String getHora() {
-        return hora;
-    }
-
-    public void setHora(String hora) {
-        this.hora = hora;
     }
 
     public String getUrl_foto_perfil() {
