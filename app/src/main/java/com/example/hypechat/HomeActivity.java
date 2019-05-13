@@ -90,7 +90,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                 this.navigationView.setCheckedItem(R.id.organizaciones);
                 break;
             case R.id.msj_privados:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,new MensajesPrivados()).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,new ChatFragment()).commit();
                 this.navigationView.setCheckedItem(R.id.msj_privados);
                 break;
             case R.id.perfil:
