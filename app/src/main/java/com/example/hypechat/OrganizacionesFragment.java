@@ -9,6 +9,8 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,7 +36,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class Organizaciones extends Fragment {
+public class OrganizacionesFragment extends Fragment {
 
     private SharedPreferences sharedPref;
     private Button crearOrganizacion;
@@ -44,7 +46,21 @@ public class Organizaciones extends Fragment {
     private String token;
     private View view;
     private ProgressDialog progressDialog;
+    private RecyclerView rv_organizaciones;
+    private AdapterOrganizaciones adaptador_para_organizaciones;
    // private JSONArray organizaciones;
+
+    //metodo que se ejecuta cuando tocamos algun tarjeta de la recycleview
+    private View.OnClickListener onItemClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            RecyclerView.ViewHolder viewHolder = (RecyclerView.ViewHolder) v.getTag();
+            int position = viewHolder.getAdapterPosition();
+            Organizacion organizacion_clickeada = adaptador_para_organizaciones.obtenerItemPorPosicion(position);
+            Toast.makeText(getContext(), "TOCASTE LA ORGANIZACION: " + organizacion_clickeada.getId(), Toast.LENGTH_SHORT).show();
+            obtenerDatosOrganizacion(organizacion_clickeada.getId());
+        }
+    };
 
 
 
@@ -59,6 +75,14 @@ public class Organizaciones extends Fragment {
 
         this.token = this.sharedPref.getString("token","no token");
         System.out.printf(this.token.toString()+"\n");
+
+        rv_organizaciones = (RecyclerView) view.findViewById(R.id.lista_organizaciones);
+        adaptador_para_organizaciones = new AdapterOrganizaciones(getContext());
+        LinearLayoutManager l = new LinearLayoutManager(getContext());
+        rv_organizaciones.setLayoutManager(l);
+        rv_organizaciones.setAdapter(adaptador_para_organizaciones);
+        adaptador_para_organizaciones.setOnItemClickListener(this.onItemClickListener);
+
 
         getOrganizaciones();
 
@@ -143,39 +167,33 @@ public class Organizaciones extends Fragment {
         try {
             Log.i("INFO",response.toString());
             JSONArray organizaciones = response.getJSONArray("organizaciones");
-            ListView list = (ListView) view.findViewById(R.id.lista_organizaciones);
-            List<HashMap<String,String>> array = new ArrayList<>();
-            SimpleAdapter adapter = new SimpleAdapter(getActivity(),array,R.layout.text_list_orga,new String[]{"Primera","Segunda"},new int[]{R.id.textlist1,R.id.textlist2});
             for(int i=0;i< organizaciones.length();i++){
-                HashMap<String,String> resultadoItem = new HashMap<>();
-
                 JSONObject item = organizaciones.getJSONObject(i);
                 String id = item.getString("id");
                 String name = item.getString("name");
-                resultadoItem.put("Primera",name);
-                resultadoItem.put("Segunda",id);
-                array.add(resultadoItem);
+                Organizacion organizacion = new Organizacion(name,id);
+                adaptador_para_organizaciones.agregarOrganizacion(organizacion);
             }
 
             //ArrayAdapter<String> adapter =new ArrayAdapter<String>(getContext(), R.layout.text_list_orga, array);
-            list.setAdapter(adapter);
-            list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    LinearLayout lay = (LinearLayout) view;
-                    TextView text1 = (TextView)  lay.getChildAt(0);
-                    TextView text2 = (TextView)  lay.getChildAt(1);
-                    sharedEditor.putString("organizacion_name",text1.getText().toString());
-                    sharedEditor.putString("organizacion_id",text2.getText().toString());
-                    sharedEditor.apply();
+            //list.setAdapter(adapter);
+            //list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            //    @Override
+            //    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            //        LinearLayout lay = (LinearLayout) view;
+                    //TextView text1 = (TextView)  lay.getChildAt(0);
+                   // TextView text2 = (TextView)  lay.getChildAt(1);
+                   // sharedEditor.putString("organizacion_name",text1.getText().toString());
+                   // sharedEditor.putString("organizacion_id",text2.getText().toString());
+                  //  sharedEditor.apply();
 
-                    obtenerDatosOrganizacion(text2.getText().toString());
+                //    obtenerDatosOrganizacion(text2.getText().toString());
 
 
                    // Toast.makeText(getActivity(),text2.getText().toString(), Toast.LENGTH_LONG).show();
 
-                }
-            });
+              //  }
+            //});
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -242,15 +260,15 @@ public class Organizaciones extends Fragment {
 
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.fragment_container,new Organizacion());
+        fragmentTransaction.replace(R.id.fragment_container,new OrganizacionFragment());
         //Esta es la linea clave para que vuelva al fragmento anterior!
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
         //Linea clave para que el fragmento termine de ponerse si o si en la activity y poder editarla!
         fragmentManager.executePendingTransactions();
 
-        //Me traigo el fragmento sabiendo que es el de Organizacion para cargarle la información
-        Organizacion org = (Organizacion) getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        //Me traigo el fragmento sabiendo que es el de OrganizacionFragment para cargarle la información
+        OrganizacionFragment org = (OrganizacionFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_container);
 
             org.completarInfoOrganizacion(response.getString("nombre"),response.getString("id"),response.getString("owner_email"),response.getString("password"));
         } catch (JSONException e) {

@@ -86,12 +86,11 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.organizaciones:
 
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,new Organizaciones()).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,new OrganizacionesFragment()).commit();
                 this.navigationView.setCheckedItem(R.id.organizaciones);
                 break;
             case R.id.msj_privados:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,new ChatFragment()).commit();
-                this.navigationView.setCheckedItem(R.id.msj_privados);
+                goToChat();
                 break;
             case R.id.perfil:
                 goToProfile(this.sharedPref.getString("email","no email"));
@@ -99,6 +98,26 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         }
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    public void irAChat(View view){
+        goToChat();
+    }
+
+    private void goToChat(){
+        this.navigationView.setCheckedItem(R.id.msj_privados);
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_container,new ChatFragment());
+        //Esta es la linea clave para que vuelva al fragmento anterior!
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
+        //Linea clave para que el fragmento termine de ponerse si o si en la activity y poder editarla!
+        fragmentManager.executePendingTransactions();
+
+        //Me traigo el fragmento sabiendo que es el de perfil para cargarle la información
+        ChatFragment chat = (ChatFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        chat.setSalaDeChat("Chat Test");
     }
 
     private void goToProfile(String email_del_perfil) {
@@ -201,7 +220,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     public void ver_organizaciones(View view){
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.fragment_container,new Organizaciones());
+        fragmentTransaction.replace(R.id.fragment_container,new OrganizacionesFragment());
         //Esta es la linea clave para que vuelva al fragmento anterior!
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
