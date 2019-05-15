@@ -59,11 +59,6 @@ public class ChatFragment extends Fragment {
         this.sharedPref = getActivity().getSharedPreferences(getString(R.string.saved_data), Context.MODE_PRIVATE);
         this.sharedEditor = sharedPref.edit();
 
-        database = FirebaseDatabase.getInstance();
-        //Aca se decide a que nodo de la base de datos voy a buscar y escribir los mensajes
-        reference = database.getReference("Chat Test");
-        titulo_chat.setText("Chat Test");
-
         boton_enviar_mensaje.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -84,8 +79,20 @@ public class ChatFragment extends Fragment {
                 setScrollBar();
             }
         });
+        return view;
+    }
 
 
+    //para que cuando se llene la pantalla de mensajes siempre vaya al ultimo
+    private void setScrollBar() {
+        chat.scrollToPosition(adaptador_para_chat.getItemCount()-1);
+    }
+
+
+    public void setSalaDeChat(String nombre_de_sala) {
+        //Aca se decide a que nodo de la base de datos voy a buscar y escribir los mensajes
+        database = FirebaseDatabase.getInstance();
+        reference = database.getReference(nombre_de_sala);
         reference.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
@@ -114,15 +121,6 @@ public class ChatFragment extends Fragment {
 
             }
         });
-
-        return view;
+        titulo_chat.setText(nombre_de_sala.toUpperCase());
     }
-
-
-    //para que cuando se llene la pantalla de mensajes siempre vaya al ultimo
-    private void setScrollBar() {
-        chat.scrollToPosition(adaptador_para_chat.getItemCount()-1);
-    }
-
-
 }

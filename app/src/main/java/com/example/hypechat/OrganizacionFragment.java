@@ -225,7 +225,9 @@ public class OrganizacionFragment extends Fragment {
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     TextView text1 = (TextView) view;
                     Toast.makeText(getActivity(),text1.getText().toString(), Toast.LENGTH_LONG).show();
-
+                    //Ir al chat de ese canal
+                    String nombre_sala = text1.getText().toString().replace("#","");
+                    irAlChat(nombre_sala);
 
                 }
             });
@@ -233,6 +235,21 @@ public class OrganizacionFragment extends Fragment {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    private void irAlChat(String nombre_de_sala) {
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_container,new ChatFragment());
+        //Esta es la linea clave para que vuelva al fragmento anterior!
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
+        //Linea clave para que el fragmento termine de ponerse si o si en la activity y poder editarla!
+        fragmentManager.executePendingTransactions();
+
+        //Me traigo el fragmento sabiendo que es el de ChatFragment para cargarle la información
+        ChatFragment chat = (ChatFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        chat.setSalaDeChat(nombre_de_sala);
     }
 
     private void responseListaMsjPrivados(JSONObject response){
