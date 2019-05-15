@@ -69,7 +69,7 @@ public class AgregarUsuarioOrganizacion extends Fragment {
                 if(creando_organizacion) {
                     FragmentManager fragmentManager = getFragmentManager();
                     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                    fragmentTransaction.replace(R.id.fragment_container, new Organizaciones());
+                    fragmentTransaction.replace(R.id.fragment_container, new OrganizacionesFragment());
                     //Esta es la linea clave para que vuelva al fragmento anterior!
                     fragmentTransaction.addToBackStack(null);
                     fragmentTransaction.commit();

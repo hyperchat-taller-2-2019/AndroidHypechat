@@ -15,14 +15,17 @@
         android:text="Chat Title"
         android:textSize="25dp"
         android:textStyle="bold"
+        android:textColor="@color/colorBlack"
+        android:background="@color/colorNaranja"
         android:textAlignment="center"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/listado_chat_cards"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:padding="5dp"/>
+        android:layout_margin="10dp"
+        android:background="@color/colorAzul"
+        android:layout_weight="1"/>
 
     <LinearLayout
         android:layout_width="match_parent"

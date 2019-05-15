@@ -86,7 +86,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.organizaciones:
 
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,new Organizaciones()).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,new OrganizacionesFragment()).commit();
                 this.navigationView.setCheckedItem(R.id.organizaciones);
                 break;
             case R.id.msj_privados:
@@ -201,7 +201,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     public void ver_organizaciones(View view){
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.fragment_container,new Organizaciones());
+        fragmentTransaction.replace(R.id.fragment_container,new OrganizacionesFragment());
         //Esta es la linea clave para que vuelva al fragmento anterior!
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
