@@ -17,6 +17,10 @@ public class ChatMensajeEnviar extends ChatMensaje {
         this.hora = hora;
     }
 
+    public ChatMensajeEnviar(String nickname, String texto, String url_foto_perfil, String url_foto_mensaje, Map hora) {
+        super(nickname, texto, url_foto_perfil, url_foto_mensaje);
+        this.hora = hora;
+    }
 
     public Map getHora() {
         return hora;

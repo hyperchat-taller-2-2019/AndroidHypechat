@@ -12,6 +12,7 @@ public class CardChatMensajes extends RecyclerView.ViewHolder {
     private TextView mensaje_chat;
     private TextView hora;
     private ImageView foto_perfil;
+    private ImageView imagen_mensaje;
 
 
 
@@ -22,6 +23,7 @@ public class CardChatMensajes extends RecyclerView.ViewHolder {
         mensaje_chat = (TextView) itemView.findViewById(R.id.chat_card_mensaje);
         hora = (TextView) itemView.findViewById(R.id.chat_card_timestamp);
         foto_perfil = (ImageView) itemView.findViewById(R.id.chat_card_foto_perfil);
+        imagen_mensaje = (ImageView) itemView.findViewById(R.id.imagen_mensaje);
     }
 
 
@@ -55,5 +57,13 @@ public class CardChatMensajes extends RecyclerView.ViewHolder {
 
     public void setFoto_perfil(ImageView foto_perfil) {
         this.foto_perfil = foto_perfil;
+    }
+
+    public ImageView getImagen_mensaje() {
+        return imagen_mensaje;
+    }
+
+    public void setImagen_mensaje(ImageView imagen_mensaje) {
+        this.imagen_mensaje = imagen_mensaje;
     }
 }
