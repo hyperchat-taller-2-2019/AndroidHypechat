@@ -2,7 +2,7 @@ package com.example.hypechat;
 
 public abstract class ChatMensaje {
 
-    private String nickname,texto,url_foto_perfil;
+    private String nickname,texto,url_foto_perfil,url_foto_mensaje;
 
     public ChatMensaje() {
     }
@@ -11,6 +11,14 @@ public abstract class ChatMensaje {
         this.nickname = nickname;
         this.texto = texto;
         this.url_foto_perfil = url_foto_perfil;
+        this.url_foto_mensaje = null;
+    }
+
+    public ChatMensaje(String nickname, String texto, String url_foto_perfil, String url_foto_mensaje) {
+        this.nickname = nickname;
+        this.texto = texto;
+        this.url_foto_perfil = url_foto_perfil;
+        this.url_foto_mensaje = url_foto_mensaje;
     }
 
     public String getNickname() {
@@ -35,5 +43,13 @@ public abstract class ChatMensaje {
 
     public void setUrl_foto_perfil(String url_foto_perfil) {
         this.url_foto_perfil = url_foto_perfil;
+    }
+
+    public String getUrl_foto_mensaje() {
+        return url_foto_mensaje;
+    }
+
+    public void setUrl_foto_mensaje(String url_foto_mensaje) {
+        this.url_foto_mensaje = url_foto_mensaje;
     }
 }

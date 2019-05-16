@@ -7,6 +7,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.bumptech.glide.Glide;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -41,11 +43,23 @@ public class AdapterChat extends RecyclerView.Adapter<CardChatMensajes> {
         cardChatMensajes.getNickname().setText(mensaje.getNickname());
         cardChatMensajes.getMensaje_chat().setText(mensaje.getTexto());
 
+        //Aca veo si es un mensaje de texto o una imagen y en funcion de eso seteo los parametros de la card
+        if (mensaje.getUrl_foto_mensaje() != null){
+            cardChatMensajes.getImagen_mensaje().setVisibility(View.VISIBLE);
+            Glide.with(ctx).load(mensaje.getUrl_foto_mensaje()).into(cardChatMensajes.getImagen_mensaje());
+        }
+        else{
+            //solo el mensaje de texto!
+            cardChatMensajes.getImagen_mensaje().setVisibility(View.GONE);
+        }
+
         //Aca se setea la hora de cada mensaje haciendo la conversion adecuada.
         Long codigoHora = mensaje.getHora();
         Date date = new Date(codigoHora);
         SimpleDateFormat sdf = new SimpleDateFormat("hh:mm");
         cardChatMensajes.getHora().setText(sdf.format(date));
+
+
 
     }
 
