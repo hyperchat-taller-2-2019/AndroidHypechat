@@ -43,6 +43,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-database:17.0.0'
     implementation 'com.google.firebase:firebase-storage:17.0.0'
     implementation 'com.github.bumptech.glide:glide:4.9.0'
+    implementation 'org.ocpsoft.prettytime:prettytime:4.0.1.Final'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.9.0'
 }
 
