@@ -9,15 +9,19 @@ import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
 
-import java.text.SimpleDateFormat;
+import org.ocpsoft.prettytime.PrettyTime;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class AdapterChat extends RecyclerView.Adapter<CardChatMensajes> {
 
     private List<ChatMensajeRecibir> listado_de_mensajes = new ArrayList<>();
     private Context ctx;
+    private final static int MENSAJE_PROPIO = 1;
+    private static final int MENSAJE_DE_OTRO = -1;
 
     public AdapterChat(Context ctx) {
         this.ctx = ctx;
@@ -30,8 +34,14 @@ public class AdapterChat extends RecyclerView.Adapter<CardChatMensajes> {
 
     @NonNull
     @Override
-    public CardChatMensajes onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        View view = LayoutInflater.from(ctx).inflate(R.layout.card_view_mensajes,viewGroup,false);
+    public CardChatMensajes onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
+        View view;
+        if (viewType == MENSAJE_PROPIO){
+            view = LayoutInflater.from(ctx).inflate(R.layout.card_view_mensajes_emisor,viewGroup,false);
+        }
+        else {
+            view = LayoutInflater.from(ctx).inflate(R.layout.card_view_mensajes_receptor, viewGroup, false);
+        }
         return new CardChatMensajes(view);
     }
 
@@ -60,10 +70,9 @@ public class AdapterChat extends RecyclerView.Adapter<CardChatMensajes> {
         }
 
         //Aca se setea la hora de cada mensaje haciendo la conversion adecuada.
-        Long codigoHora = mensaje.getHora();
-        Date date = new Date(codigoHora);
-        SimpleDateFormat sdf = new SimpleDateFormat("hh:mm");
-        cardChatMensajes.getHora().setText(sdf.format(date));
+        Date date = new Date(mensaje.getHora());
+        PrettyTime prettyTime = new PrettyTime(new Date(), Locale.getDefault());
+        cardChatMensajes.getHora().setText(prettyTime.format(date));
 
 
 
@@ -72,5 +81,18 @@ public class AdapterChat extends RecyclerView.Adapter<CardChatMensajes> {
     @Override
     public int getItemCount() {
         return listado_de_mensajes.size();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        if (!listado_de_mensajes.get(position).getNickname().equals(null)){
+            if (listado_de_mensajes.get(position).getNickname().equals(Usuario.getInstancia().getNickname())){
+                return MENSAJE_PROPIO;
+            }
+            else{
+                return MENSAJE_DE_OTRO;
+            }
+        }
+        return MENSAJE_DE_OTRO;
     }
 }
