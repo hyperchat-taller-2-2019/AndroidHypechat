@@ -2,9 +2,7 @@ package com.example.hypechat;
 
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -12,7 +10,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.android.volley.NetworkResponse;
+
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -33,8 +31,6 @@ public class LoginActivity extends AppCompatActivity {
     private EditText textoEmail;
     private EditText textoPassword;
     private ValidadorDeCampos validador;
-    private SharedPreferences sharedPref;
-    private SharedPreferences.Editor sharedEditor;
     private ProgressDialog progressDialog;
     private CallbackManager callbackManager;
     private LoginButton facebookLogin;
@@ -61,7 +57,8 @@ public class LoginActivity extends AppCompatActivity {
             JSONObject requestBody = new JSONObject();
             try {
                 //como el response no entrega el password, me lo guardo aca.
-                this.sharedEditor.putString("contraseña",password);
+                //this.sharedEditor.putString("contraseña",password);
+                Usuario.getInstancia().setPassword(password);
 
                 requestBody.put("email", email);
                 requestBody.put("psw", password);
@@ -125,20 +122,11 @@ public class LoginActivity extends AppCompatActivity {
             //Usuario valido?
             Log.i("INFO",response.toString());
 
-            String token_response = response.getString("token");
-            String apodo_response = response.getString("nickname");
-            String nombre_response = response.getString("name");
-            String email_response = response.getString("email");
-           // String photo_url_response = response.getString("photo");
-            sharedEditor.putString("apodo",apodo_response);
-            sharedEditor.putString("nombre",nombre_response);
-            sharedEditor.putString("email",email_response);
-            sharedEditor.putString("token",token_response);
-            //deberia ser reemplazado por la contraseña real del usuario pero para probar pongo la mia.
-            //sharedEditor.putString("contraseña","12345678");
-            //sharedEditor.putString("foto",photo_url_response);
+            Usuario.getInstancia().setEmail(response.getString("email"));
+            Usuario.getInstancia().setNombre(response.getString("name"));
+            Usuario.getInstancia().setNickname(response.getString("nickname"));
+            Usuario.getInstancia().setToken(response.getString("token"));
 
-            sharedEditor.apply();
             goHomeActivity();
 
         }
@@ -186,17 +174,6 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         Log.i("INFO","Se esta iniciando la aplicación");
-
-        //SharedPref para almacenar datos de sesión
-        this.sharedPref = getSharedPreferences(getString(R.string.saved_data), Context.MODE_PRIVATE);
-        this.sharedEditor = sharedPref.edit();
-
-
-        //Borro data de Shared Pref
-        this.sharedEditor.clear();
-        this.sharedEditor.apply();
-
-        Log.i("INFO", "Tomando referencias de la UI");
         //Referencias del layout
         this.validador = new ValidadorDeCampos();
         this.textoEmail = (EditText) findViewById(R.id.et_email);

@@ -2,7 +2,6 @@ package com.example.hypechat;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -30,7 +29,6 @@ public class CrearOrganizacion extends Fragment {
     private EditText textName;
     private ValidadorDeCampos validador;
     private ProgressDialog progress;
-    private SharedPreferences sharedPref;
     private Button crearOrganizacion;
     private Button cancelar;
     private EditText nombre;
@@ -47,7 +45,6 @@ public class CrearOrganizacion extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         //return inflater.inflate(R.layout.organizaciones,container,false);
         View view = inflater.inflate(R.layout.activity_crear_organizacion,container,false);
-        this.sharedPref = getActivity().getSharedPreferences(getString(R.string.saved_data), Context.MODE_PRIVATE);
         validador = new ValidadorDeCampos();
         crearOrganizacion = (Button)view.findViewById(R.id.button_crearOrg_siguiente);
         cancelar = (Button) view.findViewById(R.id.button_crearOrg_cancelar);
@@ -154,7 +151,7 @@ public class CrearOrganizacion extends Fragment {
         try {
             requestBody.put("nombre", this.nombre.getText().toString());
             requestBody.put("id", this.id.getText().toString());
-            requestBody.put("email_usuario", this.sharedPref.getString("email","no email"));
+            requestBody.put("email_usuario", Usuario.getInstancia().getEmail());
             requestBody.put("contraseña", this.psw.getText().toString());
         }
         catch(JSONException except){

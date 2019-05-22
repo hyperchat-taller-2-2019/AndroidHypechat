@@ -1,9 +1,7 @@
 package com.example.hypechat;
 
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -53,9 +51,6 @@ public class ChatFragment extends Fragment {
     private FirebaseStorage storage;
     private StorageReference storageReference;
 
-    private SharedPreferences sharedPref;
-    private SharedPreferences.Editor sharedEditor;
-
     private static final int PHOTO_SEND = 1;
 
     @Override
@@ -74,16 +69,13 @@ public class ChatFragment extends Fragment {
         chat.setLayoutManager(l);
         chat.setAdapter(adaptador_para_chat);
 
-        //SharedPref para almacenar datos de sesión
-        this.sharedPref = getActivity().getSharedPreferences(getString(R.string.saved_data), Context.MODE_PRIVATE);
-        this.sharedEditor = sharedPref.edit();
 
         boton_enviar_mensaje.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String texto = texto_mensaje.getText().toString();
                 if (!texto.isEmpty()) {
-                    reference.push().setValue(new ChatMensajeEnviar(sharedPref.getString("apodo", "NO NICK"),texto, ServerValue.TIMESTAMP,"www.example.com/imagen.png"));
+                    reference.push().setValue(new ChatMensajeEnviar(Usuario.getInstancia().getNickname(),texto, ServerValue.TIMESTAMP,Usuario.getInstancia().getUrl_foto_perfil()));
                 }
                 else{
                     Toast.makeText(getContext(), "No podes mandar un mensaje Vacio!", Toast.LENGTH_LONG).show();
@@ -179,8 +171,8 @@ public class ChatFragment extends Fragment {
                     if (task.isSuccessful()) {
                         Uri downloadUri = task.getResult();
                         Log.i("INFO","La url de la foto es: " + downloadUri.toString());
-                        ChatMensajeEnviar mensajeEnviar = new ChatMensajeEnviar(sharedPref.getString("apodo", "NO NICK"), "Te ha enviado una imagen...",
-                                "www.example.com/imagen.png", downloadUri.toString(), ServerValue.TIMESTAMP);
+                        ChatMensajeEnviar mensajeEnviar = new ChatMensajeEnviar(Usuario.getInstancia().getNickname(), "Te ha enviado una imagen...",
+                                Usuario.getInstancia().getUrl_foto_perfil(), downloadUri.toString(), ServerValue.TIMESTAMP);
                         reference.push().setValue(mensajeEnviar);
                     } else {
                         Toast.makeText(getActivity(), "Fallo la carga de la imagen" + task.getException().getMessage(), Toast.LENGTH_LONG).show();

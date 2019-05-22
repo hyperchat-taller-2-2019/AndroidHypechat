@@ -52,6 +52,12 @@ public class AdapterChat extends RecyclerView.Adapter<CardChatMensajes> {
             //solo el mensaje de texto!
             cardChatMensajes.getImagen_mensaje().setVisibility(View.GONE);
         }
+        if (mensaje.getUrl_foto_perfil().equals("")){
+            cardChatMensajes.getFoto_perfil().setImageResource(R.mipmap.ic_launcher);
+        }
+        else{
+            Glide.with(ctx).load(mensaje.getUrl_foto_perfil()).into(cardChatMensajes.getFoto_perfil());
+        }
 
         //Aca se setea la hora de cada mensaje haciendo la conversion adecuada.
         Long codigoHora = mensaje.getHora();
