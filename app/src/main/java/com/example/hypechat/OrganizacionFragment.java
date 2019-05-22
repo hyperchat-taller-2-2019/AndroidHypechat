@@ -64,9 +64,9 @@ public class OrganizacionFragment extends Fragment {
         this.organizacion_name = sharedPref.getString("organizacion_name","no organizacion");
         this.organizacion_id = sharedPref.getString("organizacion_id","no id");
 
-        this.user_email = sharedPref.getString("email","no user");
+        this.user_email = Usuario.getInstancia().getEmail();
 
-        this.token = this.sharedPref.getString("token","no token");
+        this.token = Usuario.getInstancia().getToken();
 
         titulo = (TextView) view.findViewById(R.id.titulo_organizacion);
         this.titulo.setText(organizacion_name);

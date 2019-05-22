@@ -3,8 +3,8 @@ package com.example.hypechat;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.SharedPreferences;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,9 +24,19 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.ServerValue;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import static android.app.Activity.RESULT_OK;
 
 
 public class Perfil extends Fragment {
@@ -36,9 +47,12 @@ public class Perfil extends Fragment {
     private Button cambiarContraseña, modificarPerfil;
     private Dialog dialog_cambiar_psw;
     private ValidadorDeCampos validador;
-    private SharedPreferences sharedPref;
-    private SharedPreferences.Editor sharedEditor;
     private ProgressDialog progressDialog;
+    private ImageButton btn_cambiar_foto_perfil;
+    private ImageView perfil_foto;
+    private static final int PHOTO_PERFIL = 2;
+    StorageReference storageReference;
+    FirebaseStorage storage;
 
 
     private View header;
@@ -56,9 +70,10 @@ public class Perfil extends Fragment {
         dialog_cambiar_psw = new Dialog(getActivity());
         modificarPerfil = (Button)view.findViewById(R.id.boton_modificar_perfil);
         cambiarContraseña = (Button) view.findViewById(R.id.boton_cambiar_contraseña);
+        btn_cambiar_foto_perfil = (ImageButton) view.findViewById(R.id.boton_cambiar_foto_perfil);
+        storage = FirebaseStorage.getInstance();
+
         validador = new ValidadorDeCampos();
-        this.sharedPref = getActivity().getSharedPreferences(getString(R.string.saved_data), Context.MODE_PRIVATE);
-        this.sharedEditor = sharedPref.edit();
 
         modificarPerfil.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -77,14 +92,13 @@ public class Perfil extends Fragment {
 
                     JSONObject cambiar_perfil_body = new JSONObject();
                     try{
-                        String user_token = sharedPref.getString("token","");
+                        String user_token = Usuario.getInstancia().getToken();
 
                         cambiar_perfil_body.put("token",user_token);
                         cambiar_perfil_body.put("name",nombre_perfil_string);
                         cambiar_perfil_body.put("nickname",apodo_perfil_string);
                         cambiar_perfil_body.put("email",email_perfil_string);
 
-                        //cambiar_perfil_body.put("photo","");
                     }
                     catch(JSONException except){
                         Toast.makeText(getActivity(), except.getMessage(), Toast.LENGTH_SHORT).show();
@@ -119,7 +133,7 @@ public class Perfil extends Fragment {
                 b_cambiar_contrasenia.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        String password = sharedPref.getString("contraseña","");
+                        String password = Usuario.getInstancia().getPassword();
 
                         Log.i("INFO: ", "Validando que los datos sean correctos!");
 
@@ -133,7 +147,7 @@ public class Perfil extends Fragment {
                             Log.i("INFO: ", "Los datos son correctos!");
                             Log.i("INFO","hacer el request para cambiar el password!");
 
-                            String token_usuario = sharedPref.getString("token","");
+                            String token_usuario = Usuario.getInstancia().getToken();
 
                             JSONObject cambiar_psw_body = new JSONObject();
                             try {
@@ -151,7 +165,21 @@ public class Perfil extends Fragment {
                         }
                     }
                 });
+
+
+
                 dialog_cambiar_psw.show();
+            }
+        });
+
+        btn_cambiar_foto_perfil.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i("INFO", "APRETASTE PARA CAMBIAR UNA FOTO DE PERFIL!");
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("image/*");
+                intent.putExtra(Intent.EXTRA_LOCAL_ONLY,true);
+                startActivityForResult(Intent.createChooser(intent,"Seleccionar una foto de perfil"),PHOTO_PERFIL);
             }
         });
 
@@ -159,10 +187,57 @@ public class Perfil extends Fragment {
         this.nombre_perfil = (EditText) view.findViewById(R.id.nombre_perfil);
         this.apodo_perfil = (EditText) view.findViewById(R.id.apodo_perfil);
         this.email_perfil = (EditText) view.findViewById(R.id.email_perfil);
+        this.perfil_foto = (ImageView) view.findViewById(R.id.perfil_foto);
+
+        if (!Usuario.getInstancia().getUrl_foto_perfil().equals("")){
+            Glide.with(getContext()).load(Usuario.getInstancia().getUrl_foto_perfil()).into(perfil_foto);
+        }
 
 
         return view;
 
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.i("INFO","Se va a cargar la foto a la base de datos!");
+        if (requestCode == PHOTO_PERFIL && resultCode == RESULT_OK){
+            progressDialog = ProgressDialog.show(getContext(),"Hypechat","Modificando Foto de perfil",
+                    true);
+            Uri url_foto = data.getData();
+            storageReference = storage.getReference("imagenes_perfil");
+            final StorageReference foto_referencia = storageReference.child(url_foto.getLastPathSegment());
+            //MAGIA QUE PIDE LA NUEVA DOCUMENTACION PARA OBTENER LA DOWNLOAD URL
+            foto_referencia.putFile(url_foto).continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                @Override
+                public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                    if (!task.isSuccessful()) {
+                        progressDialog.dismiss();
+                        throw task.getException();
+                    }
+                    return foto_referencia.getDownloadUrl();
+                }
+            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                @Override
+                public void onComplete(@NonNull Task<Uri> task) {
+                    if (task.isSuccessful()) {
+                        Uri downloadUri = task.getResult();
+                        Log.i("INFO","La url de la foto es: " + downloadUri.toString());
+                        Usuario.getInstancia().setUrl_foto_perfil(downloadUri.toString());
+                        //Tomo la referencia de la imagen del header
+                        ImageView header_foto_perfil = (ImageView) header.findViewById(R.id.header_foto_perfil);
+                        //Cargo la foto en el perfil y en el header
+                        Glide.with(getContext()).load(Usuario.getInstancia().getUrl_foto_perfil()).into(perfil_foto);
+                        Glide.with(getContext()).load(Usuario.getInstancia().getUrl_foto_perfil()).into(header_foto_perfil);
+                        progressDialog.dismiss();
+                        Toast.makeText(getActivity(), "La foto de perfil se modificó con exito!", Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(getActivity(), "Fallo la carga de la imagen" + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
+        }
     }
 
     private void cambiarPerfilRequest(final JSONObject cambiar_perfil_body) {
@@ -178,10 +253,10 @@ public class Perfil extends Fragment {
                             setApodoPerfil(cambiar_perfil_body.getString("nickname"));
                             setEmailPerfil(cambiar_perfil_body.getString("email"));
                             setNombrePerfil(cambiar_perfil_body.getString("name"));
-                            sharedEditor.putString("nombre",cambiar_perfil_body.getString("name"));
-                            sharedEditor.putString("email",cambiar_perfil_body.getString("email"));
-                            sharedEditor.putString("apodo",cambiar_perfil_body.getString("nickname"));
-                            sharedEditor.apply();
+                            Usuario.getInstancia().setNombre(cambiar_perfil_body.getString("name"));
+                            Usuario.getInstancia().setEmail(cambiar_perfil_body.getString("email"));
+                            Usuario.getInstancia().setNickname(cambiar_perfil_body.getString("nickname"));
+
                             TextView header_nombre_usuario = (TextView) header.findViewById(R.id.header_user_name);
                             header_nombre_usuario.setText(cambiar_perfil_body.getString("name"));
                             Toast.makeText(getContext(), "El perfil se modifico Correctamente!", Toast.LENGTH_LONG).show();
@@ -227,17 +302,13 @@ public class Perfil extends Fragment {
                     @Override
                     public void onResponse(JSONObject response) {
                         Log.i("INFO", "La contraseña se modifico correctamente!");
-
                         progressDialog.dismiss();
-
                         try{
-                            sharedEditor.putString("contraseña",cambiar_psw_body.getString("psw"));
-                            sharedEditor.apply();
+                            Usuario.getInstancia().setPassword(cambiar_psw_body.getString("psw"));
                             Toast.makeText(getActivity(), "La contraseña ha sido modificada con Exito!", Toast.LENGTH_LONG).show();
                         }catch (JSONException exception){
                             Log.i("INFO", exception.getMessage());
                         }
-
                         dialog_cambiar_psw.dismiss();
                     }
 
@@ -265,10 +336,19 @@ public class Perfil extends Fragment {
         HttpConexionSingleton.getInstance(getContext()).addToRequestQueue(jsonObjectRequest);
     }
 
-    public void completarDatosPerfil(String nombre, String apodo, String email, Boolean  soy_yo){
+    public void completarDatosPerfil(String nombre, String apodo, String email,String url_foto, Boolean  soy_yo){
         this.setNombrePerfil(nombre);
         this.setApodoPerfil(apodo);
         this.setEmailPerfil(email);
+
+
+        //Tomo la referencia de la imagen del header
+        ImageView header_foto_perfil = (ImageView) header.findViewById(R.id.header_foto_perfil);
+        if (!Usuario.getInstancia().getUrl_foto_perfil().equals("")) {
+            //Cargo la foto en el perfil y en el header
+            Glide.with(getContext()).load(Usuario.getInstancia().getUrl_foto_perfil()).into(header_foto_perfil);
+            Glide.with(getContext()).load(url_foto).into(perfil_foto);
+        }
 
         if (soy_yo){
             mostrarBotones();

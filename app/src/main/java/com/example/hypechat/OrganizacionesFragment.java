@@ -73,7 +73,7 @@ public class OrganizacionesFragment extends Fragment {
         this.sharedEditor = sharedPref.edit();
         System.out.printf("ESTOY EN ORGANIZACIONES CON TOKEN:     ");
 
-        this.token = this.sharedPref.getString("token","no token");
+        this.token = Usuario.getInstancia().getToken();
         System.out.printf(this.token.toString()+"\n");
 
         rv_organizaciones = (RecyclerView) view.findViewById(R.id.lista_organizaciones);
