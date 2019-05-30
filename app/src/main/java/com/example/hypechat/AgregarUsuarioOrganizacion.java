@@ -33,10 +33,11 @@ public class AgregarUsuarioOrganizacion extends Fragment {
     private Button finalizar;
     private EditText email;
     private ProgressDialog progressDialog;
-    private String URL_AGREGAR_USUARIO = "https://virtserver.swaggerhub.com/vickyperezz/hypeChatAndroid/1.0.0/agregarUsuarioOrganizacion";
+    private String URL_AGREGAR_USUARIO = "https://secure-plateau-18239.herokuapp.com/organization/user";
     private String organizacion_id;
     private Boolean creando_organizacion;
-
+    private String token;
+    private String psw;
 
     @Nullable
     @Override
@@ -99,8 +100,10 @@ public class AgregarUsuarioOrganizacion extends Fragment {
 
         JSONObject requestBody = new JSONObject();
         try {
-            requestBody.put("id_organizacion", this.organizacion_id);
-            requestBody.put("email_usuario", this.email.getText().toString());
+            requestBody.put("token",this.token );
+            requestBody.put("psw", this.psw);
+            requestBody.put("idOrganization", this.organizacion_id);
+            requestBody.put("email", this.email.getText().toString());
         }
         catch(JSONException except){
             Toast.makeText(getActivity(), except.getMessage(), Toast.LENGTH_SHORT).show();
@@ -147,8 +150,10 @@ public class AgregarUsuarioOrganizacion extends Fragment {
 
     }
 
-    public void completarOrganizacionID(String id,Boolean creandoOrg) {
+    public void completarOrganizacionID(String id,Boolean creandoOrg,String psw, String token) {
         this.organizacion_id = id;
         this.creando_organizacion = creandoOrg;
+        this.psw = psw;
+        this.token = token;
     }
 }

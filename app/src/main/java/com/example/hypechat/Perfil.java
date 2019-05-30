@@ -369,7 +369,7 @@ public class Perfil extends Fragment {
     private void setEditTextNormales() {
         this.nombre_perfil.setEnabled(true);
         this.apodo_perfil.setEnabled(true);
-        this.email_perfil.setEnabled(true);
+        this.email_perfil.setEnabled(false);
     }
 
     private void mostrarBotones() {

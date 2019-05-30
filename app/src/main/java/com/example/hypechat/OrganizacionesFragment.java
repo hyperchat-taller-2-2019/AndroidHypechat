@@ -15,12 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.SimpleAdapter;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -32,16 +27,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 public class OrganizacionesFragment extends Fragment {
 
     private SharedPreferences sharedPref;
     private Button crearOrganizacion;
-    private final String URL_ORGANIZACIONES = "https://virtserver.swaggerhub.com/vickyperezz/hypeChatAndroid/1.0.0/getOrganizaciones";
-    private final String URL_INFO_ORG = "https://virtserver.swaggerhub.com/vickyperezz/hypeChatAndroid/1.0.0/getInfoOrganizacion";
+    private final String URL_ORGANIZACIONES = "https://secure-plateau-18239.herokuapp.com/organizations/";
+    private final String URL_INFO_ORG = "https://secure-plateau-18239.herokuapp.com/organization/";
     private SharedPreferences.Editor sharedEditor;
     private String token;
     private View view;
@@ -57,7 +48,7 @@ public class OrganizacionesFragment extends Fragment {
             RecyclerView.ViewHolder viewHolder = (RecyclerView.ViewHolder) v.getTag();
             int position = viewHolder.getAdapterPosition();
             Organizacion organizacion_clickeada = adaptador_para_organizaciones.obtenerItemPorPosicion(position);
-            Toast.makeText(getContext(), "TOCASTE LA ORGANIZACION: " + organizacion_clickeada.getId(), Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getContext(), "TOCASTE LA ORGANIZACION: " + organizacion_clickeada.getId(), Toast.LENGTH_SHORT).show();
             obtenerDatosOrganizacion(organizacion_clickeada.getId());
         }
     };
@@ -117,18 +108,11 @@ public class OrganizacionesFragment extends Fragment {
                 getActivity(),"Hypechat","Obteniendo organizaciones del usuario...",true);
 
         //Preparo Body del POST
-        JSONObject requestBody = new JSONObject();
-        try {
-            requestBody.put("token", this.token);
-        }
-        catch(JSONException except){
-            Toast.makeText(getActivity(), except.getMessage(), Toast.LENGTH_SHORT).show();
-        }
-
+        String URL = URL_ORGANIZACIONES + Usuario.getInstancia().getEmail();
         Log.i("INFO", "Json Request getOrganizaciones, check http status codes");
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.POST, URL_ORGANIZACIONES, requestBody, new Response.Listener<JSONObject>() {
+                (Request.Method.GET, URL, null, new Response.Listener<JSONObject>() {
 
                     @Override
                     public void onResponse(JSONObject response) {
@@ -146,11 +130,11 @@ public class OrganizacionesFragment extends Fragment {
                         //progressDialog.dismiss();
                         progressDialog.dismiss();
                         switch (error.networkResponse.statusCode){
-                            case (400):
-                                //Toast.makeText(LoginActivity.this,"Usuario o Contraseña Invalidos!", Toast.LENGTH_LONG).show();
-                            case (500):
-                                // Toast.makeText(LoginActivity.this,"Server error!", Toast.LENGTH_LONG).show();
                             case (404):
+                                Toast.makeText(getActivity(),"Usuario Invalido!", Toast.LENGTH_LONG).show();
+                            case (500):
+                                 Toast.makeText(getActivity(),"Server error!", Toast.LENGTH_LONG).show();
+                            case (400):
                                 //Toast.makeText(LoginActivity.this,"No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
 
                         }
@@ -166,7 +150,7 @@ public class OrganizacionesFragment extends Fragment {
 
         try {
             Log.i("INFO",response.toString());
-            JSONArray organizaciones = response.getJSONArray("organizaciones");
+            JSONArray organizaciones = response.getJSONArray("organizations");
             for(int i=0;i< organizaciones.length();i++){
                 JSONObject item = organizaciones.getJSONObject(i);
                 String id = item.getString("id");
@@ -206,20 +190,13 @@ public class OrganizacionesFragment extends Fragment {
                 getActivity(),"Hypechat","Obteniendo organizaciones del usuario...",true);
 
         //Preparo Body del POST
-        JSONObject requestBody = new JSONObject();
-        try {
-            requestBody.put("token", this.token);
-            requestBody.put("id_organizacion",id);
 
-        }
-        catch(JSONException except){
-            Toast.makeText(getActivity(), except.getMessage(), Toast.LENGTH_SHORT).show();
-        }
+        String URL = URL_INFO_ORG + this.token+ "/" + id;
 
         Log.i("INFO", "Json Request getOrganizaciones, check http status codes");
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.GET, URL_INFO_ORG, requestBody, new Response.Listener<JSONObject>() {
+                (Request.Method.GET, URL, null, new Response.Listener<JSONObject>() {
 
                     @Override
                     public void onResponse(JSONObject response) {
@@ -240,9 +217,7 @@ public class OrganizacionesFragment extends Fragment {
                             case (400):
                                 //Toast.makeText(LoginActivity.this,"Usuario o Contraseña Invalidos!", Toast.LENGTH_LONG).show();
                             case (500):
-                                // Toast.makeText(LoginActivity.this,"Server error!", Toast.LENGTH_LONG).show();
-                            case (404):
-                                //Toast.makeText(LoginActivity.this,"No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
+                                Toast.makeText(getActivity(),"No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
 
                         }
                     }
@@ -254,8 +229,9 @@ public class OrganizacionesFragment extends Fragment {
 
     private void mostrarOrganizacion(JSONObject response) {
         try {
-        this.sharedEditor.putString("organizacion_name",response.getString("nombre"));
-        this.sharedEditor.putString("organizacion_id",response.getString("id"));
+            JSONObject orga = response.getJSONObject("organization");
+        this.sharedEditor.putString("organizacion_name",orga.getString("name"));
+        this.sharedEditor.putString("organizacion_id",orga.getString("id"));
         this.sharedEditor.apply();
 
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
@@ -270,7 +246,7 @@ public class OrganizacionesFragment extends Fragment {
         //Me traigo el fragmento sabiendo que es el de OrganizacionFragment para cargarle la información
         OrganizacionFragment org = (OrganizacionFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_container);
 
-            org.completarInfoOrganizacion(response.getString("nombre"),response.getString("id"),response.getString("owner_email"),response.getString("password"));
+            org.completarInfoOrganizacion(orga.getString("name"),orga.getString("id"),orga.getString("owner"),orga.getString("psw"));
         } catch (JSONException e) {
             e.printStackTrace();
         }

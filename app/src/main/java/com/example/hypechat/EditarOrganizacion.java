@@ -36,9 +36,11 @@ public class EditarOrganizacion extends Fragment {
     private Button guardar_cambio;
     private Button cambiar_pass;
     private Button agregar_usuario;
-    private String password, owner, token;
-    private String URL_CAMBIO_NOMBRE = "https://virtserver.swaggerhub.com/vickyperezz/hypeChatAndroid/1.0.0/setNombreOrganizacion";
-    private String URL_CAMBIO_PASSWORD = "https://virtserver.swaggerhub.com/vickyperezz/hypeChatAndroid/1.0.0/setPasswordOrganizacion";
+    private String password, token;
+    private Boolean owner;
+    private String URL_INFO = "https://secure-plateau-18239.herokuapp.com/organization/";
+    private String URL_CAMBIO_NOMBRE = "https://secure-plateau-18239.herokuapp.com/organization/name";
+    private String URL_CAMBIO_PASSWORD = "https://secure-plateau-18239.herokuapp.com/organization/password";
     private Dialog dialog_cambiar_psw;
     private ProgressDialog progressDialog;
 
@@ -47,7 +49,7 @@ public class EditarOrganizacion extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         //return inflater.inflate(R.layout.organizaciones,container,false);
-        View view = inflater.inflate(R.layout.activity_editar_organizacion,container,false);
+        View view = inflater.inflate(R.layout.activity_editar_organizacion, container, false);
         validador = new ValidadorDeCampos();
         cancelar = (Button) view.findViewById(R.id.button_editarOrg_cancelar);
         guardar_cambio = (Button) view.findViewById(R.id.button_editarOrg_guardar);
@@ -61,7 +63,7 @@ public class EditarOrganizacion extends Fragment {
         cancelar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i("INFO","Cancelar la edicion de la organizacion: "+nombre_titulo.getText().toString());
+                Log.i("INFO", "Cancelar la edicion de la organizacion: " + nombre_titulo.getText().toString());
 
                 getFragmentManager().popBackStackImmediate();
 
@@ -72,14 +74,14 @@ public class EditarOrganizacion extends Fragment {
         guardar_cambio.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i("INFO","Apretaste para guardar cambios de una organizacion");
+                Log.i("INFO", "Apretaste para guardar cambios de una organizacion");
                 //Intent launchactivity = new Intent(getActivity(),CrearOrganizacion.class);
                 //startActivity(launchactivity);
-                if(!nombre_titulo.equals(nombre.getText().toString())){
-                    if(validador.isValidName(nombre.getText().toString(),getContext())) {
+                if (!nombre_titulo.equals(nombre.getText().toString())) {
+                    if (validador.isValidName(nombre.getText().toString(), getContext())) {
                         enviarCambioNombre();
                     }
-                }else{
+                } else {
                     getFragmentManager().popBackStackImmediate();
                 }
 
@@ -90,7 +92,7 @@ public class EditarOrganizacion extends Fragment {
         cambiar_pass.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i("INFO","Apretaste para cambiar password de una organizacion");
+                Log.i("INFO", "Apretaste para cambiar password de una organizacion");
                 //Intent launchactivity = new Intent(getActivity(),CrearOrganizacion.class);
                 //startActivity(launchactivity);
                 dialog_cambiar_psw.setContentView(R.layout.popup_cambiar_password);
@@ -120,23 +122,22 @@ public class EditarOrganizacion extends Fragment {
                         Log.i("INFO:", "passwordNuevoInsertado:" + pass_nuevo.getText().toString());
                         Log.i("INFO:", "passwordNuevoRepetido:" + pass_nuevo_bis.getText().toString());
 
-                        if (validador.isValidPasswordChange(password,pass_viejo.getText().toString(),pass_nuevo.getText().toString(),pass_nuevo_bis.getText().toString(), getActivity())){
+                        if (validador.isValidPasswordChange(password, pass_viejo.getText().toString(), pass_nuevo.getText().toString(), pass_nuevo_bis.getText().toString(), getActivity())) {
 
                             Log.i("INFO: ", "Los datos son correctos!");
-                            Log.i("INFO","hacer el request para cambiar el password!");
+                            Log.i("INFO", "hacer el request para cambiar el password!");
 
 
                             JSONObject cambiar_psw_body = new JSONObject();
                             try {
                                 cambiar_psw_body.put("token", token);
-                                cambiar_psw_body.put("id_organizacion",id.getText().toString());
+                                cambiar_psw_body.put("organizationID", id.getText().toString());
                                 cambiar_psw_body.put("psw", pass_nuevo.getText().toString());
-                            }
-                            catch(JSONException except){
+                            } catch (JSONException except) {
                                 Toast.makeText(getActivity(), except.getMessage(), Toast.LENGTH_SHORT).show();
                             }
 
-                            progressDialog = ProgressDialog.show(getContext(),"Hypechat","Cambiando Contraseña...",
+                            progressDialog = ProgressDialog.show(getContext(), "Hypechat", "Cambiando Contraseña...",
                                     true);
 
                             cambiarPswRequest(cambiar_psw_body);
@@ -151,7 +152,7 @@ public class EditarOrganizacion extends Fragment {
         agregar_usuario.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i("INFO","Apretaste para agregar usuario a una organizacion");
+                Log.i("INFO", "Apretaste para agregar usuario a una organizacion");
                 //Intent launchactivity = new Intent(getActivity(),CrearOrganizacion.class);
                 //startActivity(launchactivity);
                 FragmentManager fragmentManager = getFragmentManager();
@@ -165,7 +166,7 @@ public class EditarOrganizacion extends Fragment {
 
                 //Me traigo el fragmento sabiendo que es el de perfil para cargarle la información
                 AgregarUsuarioOrganizacion add_Usuario = (AgregarUsuarioOrganizacion) getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-                add_Usuario.completarOrganizacionID(id.getText().toString(),false);
+                add_Usuario.completarOrganizacionID(id.getText().toString(), false, password, token);
 
 
             }
@@ -179,16 +180,15 @@ public class EditarOrganizacion extends Fragment {
         JSONObject requestBody = new JSONObject();
         try {
             requestBody.put("token", this.token);
-            requestBody.put("id_organizacion",this.id.getText().toString());
-            requestBody.put("nombre_organizacion",this.nombre.getText().toString());
-        }
-        catch(JSONException except){
+            requestBody.put("organizationID", this.id.getText().toString());
+            requestBody.put("name", this.nombre.getText().toString());
+        } catch (JSONException except) {
             Toast.makeText(getActivity(), except.getMessage(), Toast.LENGTH_SHORT).show();
         }
         Log.i("INFO", "Json Request , check http status codes");
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.POST, URL_CAMBIO_NOMBRE, requestBody, new Response.Listener<JSONObject>() {
+                (Request.Method.PUT, URL_CAMBIO_NOMBRE, requestBody, new Response.Listener<JSONObject>() {
 
                     @Override
                     public void onResponse(JSONObject response) {
@@ -204,11 +204,11 @@ public class EditarOrganizacion extends Fragment {
                     public void onErrorResponse(VolleyError error) {
                         //progressDialog.dismiss();
 
-                        switch (error.networkResponse.statusCode){
-                            case (400):
-                                Toast.makeText(getActivity(),"No fue posible conectarse al servidor, por favor intente de nuevo mas tarde!", Toast.LENGTH_LONG).show();
+                        switch (error.networkResponse.statusCode) {
+                            case (500):
+                                Toast.makeText(getActivity(), "No fue posible conectarse al servidor, por favor intente de nuevo mas tarde!", Toast.LENGTH_LONG).show();
                             case (405):
-                                 Toast.makeText(getActivity(),"Server error!", Toast.LENGTH_LONG).show();
+                                Toast.makeText(getActivity(), "Server error!", Toast.LENGTH_LONG).show();
                             case (404):
                                 //Toast.makeText(LoginActivity.this,"No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
 
@@ -221,21 +221,34 @@ public class EditarOrganizacion extends Fragment {
 
     }
 
-    public void completarInformacionOrganizacion(String token, String nombre, String id, String pass, String owner,Boolean sameUser){
-        Log.i("INFO","Completo la informacion de la  organizacion: "+nombre+" ; "+id+" ; "+pass+" ; "+owner);
-        this.token = token;
-        this.nombre_titulo.setText(nombre);
-        this.nombre.setText(nombre);
-        this.id.setText(id);
-        this.id.setEnabled(false);
-        this.password = pass;
-        this.owner = owner;
-        if(sameUser){
-            enableButtons();
-        }else{
-            disableButtons();
+
+
+    private void procesarInfo(JSONObject response) {
+        try {
+            JSONObject orga = response.getJSONObject("organization");
+
+            this.nombre_titulo.setText(orga.getString("name"));
+            this.nombre.setText(orga.getString("name"));
+            this.id.setText(orga.getString("id"));
+            this.owner = false;
+            for (int i = 0; i < orga.getJSONArray("owner").length(); i++){
+                if (orga.getJSONArray("owner").getString(i).equals(Usuario.getInstancia().getEmail())){
+                    this.owner = true;
+                }
+            }
+            if (this.owner) {
+                enableButtons();
+            } else {
+                disableButtons();
+            }
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
+
     }
+
 
     private void enableButtons() {
         this.nombre.setEnabled(true);
@@ -254,7 +267,7 @@ public class EditarOrganizacion extends Fragment {
     private void cambiarPswRequest(final JSONObject cambiar_psw_body) {
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.POST, URL_CAMBIO_PASSWORD, cambiar_psw_body, new Response.Listener<JSONObject>() {
+                (Request.Method.PUT, URL_CAMBIO_PASSWORD, cambiar_psw_body, new Response.Listener<JSONObject>() {
 
                     @Override
                     public void onResponse(JSONObject response) {
@@ -270,14 +283,14 @@ public class EditarOrganizacion extends Fragment {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         progressDialog.dismiss();
-                        switch (error.networkResponse.statusCode){
+                        switch (error.networkResponse.statusCode) {
                             case (404):
                                 Toast.makeText(getActivity(),
                                         "Usuario o Contraseña Invalidos!", Toast.LENGTH_LONG).show();
-                            case (500):
+                            case (400):
                                 Toast.makeText(getActivity(),
                                         "Server error!", Toast.LENGTH_LONG).show();
-                            case (400):
+                            case (500):
                                 Toast.makeText(getActivity(),
                                         "No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
 
@@ -288,5 +301,47 @@ public class EditarOrganizacion extends Fragment {
         //Agrego la request a la cola para que se conecte con el server!
         HttpConexionSingleton.getInstance(getContext()).addToRequestQueue(jsonObjectRequest);
     }
+
+
+    public void completarInformacionOrganizacion(String id) {
+
+        this.token = Usuario.getInstancia().getToken();
+
+        String URL = URL_INFO + this.token + "/" + id;
+
+        Log.i("INFO", "Json Request , check http status codes");
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.GET, URL, null, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+
+                        System.out.println(response);
+                        procesarInfo(response);
+
+                    }
+
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        //progressDialog.dismiss();
+
+                        switch (error.networkResponse.statusCode) {
+                            case (400):
+                                //Toast.makeText(LoginActivity.this,"Usuario o Contraseña Invalidos!", Toast.LENGTH_LONG).show();
+                            case (500):
+                                Toast.makeText(getActivity(), "No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
+
+                        }
+                    }
+                });
+
+        //Agrego la request a la cola para que se conecte con el server!
+        HttpConexionSingleton.getInstance(getContext()).addToRequestQueue(jsonObjectRequest);
+    }
+
+
 
 }

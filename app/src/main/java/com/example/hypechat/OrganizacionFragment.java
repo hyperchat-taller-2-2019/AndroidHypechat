@@ -38,8 +38,8 @@ public class OrganizacionFragment extends Fragment {
     private ImageButton crearCanal;;
     private ImageButton crearMsjPrivado;
     private ImageButton editar_organizacion;
-    private final String URL_CANALES_MSJ_PRIVADOS = "https://virtserver.swaggerhub.com/vickyperezz/hypeChatAndroid/1.0.0/getCanalesYmsjPrivados";
-    //private final String URL_MSJ_PRIVADOS = "https://virtserver.swaggerhub.com/vickyperezz/hypeChatAndroid/1.0.0/getMsjPrivados";
+    private final String URL_CANALES = "https://secure-plateau-18239.herokuapp.com/channels/user";
+    private final String URL_MSJ_PRIVADOS = "https://secure-plateau-18239.herokuapp.com/privateMsj";
     private SharedPreferences.Editor sharedEditor;
     private String token;
     private String organizacion_id;
@@ -70,8 +70,8 @@ public class OrganizacionFragment extends Fragment {
 
         titulo = (TextView) view.findViewById(R.id.titulo_organizacion);
         this.titulo.setText(organizacion_name);
-        getCanalesYmsjPrivados();
-        //getMsjPrivados();
+        getCanales();
+
 
 
         crearCanal= (ImageButton)view.findViewById(R.id.crear_canal);
@@ -128,10 +128,10 @@ public class OrganizacionFragment extends Fragment {
                 //Linea clave para que el fragmento termine de ponerse si o si en la activity y poder editarla!
                 fragmentManager.executePendingTransactions();
 
-                Boolean sameUser = (owner_email.equals(user_email));
+
                 //Me traigo el fragmento sabiendo que es el de EditarOrganizacion para cargarle la información
                 EditarOrganizacion editar_organization = (EditarOrganizacion) getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-                editar_organization.completarInformacionOrganizacion(token,organizacion_name,organizacion_id, password, owner_email,sameUser);
+                editar_organization.completarInformacionOrganizacion(organizacion_id);
 
 
 
@@ -147,7 +147,8 @@ public class OrganizacionFragment extends Fragment {
         JSONObject requestBody = new JSONObject();
         try {
             requestBody.put("token", this.token);
-            requestBody.put("organizacion_id",this.organizacion_id);
+            requestBody.put("id",this.organizacion_id);
+            requestBody.put("email",this.user_email);
         }
         catch(JSONException except){
             Toast.makeText(getActivity(), except.getMessage(), Toast.LENGTH_SHORT).show();
@@ -158,23 +159,72 @@ public class OrganizacionFragment extends Fragment {
     }
 
 
-    private void getCanalesYmsjPrivados(){
-        Log.i("INFO", "Obtengo los canales y msj privados del usuario en la organizacion: "+organizacion_id);
-        progressDialog = ProgressDialog.show(
-                getActivity(),"Hypechat","Obteniendo canales y msj privados del usuario...",true);
+    private void getCanales(){
+        Log.i("INFO", "Obtengo los canales del usuario en la organizacion: "+organizacion_id);
+        progressDialog = ProgressDialog.show(getActivity(),"Hypechat","Obteniendo canales del usuario...",true);
 
         JSONObject request = get_json_Request_Body();
 
-        Log.i("INFO", "Json Request getCanales, check http status codes");
+        Log.i("INFO", "Json Request getCanales, check http status codes "+ request.toString());
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.POST, URL_CANALES_MSJ_PRIVADOS, request, new Response.Listener<JSONObject>() {
+                (Request.Method.POST, URL_CANALES, request, new Response.Listener<JSONObject>() {
 
                     @Override
                     public void onResponse(JSONObject response) {
                         progressDialog.dismiss();
                         System.out.println(response);
                         responseListaCanales(response);
+                        getMsjPrivados();
+
+                    }
+
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        //progressDialog.dismiss();
+                        progressDialog.dismiss();
+                        switch (error.networkResponse.statusCode){
+                            case (400):
+                                Toast.makeText(getActivity(),"Usuario  Invalido!", Toast.LENGTH_LONG).show();
+                                break;
+                            case (404):
+                                 Toast.makeText(getActivity(),"Organizacion invalida!", Toast.LENGTH_LONG).show();
+                                 break;
+                            case (405):
+                                Toast.makeText(getActivity(),"No existe el usuario en esa organizacion!", Toast.LENGTH_LONG).show();
+                                break;
+                            case (500):
+                                 Toast.makeText(getActivity(),"No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
+                                break;
+                        }
+                    }
+                });
+
+        //Agrego la request a la cola para que se conecte con el server!
+        HttpConexionSingleton.getInstance(getContext()).addToRequestQueue(jsonObjectRequest);
+
+    }
+
+    private void getMsjPrivados(){
+        Log.i("INFO", "Obtengo los msj privados del usuario en la organizacion: "+organizacion_id);
+        progressDialog = ProgressDialog.show(
+                getActivity(),"Hypechat","Obteniendo msj privados del usuario...",true);
+
+        JSONObject request = get_json_Request_Body();
+
+
+
+        Log.i("INFO", "Json Request getCanales, check http status codes");
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.POST, URL_MSJ_PRIVADOS, request, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        progressDialog.dismiss();
+                        System.out.println(response);
                         responseListaMsjPrivados(response);
 
                     }
@@ -189,10 +239,8 @@ public class OrganizacionFragment extends Fragment {
                             case (400):
                                 //Toast.makeText(LoginActivity.this,"Usuario o Contraseña Invalidos!", Toast.LENGTH_LONG).show();
                             case (500):
-                                // Toast.makeText(LoginActivity.this,"Server error!", Toast.LENGTH_LONG).show();
-                            case (404):
-                                //Toast.makeText(LoginActivity.this,"No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
-
+                                Toast.makeText(getActivity(),"No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
+                                break;
                         }
                     }
                 });
@@ -207,7 +255,7 @@ public class OrganizacionFragment extends Fragment {
     private void responseListaCanales(JSONObject response){
         try {
             Log.i("INFO",response.toString());
-            JSONArray canales = response.getJSONArray("canales");
+            JSONArray canales = response.getJSONArray("channel");
             ListView list = (ListView) view.findViewById(R.id.lista_canales);
             List<String> array = new ArrayList<>();
             ArrayAdapter<String> adapter =new ArrayAdapter<String>(getContext(), R.layout.text_list_canales, array);
@@ -255,7 +303,7 @@ public class OrganizacionFragment extends Fragment {
     private void responseListaMsjPrivados(JSONObject response){
         try {
             Log.i("INFO",response.toString());
-            JSONArray msjPrivados = response.getJSONArray("msjPrivados");
+            JSONArray msjPrivados = response.getJSONArray("msjs");
             ListView list = (ListView) view.findViewById(R.id.lista_msj_privados);
             List<String> array = new ArrayList<>();
             ArrayAdapter<String> adapter =new ArrayAdapter<String>(getContext(), R.layout.text_list_canales, array);
