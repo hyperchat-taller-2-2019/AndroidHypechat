@@ -261,8 +261,8 @@ public class OrganizacionFragment extends Fragment {
             ArrayAdapter<String> adapter =new ArrayAdapter<String>(getContext(), R.layout.text_list_canales, array);
             for(int i = 0; i< canales.length(); i++){
 
-                JSONObject item = canales.getJSONObject(i);
-                String name = item.getString("name");
+
+                String name = canales.getString(i);
                 array.add("# "+name);
             }
 
@@ -309,8 +309,8 @@ public class OrganizacionFragment extends Fragment {
             ArrayAdapter<String> adapter =new ArrayAdapter<String>(getContext(), R.layout.text_list_canales, array);
             for(int i = 0; i< msjPrivados.length(); i++){
 
-                JSONObject item = msjPrivados.getJSONObject(i);
-                String name = item.getString("name");
+
+                String name = msjPrivados.getString(i);
                 array.add(name);
             }
 
