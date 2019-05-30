@@ -43,11 +43,6 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        //SharedPref para almacenar datos de sesión
-        this.sharedPref = getSharedPreferences(getString(R.string.saved_data), Context.MODE_PRIVATE);
-        this.sharedEditor = sharedPref.edit();
-
-
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -59,7 +54,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
         //Setea el header de la navigation bar para que tenga el nombre de usuario (podria ser apodo o mail)
         this.header = navigationView.getHeaderView(0);
-        setHeaderUserName(this.sharedPref.getString("nombre","No Name"));
+        setHeaderUserName(Usuario.getInstancia().getNombre());
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this,drawer,toolbar,R.string.navigation_drawer_open,R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
@@ -86,19 +81,38 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.organizaciones:
 
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,new Organizaciones()).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,new OrganizacionesFragment()).commit();
                 this.navigationView.setCheckedItem(R.id.organizaciones);
                 break;
             case R.id.msj_privados:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,new MensajesPrivados()).commit();
-                this.navigationView.setCheckedItem(R.id.msj_privados);
+                goToChat();
                 break;
             case R.id.perfil:
-                goToProfile(this.sharedPref.getString("email","no email"));
+                goToProfile(Usuario.getInstancia().getEmail());
                 break;
         }
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    public void irAChat(View view){
+        goToChat();
+    }
+
+    private void goToChat(){
+        this.navigationView.setCheckedItem(R.id.msj_privados);
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_container,new ChatFragment());
+        //Esta es la linea clave para que vuelva al fragmento anterior!
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
+        //Linea clave para que el fragmento termine de ponerse si o si en la activity y poder editarla!
+        fragmentManager.executePendingTransactions();
+
+        //Me traigo el fragmento sabiendo que es el de perfil para cargarle la información
+        ChatFragment chat = (ChatFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        chat.setSalaDeChat("Chat Test");
     }
 
     private void goToProfile(String email_del_perfil) {
@@ -139,9 +153,10 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         try {
             Log.i("INFO",response.toString());
 
-            String email = this.sharedPref.getString("email","");
-            String nombre = this.sharedPref.getString("nombre","");
-            String apodo = this.sharedPref.getString("apodo","");
+            String email = Usuario.getInstancia().getEmail();
+            String nombre = Usuario.getInstancia().getNombre();
+            String apodo = Usuario.getInstancia().getNickname();
+            String url_foto_perfil = Usuario.getInstancia().getUrl_foto_perfil();
 
             Boolean soy_yo = false;
 
@@ -152,19 +167,20 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             }
             else{
                 Log.i("INFO", "perfil de otro usuario");
+                //Agregar foto perfil de otro usuario cuando se implemente!
                 email = response.getString("email");
                 nombre = response.getString("name");
                 apodo = response.getString("nickname");
             }
 
-            setProfileFragment(nombre,apodo,email,soy_yo);
+            setProfileFragment(nombre,apodo,email,url_foto_perfil,soy_yo);
         }
         catch (JSONException exception){
             Toast.makeText(this, exception.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 
-    private void setProfileFragment(String nombre, String apodo, String email,Boolean soy_yo) {
+    private void setProfileFragment(String nombre, String apodo, String email,String url_foto_perfil,Boolean soy_yo) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.fragment_container,new Perfil());
@@ -176,13 +192,12 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
         //Me traigo el fragmento sabiendo que es el de perfil para cargarle la información
         Perfil perfil = (Perfil) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-        perfil.completarDatosPerfil(nombre,apodo,email,soy_yo);
         perfil.setHeader(this.header);
-
+        perfil.completarDatosPerfil(nombre,apodo,email,url_foto_perfil,soy_yo);
     }
 
     public void irAMiPerfil(View view){
-        this.goToProfile(this.sharedPref.getString("email","no email"));
+        this.goToProfile(Usuario.getInstancia().getEmail());
     }
 
 
@@ -201,7 +216,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     public void ver_organizaciones(View view){
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.fragment_container,new Organizaciones());
+        fragmentTransaction.replace(R.id.fragment_container,new OrganizacionesFragment());
         //Esta es la linea clave para que vuelva al fragmento anterior!
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();

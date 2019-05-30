@@ -33,10 +33,11 @@ public class AgregarUsuarioOrganizacion extends Fragment {
     private Button finalizar;
     private EditText email;
     private ProgressDialog progressDialog;
-    private String URL_AGREGAR_USUARIO = "https://virtserver.swaggerhub.com/vickyperezz/hypeChatAndroid/1.0.0/agregarUsuarioOrganizacion";
+    private String URL_AGREGAR_USUARIO = "https://secure-plateau-18239.herokuapp.com/organization/user";
     private String organizacion_id;
     private Boolean creando_organizacion;
-
+    private String token;
+    private String psw;
 
     @Nullable
     @Override
@@ -69,7 +70,7 @@ public class AgregarUsuarioOrganizacion extends Fragment {
                 if(creando_organizacion) {
                     FragmentManager fragmentManager = getFragmentManager();
                     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                    fragmentTransaction.replace(R.id.fragment_container, new Organizaciones());
+                    fragmentTransaction.replace(R.id.fragment_container, new OrganizacionesFragment());
                     //Esta es la linea clave para que vuelva al fragmento anterior!
                     fragmentTransaction.addToBackStack(null);
                     fragmentTransaction.commit();
@@ -99,15 +100,18 @@ public class AgregarUsuarioOrganizacion extends Fragment {
 
         JSONObject requestBody = new JSONObject();
         try {
-            requestBody.put("id_organizacion", this.organizacion_id);
-            requestBody.put("email_usuario", this.email.getText().toString());
+            requestBody.put("token",this.token );
+            requestBody.put("idOrganization", this.organizacion_id);
+            requestBody.put("email", this.email.getText().toString());
+            requestBody.put("psw", this.psw);
+            Log.i("INFO", "PSW: "+this.psw);
         }
         catch(JSONException except){
             Toast.makeText(getActivity(), except.getMessage(), Toast.LENGTH_SHORT).show();
         }
         Log.i("INFO", "Agrego el usuario a la organizacion en el server");
 
-
+        Log.i("INFO", "Request body: "+requestBody.toString());
         Log.i("INFO", "Json Request , check http status codes");
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
@@ -131,13 +135,16 @@ public class AgregarUsuarioOrganizacion extends Fragment {
                         switch (error.networkResponse.statusCode){
                             case (400):
                                 Toast.makeText(getActivity(),"El usuario ya se ha agregado a la organizacion", Toast.LENGTH_LONG).show();
+                                break;
                             case (401):
                                 Toast.makeText(getActivity(),"No existe un usuario con ese email", Toast.LENGTH_LONG).show();
-                            case (500):
-                                // Toast.makeText(LoginActivity.this,"Server error!", Toast.LENGTH_LONG).show();
+                                break;
                             case (404):
-                                //Toast.makeText(LoginActivity.this,"No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
-
+                                Toast.makeText(getActivity(),"No existe una organizacion con ese id", Toast.LENGTH_LONG).show();
+                                break;
+                            case (500):
+                                Toast.makeText(getActivity(),"No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
+                                break;
                         }
                     }
                 });
@@ -147,8 +154,10 @@ public class AgregarUsuarioOrganizacion extends Fragment {
 
     }
 
-    public void completarOrganizacionID(String id,Boolean creandoOrg) {
+    public void completarOrganizacionID(String id,Boolean creandoOrg,String psw, String token) {
         this.organizacion_id = id;
         this.creando_organizacion = creandoOrg;
+        this.psw = psw;
+        this.token = token;
     }
 }

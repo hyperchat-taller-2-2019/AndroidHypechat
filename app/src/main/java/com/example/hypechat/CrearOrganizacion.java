@@ -1,8 +1,6 @@
 package com.example.hypechat;
 
 import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -30,7 +28,6 @@ public class CrearOrganizacion extends Fragment {
     private EditText textName;
     private ValidadorDeCampos validador;
     private ProgressDialog progress;
-    private SharedPreferences sharedPref;
     private Button crearOrganizacion;
     private Button cancelar;
     private EditText nombre;
@@ -38,8 +35,9 @@ public class CrearOrganizacion extends Fragment {
     private EditText psw;
     private String mensaje;
     private ProgressDialog progressDialog;
-    private String URL_CHECK_ID = "https://virtserver.swaggerhub.com/vickyperezz/hypeChatAndroid/1.0.0/organizationID_valid";
-    private String URL_SEND_ORGANIZACION_DATA = "https://virtserver.swaggerhub.com/vickyperezz/hypeChatAndroid/1.0.0/crearOrganizacion";
+    private String URL_CHECK_ID = "https://secure-plateau-18239.herokuapp.com/idOrganizationValid/";
+    private String URL_SEND_ORGANIZACION_DATA = "https://secure-plateau-18239.herokuapp.com/organization";
+
 
 
     @Nullable
@@ -47,7 +45,6 @@ public class CrearOrganizacion extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         //return inflater.inflate(R.layout.organizaciones,container,false);
         View view = inflater.inflate(R.layout.activity_crear_organizacion,container,false);
-        this.sharedPref = getActivity().getSharedPreferences(getString(R.string.saved_data), Context.MODE_PRIVATE);
         validador = new ValidadorDeCampos();
         crearOrganizacion = (Button)view.findViewById(R.id.button_crearOrg_siguiente);
         cancelar = (Button) view.findViewById(R.id.button_crearOrg_cancelar);
@@ -100,20 +97,13 @@ public class CrearOrganizacion extends Fragment {
     }
 
     private void chequearIdDuplicado() {
-        JSONObject requestBody = new JSONObject();
-        try {
-            requestBody.put("id", this.id.getText().toString());
-        }
-        catch(JSONException except){
-            Toast.makeText(getActivity(), except.getMessage(), Toast.LENGTH_SHORT).show();
-        }
+
         Log.i("INFO", "Chequeo si el ID ya existe");
 
-
         Log.i("INFO", "Json Request , check http status codes");
-
+        String URL = this.URL_CHECK_ID+this.id.getText().toString();
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.GET, URL_CHECK_ID, requestBody, new Response.Listener<JSONObject>() {
+                (Request.Method.GET, URL, null, new Response.Listener<JSONObject>() {
 
                     @Override
                     public void onResponse(JSONObject response) {
@@ -133,9 +123,8 @@ public class CrearOrganizacion extends Fragment {
                             case (400):
                                 Toast.makeText(getActivity(),"El ID ya existe, intente con otro.", Toast.LENGTH_LONG).show();
                             case (500):
-                                // Toast.makeText(LoginActivity.this,"Server error!", Toast.LENGTH_LONG).show();
-                            case (404):
-                                //Toast.makeText(LoginActivity.this,"No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
+                                 Toast.makeText(getActivity(),"No fue posible conectarse al servidor, por favor intente de nuevo mas tarde\"", Toast.LENGTH_LONG).show();
+
 
                         }
                     }
@@ -152,10 +141,10 @@ public class CrearOrganizacion extends Fragment {
 
         JSONObject requestBody = new JSONObject();
         try {
-            requestBody.put("nombre", this.nombre.getText().toString());
+            requestBody.put("name", this.nombre.getText().toString());
             requestBody.put("id", this.id.getText().toString());
-            requestBody.put("email_usuario", this.sharedPref.getString("email","no email"));
-            requestBody.put("contraseña", this.psw.getText().toString());
+            requestBody.put("email", Usuario.getInstancia().getEmail());
+            requestBody.put("psw", this.psw.getText().toString());
         }
         catch(JSONException except){
             Toast.makeText(getActivity(), except.getMessage(), Toast.LENGTH_SHORT).show();
@@ -183,13 +172,12 @@ public class CrearOrganizacion extends Fragment {
                     public void onErrorResponse(VolleyError error) {
                         progressDialog.dismiss();
                         switch (error.networkResponse.statusCode){
-                            case (400):
-                                Toast.makeText(getActivity(),"No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
                             case (500):
-                                // Toast.makeText(LoginActivity.this,"Server error!", Toast.LENGTH_LONG).show();
+                                Toast.makeText(getActivity(),"No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
+                            case (400):
+                                Toast.makeText(getActivity(),"El ID ya existe, intente con otro.", Toast.LENGTH_LONG).show();
                             case (404):
-                                //Toast.makeText(LoginActivity.this,"No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
-
+                                Toast.makeText(getActivity(),"El usuario es invalido", Toast.LENGTH_LONG).show();
                         }
                     }
                 });
@@ -214,9 +202,11 @@ public class CrearOrganizacion extends Fragment {
 
         //Me traigo el fragmento sabiendo que es el de perfil para cargarle la información
         AgregarUsuarioOrganizacion add_Usuario = (AgregarUsuarioOrganizacion) getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-        add_Usuario.completarOrganizacionID(this.id.getText().toString(),true);
+        add_Usuario.completarOrganizacionID(this.id.getText().toString(),true,this.psw.getText().toString(),Usuario.getInstancia().getToken());
 
     }
+
+
 
 
 }

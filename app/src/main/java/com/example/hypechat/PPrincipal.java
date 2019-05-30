@@ -10,9 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 public class PPrincipal extends Fragment {
-    private SharedPreferences sharedPref;
-    private SharedPreferences.Editor sharedEditor;
-
 
     @Nullable
     @Override

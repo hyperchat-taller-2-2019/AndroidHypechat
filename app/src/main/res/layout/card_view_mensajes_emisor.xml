@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:cardview="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="2sp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="2">
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+            <android.support.v7.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                cardview:cardCornerRadius="10sp"
+                cardview:cardBackgroundColor="#3F51B5"
+                cardview:contentPadding="5sp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_weight="1">
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+                            <TextView
+                                android:id="@+id/chat_card_timestamp"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="#ffffff"
+                                android:textStyle="italic"
+                                android:text="00:00"/>
+                            <TextView
+                                android:id="@+id/chat_card_nickname"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Nickname"
+                                android:textColor="#ffffff"
+                                android:textStyle="bold"
+                                android:layout_weight="1"
+                                android:gravity="end"/>
+
+                        </LinearLayout>
+                        <TextView
+                            android:id="@+id/chat_card_mensaje"
+                            android:textColor="#ffffff"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Este es un mensaje enviado!"
+                            android:gravity="end"/>
+                        <ImageView
+                            android:id="@+id/imagen_mensaje"
+                            android:src="@mipmap/ic_launcher"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:visibility="visible"
+                            android:adjustViewBounds="true"/>
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="5sp">
+                        <ImageView
+                            android:id="@+id/chat_card_foto_perfil"
+                            android:layout_width="24sp"
+                            android:layout_height="24sp"
+                            android:src="@mipmap/ic_launcher"/>
+                    </LinearLayout>
+
+                </LinearLayout>
+
+
+
+
+            </android.support.v7.widget.CardView>
+        </LinearLayout>
+
+
+
+
+        
+
+
+    </LinearLayout>
+
+
+</LinearLayout>

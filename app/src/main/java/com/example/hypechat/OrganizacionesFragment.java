@@ -9,16 +9,13 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.SimpleAdapter;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -30,21 +27,31 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-public class Organizaciones extends Fragment {
+public class OrganizacionesFragment extends Fragment {
 
     private SharedPreferences sharedPref;
     private Button crearOrganizacion;
-    private final String URL_ORGANIZACIONES = "https://virtserver.swaggerhub.com/vickyperezz/hypeChatAndroid/1.0.0/getOrganizaciones";
-    private final String URL_INFO_ORG = "https://virtserver.swaggerhub.com/vickyperezz/hypeChatAndroid/1.0.0/getInfoOrganizacion";
+    private final String URL_ORGANIZACIONES = "https://secure-plateau-18239.herokuapp.com/organizations/";
+    private final String URL_INFO_ORG = "https://secure-plateau-18239.herokuapp.com/organization/";
     private SharedPreferences.Editor sharedEditor;
     private String token;
     private View view;
     private ProgressDialog progressDialog;
+    private RecyclerView rv_organizaciones;
+    private AdapterOrganizaciones adaptador_para_organizaciones;
    // private JSONArray organizaciones;
+
+    //metodo que se ejecuta cuando tocamos algun tarjeta de la recycleview
+    private View.OnClickListener onItemClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            RecyclerView.ViewHolder viewHolder = (RecyclerView.ViewHolder) v.getTag();
+            int position = viewHolder.getAdapterPosition();
+            Organizacion organizacion_clickeada = adaptador_para_organizaciones.obtenerItemPorPosicion(position);
+            //Toast.makeText(getContext(), "TOCASTE LA ORGANIZACION: " + organizacion_clickeada.getId(), Toast.LENGTH_SHORT).show();
+            obtenerDatosOrganizacion(organizacion_clickeada.getId());
+        }
+    };
 
 
 
@@ -57,8 +64,16 @@ public class Organizaciones extends Fragment {
         this.sharedEditor = sharedPref.edit();
         System.out.printf("ESTOY EN ORGANIZACIONES CON TOKEN:     ");
 
-        this.token = this.sharedPref.getString("token","no token");
+        this.token = Usuario.getInstancia().getToken();
         System.out.printf(this.token.toString()+"\n");
+
+        rv_organizaciones = (RecyclerView) view.findViewById(R.id.lista_organizaciones);
+        adaptador_para_organizaciones = new AdapterOrganizaciones(getContext());
+        LinearLayoutManager l = new LinearLayoutManager(getContext());
+        rv_organizaciones.setLayoutManager(l);
+        rv_organizaciones.setAdapter(adaptador_para_organizaciones);
+        adaptador_para_organizaciones.setOnItemClickListener(this.onItemClickListener);
+
 
         getOrganizaciones();
 
@@ -93,18 +108,11 @@ public class Organizaciones extends Fragment {
                 getActivity(),"Hypechat","Obteniendo organizaciones del usuario...",true);
 
         //Preparo Body del POST
-        JSONObject requestBody = new JSONObject();
-        try {
-            requestBody.put("token", this.token);
-        }
-        catch(JSONException except){
-            Toast.makeText(getActivity(), except.getMessage(), Toast.LENGTH_SHORT).show();
-        }
-
+        String URL = URL_ORGANIZACIONES + Usuario.getInstancia().getEmail();
         Log.i("INFO", "Json Request getOrganizaciones, check http status codes");
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.POST, URL_ORGANIZACIONES, requestBody, new Response.Listener<JSONObject>() {
+                (Request.Method.GET, URL, null, new Response.Listener<JSONObject>() {
 
                     @Override
                     public void onResponse(JSONObject response) {
@@ -122,11 +130,11 @@ public class Organizaciones extends Fragment {
                         //progressDialog.dismiss();
                         progressDialog.dismiss();
                         switch (error.networkResponse.statusCode){
-                            case (400):
-                                //Toast.makeText(LoginActivity.this,"Usuario o Contraseña Invalidos!", Toast.LENGTH_LONG).show();
-                            case (500):
-                                // Toast.makeText(LoginActivity.this,"Server error!", Toast.LENGTH_LONG).show();
                             case (404):
+                                Toast.makeText(getActivity(),"Usuario Invalido!", Toast.LENGTH_LONG).show();
+                            case (500):
+                                 Toast.makeText(getActivity(),"Server error!", Toast.LENGTH_LONG).show();
+                            case (400):
                                 //Toast.makeText(LoginActivity.this,"No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
 
                         }
@@ -142,40 +150,34 @@ public class Organizaciones extends Fragment {
 
         try {
             Log.i("INFO",response.toString());
-            JSONArray organizaciones = response.getJSONArray("organizaciones");
-            ListView list = (ListView) view.findViewById(R.id.lista_organizaciones);
-            List<HashMap<String,String>> array = new ArrayList<>();
-            SimpleAdapter adapter = new SimpleAdapter(getActivity(),array,R.layout.text_list_orga,new String[]{"Primera","Segunda"},new int[]{R.id.textlist1,R.id.textlist2});
+            JSONArray organizaciones = response.getJSONArray("organizations");
             for(int i=0;i< organizaciones.length();i++){
-                HashMap<String,String> resultadoItem = new HashMap<>();
-
                 JSONObject item = organizaciones.getJSONObject(i);
                 String id = item.getString("id");
                 String name = item.getString("name");
-                resultadoItem.put("Primera",name);
-                resultadoItem.put("Segunda",id);
-                array.add(resultadoItem);
+                Organizacion organizacion = new Organizacion(name,id);
+                adaptador_para_organizaciones.agregarOrganizacion(organizacion);
             }
 
             //ArrayAdapter<String> adapter =new ArrayAdapter<String>(getContext(), R.layout.text_list_orga, array);
-            list.setAdapter(adapter);
-            list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    LinearLayout lay = (LinearLayout) view;
-                    TextView text1 = (TextView)  lay.getChildAt(0);
-                    TextView text2 = (TextView)  lay.getChildAt(1);
-                    sharedEditor.putString("organizacion_name",text1.getText().toString());
-                    sharedEditor.putString("organizacion_id",text2.getText().toString());
-                    sharedEditor.apply();
+            //list.setAdapter(adapter);
+            //list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            //    @Override
+            //    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            //        LinearLayout lay = (LinearLayout) view;
+                    //TextView text1 = (TextView)  lay.getChildAt(0);
+                   // TextView text2 = (TextView)  lay.getChildAt(1);
+                   // sharedEditor.putString("organizacion_name",text1.getText().toString());
+                   // sharedEditor.putString("organizacion_id",text2.getText().toString());
+                  //  sharedEditor.apply();
 
-                    obtenerDatosOrganizacion(text2.getText().toString());
+                //    obtenerDatosOrganizacion(text2.getText().toString());
 
 
                    // Toast.makeText(getActivity(),text2.getText().toString(), Toast.LENGTH_LONG).show();
 
-                }
-            });
+              //  }
+            //});
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -188,20 +190,13 @@ public class Organizaciones extends Fragment {
                 getActivity(),"Hypechat","Obteniendo organizaciones del usuario...",true);
 
         //Preparo Body del POST
-        JSONObject requestBody = new JSONObject();
-        try {
-            requestBody.put("token", this.token);
-            requestBody.put("id_organizacion",id);
 
-        }
-        catch(JSONException except){
-            Toast.makeText(getActivity(), except.getMessage(), Toast.LENGTH_SHORT).show();
-        }
+        String URL = URL_INFO_ORG + this.token+ "/" + id;
 
         Log.i("INFO", "Json Request getOrganizaciones, check http status codes");
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.GET, URL_INFO_ORG, requestBody, new Response.Listener<JSONObject>() {
+                (Request.Method.GET, URL, null, new Response.Listener<JSONObject>() {
 
                     @Override
                     public void onResponse(JSONObject response) {
@@ -222,9 +217,7 @@ public class Organizaciones extends Fragment {
                             case (400):
                                 //Toast.makeText(LoginActivity.this,"Usuario o Contraseña Invalidos!", Toast.LENGTH_LONG).show();
                             case (500):
-                                // Toast.makeText(LoginActivity.this,"Server error!", Toast.LENGTH_LONG).show();
-                            case (404):
-                                //Toast.makeText(LoginActivity.this,"No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
+                                Toast.makeText(getActivity(),"No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
 
                         }
                     }
@@ -236,23 +229,24 @@ public class Organizaciones extends Fragment {
 
     private void mostrarOrganizacion(JSONObject response) {
         try {
-        this.sharedEditor.putString("organizacion_name",response.getString("nombre"));
-        this.sharedEditor.putString("organizacion_id",response.getString("id"));
+            JSONObject orga = response.getJSONObject("organization");
+        this.sharedEditor.putString("organizacion_name",orga.getString("name"));
+        this.sharedEditor.putString("organizacion_id",orga.getString("id"));
         this.sharedEditor.apply();
 
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.fragment_container,new Organizacion());
+        fragmentTransaction.replace(R.id.fragment_container,new OrganizacionFragment());
         //Esta es la linea clave para que vuelva al fragmento anterior!
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
         //Linea clave para que el fragmento termine de ponerse si o si en la activity y poder editarla!
         fragmentManager.executePendingTransactions();
 
-        //Me traigo el fragmento sabiendo que es el de Organizacion para cargarle la información
-        Organizacion org = (Organizacion) getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        //Me traigo el fragmento sabiendo que es el de OrganizacionFragment para cargarle la información
+        OrganizacionFragment org = (OrganizacionFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_container);
 
-            org.completarInfoOrganizacion(response.getString("nombre"),response.getString("id"),response.getString("owner_email"),response.getString("password"));
+            org.completarInfoOrganizacion(orga.getString("name"),orga.getString("id"),orga.getString("owner"),orga.getString("psw"));
         } catch (JSONException e) {
             e.printStackTrace();
         }
