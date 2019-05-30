@@ -128,7 +128,7 @@
 
         <Button
             android:id="@+id/b_olvide_pass"
-            android:onClick="olvide_psw"
+            android:onClick="restaurar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/transparent_button"

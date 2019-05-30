@@ -101,16 +101,17 @@ public class AgregarUsuarioOrganizacion extends Fragment {
         JSONObject requestBody = new JSONObject();
         try {
             requestBody.put("token",this.token );
-            requestBody.put("psw", this.psw);
             requestBody.put("idOrganization", this.organizacion_id);
             requestBody.put("email", this.email.getText().toString());
+            requestBody.put("psw", this.psw);
+            Log.i("INFO", "PSW: "+this.psw);
         }
         catch(JSONException except){
             Toast.makeText(getActivity(), except.getMessage(), Toast.LENGTH_SHORT).show();
         }
         Log.i("INFO", "Agrego el usuario a la organizacion en el server");
 
-
+        Log.i("INFO", "Request body: "+requestBody.toString());
         Log.i("INFO", "Json Request , check http status codes");
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
@@ -134,13 +135,16 @@ public class AgregarUsuarioOrganizacion extends Fragment {
                         switch (error.networkResponse.statusCode){
                             case (400):
                                 Toast.makeText(getActivity(),"El usuario ya se ha agregado a la organizacion", Toast.LENGTH_LONG).show();
+                                break;
                             case (401):
                                 Toast.makeText(getActivity(),"No existe un usuario con ese email", Toast.LENGTH_LONG).show();
-                            case (500):
-                                // Toast.makeText(LoginActivity.this,"Server error!", Toast.LENGTH_LONG).show();
+                                break;
                             case (404):
-                                //Toast.makeText(LoginActivity.this,"No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
-
+                                Toast.makeText(getActivity(),"No existe una organizacion con ese id", Toast.LENGTH_LONG).show();
+                                break;
+                            case (500):
+                                Toast.makeText(getActivity(),"No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
+                                break;
                         }
                     }
                 });

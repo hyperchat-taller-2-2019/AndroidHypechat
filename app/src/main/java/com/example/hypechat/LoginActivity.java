@@ -10,7 +10,6 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -34,6 +33,7 @@ public class LoginActivity extends AppCompatActivity {
     private ProgressDialog progressDialog;
     private CallbackManager callbackManager;
     private LoginButton facebookLogin;
+
 
     //ESTA DESPUES DEBERIA SER LA DIRECCION DE DONDE ESTE EL SERVER REAL Y EL ENDPOINT CORRESPONDIENTE!
     private final String URL_LOGIN = "https://secure-plateau-18239.herokuapp.com/login";
@@ -72,6 +72,10 @@ public class LoginActivity extends AppCompatActivity {
         }
 
 
+    }
+
+    public void restaurar(View view){
+        Toast.makeText(this, "Restaurar contrasenia", Toast.LENGTH_SHORT).show();
     }
 
     public void JsonRequest_login(String URL, JSONObject requestBody) {

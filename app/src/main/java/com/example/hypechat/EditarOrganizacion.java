@@ -32,10 +32,11 @@ public class EditarOrganizacion extends Fragment {
     private TextView nombre_titulo;
     private EditText nombre;
     private EditText id;
+    private EditText bienvenida;
     private Button cancelar;
     private Button guardar_cambio;
     private Button cambiar_pass;
-    private Button agregar_usuario;
+    private Button usuarios;
     private String password, token;
     private Boolean owner;
     private String URL_INFO = "https://secure-plateau-18239.herokuapp.com/organization/";
@@ -54,9 +55,10 @@ public class EditarOrganizacion extends Fragment {
         cancelar = (Button) view.findViewById(R.id.button_editarOrg_cancelar);
         guardar_cambio = (Button) view.findViewById(R.id.button_editarOrg_guardar);
         cambiar_pass = (Button) view.findViewById(R.id.cambiar_contraseña);
-        agregar_usuario = (Button) view.findViewById(R.id.agregar_usuarios_org);
+        usuarios = (Button) view.findViewById(R.id.usuarios_org);
         nombre = (EditText) view.findViewById(R.id.name_edit_organizacion);
         id = (EditText) view.findViewById(R.id.id_organizacion);
+        bienvenida = (EditText) view.findViewById(R.id.welcome_organizacion);
         nombre_titulo = (TextView) view.findViewById(R.id.titulo_organizacion);
         dialog_cambiar_psw = new Dialog(getActivity());
 
@@ -149,15 +151,16 @@ public class EditarOrganizacion extends Fragment {
             }
         });
 
-        agregar_usuario.setOnClickListener(new View.OnClickListener() {
+        usuarios.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i("INFO", "Apretaste para agregar usuario a una organizacion");
+
+                Log.i("INFO", "Apretaste para ver los usuarios de una organizacion");
                 //Intent launchactivity = new Intent(getActivity(),CrearOrganizacion.class);
                 //startActivity(launchactivity);
                 FragmentManager fragmentManager = getFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.fragment_container, new AgregarUsuarioOrganizacion());
+                fragmentTransaction.replace(R.id.fragment_container, new VerUsuariosOrganizacion());
                 //Esta es la linea clave para que vuelva al fragmento anterior!
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();
@@ -165,8 +168,9 @@ public class EditarOrganizacion extends Fragment {
                 fragmentManager.executePendingTransactions();
 
                 //Me traigo el fragmento sabiendo que es el de perfil para cargarle la información
-                AgregarUsuarioOrganizacion add_Usuario = (AgregarUsuarioOrganizacion) getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-                add_Usuario.completarOrganizacionID(id.getText().toString(), false, password, token);
+                VerUsuariosOrganizacion usuarios = (VerUsuariosOrganizacion) getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+                usuarios.completarinfo(id.getText().toString(), password, token, owner);
+
 
 
             }
@@ -230,6 +234,8 @@ public class EditarOrganizacion extends Fragment {
             this.nombre_titulo.setText(orga.getString("name"));
             this.nombre.setText(orga.getString("name"));
             this.id.setText(orga.getString("id"));
+            this.password = orga.getString("psw");
+            this.bienvenida.setText(orga.getString("welcome"));
             this.owner = false;
             for (int i = 0; i < orga.getJSONArray("owner").length(); i++){
                 if (orga.getJSONArray("owner").getString(i).equals(Usuario.getInstancia().getEmail())){
@@ -252,14 +258,18 @@ public class EditarOrganizacion extends Fragment {
 
     private void enableButtons() {
         this.nombre.setEnabled(true);
+        this.cambiar_pass.setVisibility(View.VISIBLE);
         this.cambiar_pass.setEnabled(true);
-        this.agregar_usuario.setEnabled(true);
+        this.usuarios.setEnabled(true);
+        this.bienvenida.setEnabled(true);
     }
 
     private void disableButtons() {
         this.nombre.setEnabled(false);
         this.cambiar_pass.setEnabled(false);
-        this.agregar_usuario.setEnabled(false);
+        this.cambiar_pass.setVisibility(View.INVISIBLE);
+        this.usuarios.setEnabled(true);
+        this.bienvenida.setEnabled(false);
 
     }
 
