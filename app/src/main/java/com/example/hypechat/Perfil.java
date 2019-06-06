@@ -43,7 +43,8 @@ public class Perfil extends Fragment {
 
     private View vista;
 
-    private EditText nombre_perfil, apodo_perfil, email_perfil;
+    private EditText nombre_perfil, apodo_perfil;
+    private TextView email_perfil;
     private Button cambiarContraseña, modificarPerfil;
     private Dialog dialog_cambiar_psw;
     private ValidadorDeCampos validador;
@@ -81,7 +82,7 @@ public class Perfil extends Fragment {
                 Log.i("INFO","Apretaste para modificar perfil");
                 nombre_perfil = (EditText) view.findViewById(R.id.nombre_perfil);
                 apodo_perfil = (EditText) view.findViewById(R.id.apodo_perfil);
-                email_perfil = (EditText) view.findViewById(R.id.email_perfil);
+                email_perfil = (TextView) view.findViewById(R.id.email_perfil);
 
                 String nombre_perfil_string = nombre_perfil.getText().toString();
                 String apodo_perfil_string = apodo_perfil.getText().toString();
@@ -186,7 +187,7 @@ public class Perfil extends Fragment {
 
         this.nombre_perfil = (EditText) view.findViewById(R.id.nombre_perfil);
         this.apodo_perfil = (EditText) view.findViewById(R.id.apodo_perfil);
-        this.email_perfil = (EditText) view.findViewById(R.id.email_perfil);
+        this.email_perfil = (TextView) view.findViewById(R.id.email_perfil);
         this.perfil_foto = (ImageView) view.findViewById(R.id.perfil_foto);
 
         if (!Usuario.getInstancia().getUrl_foto_perfil().equals("")){
@@ -363,13 +364,11 @@ public class Perfil extends Fragment {
     private void setearEditTextComoNoEditables() {
         this.nombre_perfil.setEnabled(false);
         this.apodo_perfil.setEnabled(false);
-        this.email_perfil.setEnabled(false);
     }
 
     private void setEditTextNormales() {
         this.nombre_perfil.setEnabled(true);
         this.apodo_perfil.setEnabled(true);
-        this.email_perfil.setEnabled(false);
     }
 
     private void mostrarBotones() {

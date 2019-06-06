@@ -12,13 +12,13 @@ public class ChatMensajeEnviar extends ChatMensaje {
         this.hora = hora;
     }
 
-    public ChatMensajeEnviar(String nickname, String texto, Map hora, String url_foto_perfil) {
-        super(nickname, texto, url_foto_perfil);
+    public ChatMensajeEnviar(String nickname, String texto, Map hora, String url_foto_perfil,String email) {
+        super(nickname, texto, url_foto_perfil,email);
         this.hora = hora;
     }
 
-    public ChatMensajeEnviar(String nickname, String texto, String url_foto_perfil, String url_foto_mensaje, Map hora) {
-        super(nickname, texto, url_foto_perfil, url_foto_mensaje);
+    public ChatMensajeEnviar(String nickname, String texto, String url_foto_perfil, String url_foto_mensaje, Map hora,String email) {
+        super(nickname, texto, url_foto_perfil, url_foto_mensaje,email);
         this.hora = hora;
     }
 

@@ -89,7 +89,7 @@
             android:textSize="18sp"
             android:textStyle="bold" />
 
-        <EditText
+        <TextView
             android:id="@+id/email_perfil"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -97,6 +97,7 @@
             android:enabled="false"
             android:inputType="none"
             android:text="Name"
+            android:textStyle="italic"
             android:textColor="@android:color/black" />
 
         <LinearLayout

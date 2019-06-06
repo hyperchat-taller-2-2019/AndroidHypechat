@@ -85,14 +85,11 @@ public class AdapterChat extends RecyclerView.Adapter<CardChatMensajes> {
 
     @Override
     public int getItemViewType(int position) {
-        if (!listado_de_mensajes.get(position).getNickname().equals(null)){
-            if (listado_de_mensajes.get(position).getNickname().equals(Usuario.getInstancia().getNickname())){
+            if (listado_de_mensajes.get(position).getEmail().equals(Usuario.getInstancia().getEmail())){
                 return MENSAJE_PROPIO;
             }
             else{
                 return MENSAJE_DE_OTRO;
             }
-        }
-        return MENSAJE_DE_OTRO;
     }
 }
