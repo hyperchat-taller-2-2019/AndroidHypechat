@@ -75,7 +75,8 @@ public class ChatFragment extends Fragment {
             public void onClick(View v) {
                 String texto = texto_mensaje.getText().toString();
                 if (!texto.isEmpty()) {
-                    reference.push().setValue(new ChatMensajeEnviar(Usuario.getInstancia().getNickname(),texto, ServerValue.TIMESTAMP,Usuario.getInstancia().getUrl_foto_perfil()));
+                    reference.push().setValue(new ChatMensajeEnviar(Usuario.getInstancia().getNickname(),texto,
+                            ServerValue.TIMESTAMP,Usuario.getInstancia().getUrl_foto_perfil(),Usuario.getInstancia().getEmail()));
                 }
                 else{
                     Toast.makeText(getContext(), "No podes mandar un mensaje Vacio!", Toast.LENGTH_LONG).show();
@@ -172,7 +173,7 @@ public class ChatFragment extends Fragment {
                         Uri downloadUri = task.getResult();
                         Log.i("INFO","La url de la foto es: " + downloadUri.toString());
                         ChatMensajeEnviar mensajeEnviar = new ChatMensajeEnviar(Usuario.getInstancia().getNickname(), "Te ha enviado una imagen...",
-                                Usuario.getInstancia().getUrl_foto_perfil(), downloadUri.toString(), ServerValue.TIMESTAMP);
+                                Usuario.getInstancia().getUrl_foto_perfil(), downloadUri.toString(), ServerValue.TIMESTAMP,Usuario.getInstancia().getEmail());
                         reference.push().setValue(mensajeEnviar);
                     } else {
                         Toast.makeText(getActivity(), "Fallo la carga de la imagen" + task.getException().getMessage(), Toast.LENGTH_LONG).show();

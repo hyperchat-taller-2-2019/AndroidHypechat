@@ -10,8 +10,8 @@ public class ChatMensajeRecibir extends ChatMensaje{
         this.hora = hora;
     }
 
-    public ChatMensajeRecibir(String nickname, String texto, Long hora, String url_foto_perfil) {
-        super(nickname, texto, url_foto_perfil);
+    public ChatMensajeRecibir(String nickname, String texto, Long hora, String url_foto_perfil,String email) {
+        super(nickname, texto, url_foto_perfil,email);
         this.hora = hora;
     }
 

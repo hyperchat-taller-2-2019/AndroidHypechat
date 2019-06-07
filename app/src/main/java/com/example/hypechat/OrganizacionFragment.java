@@ -2,7 +2,9 @@ package com.example.hypechat;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.Image;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -51,6 +53,7 @@ public class OrganizacionFragment extends Fragment {
     private String user_email;
     private String password;
     // private JSONArray organizaciones;
+    private ImageButton ubicacion_equipo;
 
 
     @Nullable
@@ -77,6 +80,7 @@ public class OrganizacionFragment extends Fragment {
         crearCanal= (ImageButton)view.findViewById(R.id.crear_canal);
         crearMsjPrivado = (ImageButton)view.findViewById(R.id.crear_msj_privado);
         editar_organizacion = (ImageButton)view.findViewById(R.id.edit_Organizacion);
+        ubicacion_equipo = (ImageButton) view.findViewById(R.id.btn_ubicacion_equipo);
 
         crearCanal.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -138,6 +142,18 @@ public class OrganizacionFragment extends Fragment {
 
             }
         });
+
+        ubicacion_equipo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Aca se abre el mapa para ver la localizacion de los miembros de la organizacion
+                Intent intent = new Intent(getActivity(),UbicacionActivity.class);
+                intent.putExtra("id_organizacion",organizacion_id);
+                startActivity(intent);
+            }
+        });
+
+
         return view;
     }
 
