@@ -61,6 +61,7 @@ public class Perfil extends Fragment {
     private static final int PHOTO_PERFIL = 2;
     StorageReference storageReference;
     FirebaseStorage storage;
+    private final int REQUEST_CODE = 123;
     private FusedLocationProviderClient fusedLocationClient;
 
 
@@ -69,6 +70,7 @@ public class Perfil extends Fragment {
 
     private final String URL_CAMBIAR_PASSWORD = "https://secure-plateau-18239.herokuapp.com/psw";
     private final String URL_CAMBIAR_PERFIL = "https://secure-plateau-18239.herokuapp.com/profile";
+    private final String URL_ACTUALIZAR_UBICACION = "https://secure-plateau-18239.herokuapp.com/location";
 
     @Nullable
     @Override
@@ -82,8 +84,8 @@ public class Perfil extends Fragment {
         btn_cambiar_foto_perfil = (ImageButton) view.findViewById(R.id.boton_cambiar_foto_perfil);
         btn_actualizar_ubicacion = (ImageButton) view.findViewById(R.id.btn_actualizar_ubicacion);
         storage = FirebaseStorage.getInstance();
+        ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE);
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
-
 
         validador = new ValidadorDeCampos();
 
@@ -195,10 +197,8 @@ public class Perfil extends Fragment {
         btn_actualizar_ubicacion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Aca hay que hacer el request para actualizar la ubicacion del usuario que apreta
-                if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                        && ActivityCompat.checkSelfPermission(getContext(),
-                        Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+                if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                     // TODO: Consider calling
                     //    ActivityCompat#requestPermissions
                     // here to request the missing permissions, and then overriding
@@ -206,25 +206,23 @@ public class Perfil extends Fragment {
                     //                                          int[] grantResults)
                     // to handle the case where the user grants the permission. See the documentation
                     // for ActivityCompat#requestPermissions for more details.
-                    Toast.makeText(getActivity(), "No tenes los permisos necesarios", Toast.LENGTH_LONG).show();
                     return;
                 }
                 fusedLocationClient.getLastLocation()
                         .addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
                             @Override
                             public void onSuccess(Location location) {
-                                Log.i("INFO","VAS A DESCUBRIR TU UBICACION");
                                 // Got last known location. In some rare situations this can be null.
                                 if (location != null) {
                                     // Logic to handle location object
-                                    Log.i("INFO","Tu LONGITUD es: "+location.getLongitude());
-                                    Log.i("INFO","Tu LATITUD es: "+location.getLatitude());
+                                    requestActualizarUbicacion(location.getLatitude(),location.getLongitude());
+
                                 }else{
-                                    Toast.makeText(getActivity(), "Algo falló, intenta de nuevo activando el GPS", Toast.LENGTH_LONG).show();
+                                    Toast.makeText(getActivity(), "No fue posible obtener la ubicacion!", Toast.LENGTH_LONG).show();
                                 }
                             }
                         });
-                }
+            }
         });
 
 
@@ -240,6 +238,57 @@ public class Perfil extends Fragment {
 
         return view;
 
+    }
+
+    private void requestActualizarUbicacion(double latitude, double longitude) {
+        //Preparo el body con la informacion de la ubicacion actual del usuario
+        JSONObject requestBody = new JSONObject();
+        try {
+            requestBody.put("token",Usuario.getInstancia().getToken());
+            //requestBody.put("email",Usuario.getInstancia().getEmail());
+            requestBody.put("latitud", latitude);
+            requestBody.put("longitud", longitude);
+        }catch (JSONException exception){
+            Toast.makeText(getActivity(), exception.getMessage(), Toast.LENGTH_LONG).show();
+        }
+        //Ejecuto la request contra nuestro server
+        progressDialog = ProgressDialog.show(getContext(), "Hypechat", "Actualizando Ubicacion...",
+                true);
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.PUT, URL_ACTUALIZAR_UBICACION , requestBody, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        progressDialog.dismiss();
+                        Toast.makeText(getContext(), "La Ubicacion se actualizó Correctamente!", Toast.LENGTH_LONG).show();
+
+                    }
+
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        progressDialog.dismiss();
+
+                        switch (error.networkResponse.statusCode){
+                            case (400):
+                                Toast.makeText(getContext(),
+                                        "Usuario o Contraseña Invalidos!", Toast.LENGTH_LONG).show();
+                            case (500):
+                                Toast.makeText(getContext(),
+                                        "Server error!", Toast.LENGTH_LONG).show();
+                            case (404):
+                                Toast.makeText(getContext(),
+                                        "No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
+                            default:
+                                Toast.makeText(getContext(), "Ocurrio un error!!!", Toast.LENGTH_LONG).show();
+
+                        }
+                    }
+                });
+
+        //Agrego la request a la cola para que se conecte con el server!
+        HttpConexionSingleton.getInstance(getContext()).addToRequestQueue(jsonObjectRequest);
     }
 
     @Override

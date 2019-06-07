@@ -148,6 +148,7 @@ public class OrganizacionFragment extends Fragment {
             public void onClick(View v) {
                 //Aca se abre el mapa para ver la localizacion de los miembros de la organizacion
                 Intent intent = new Intent(getActivity(),UbicacionActivity.class);
+                intent.putExtra("id_organizacion",organizacion_id);
                 startActivity(intent);
             }
         });
