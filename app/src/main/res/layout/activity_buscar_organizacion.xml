@@ -41,29 +41,18 @@
             android:orientation="vertical"
             android:layout_weight="1">
 
-            <TextView
-                android:id="@+id/textView3"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAlignment="center"
-                android:text="ORGANIZACIONES"
-                android:textStyle="bold"
-                android:textColor="@color/colorBlack"
-                android:background="@color/colorNaranja"
-                android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center"
-                android:layout_marginTop="5dp">
+                android:layout_marginTop="130dp">
 
                 <EditText
-                    android:id="@+id/text_ingresar_organizacion"
+                    android:id="@+id/textView3"
                     android:layout_width="250dp"
                     android:layout_height="match_parent"
-                    android:hint="ORGANIZACION ID"
+                    android:text="ORGANIZACIONES"
                     android:textColor="@color/colorBar"
                     android:drawableLeft="@drawable/ic_search"
                     android:drawableTint="@color/colorGrisClaro"
@@ -72,7 +61,6 @@
                     android:textSize="20sp" />
 
                 <Button
-                    android:id="@+id/button_buscar_organizacion"
                     android:layout_width="100dp"
                     android:layout_height="match_parent"
                     android:text="buscar"/>
@@ -80,38 +68,59 @@
             </LinearLayout>
 
             <TextView
-                android:id="@+id/error_buscar_organizacion"
+                android:id="@+id/id_de_la_organizacion"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="    No se encontraron resultados para esa busqueda"
                 android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
+                android:layout_marginBottom="50dp"
                 android:textSize="15sp"
                 android:textColor="@color/colorBlack" />
 
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/lista_organizaciones"
+            <TextView
+                android:id="@+id/id_buscar_organizacion"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#ffffff"
-                android:layout_weight="1"
-                android:cacheColorHint="#00000000"
-                android:divider="@android:color/transparent"/>
-
-            <Button
-                android:id="@+id/boton_addOrganizacion"
-                android:layout_width="200dp"
-                android:layout_height="wrap_content"
-                android:text= " Nueva"
-                android:layout_gravity="center"
-                app:fontFamily="sans-serif-smallcaps"
-                android:drawableLeft="@drawable/ic_add"
+                android:text="Id de la organizacion"
+                android:layout_marginTop="50dp"
                 android:textSize="20sp"
-                android:background="@color/colorBar"
-                android:layout_marginRight="10dp"
-                android:elevation="10dp"/>
+                android:textColor="@color/colorAccent" />
 
 
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginTop="100dp">
+
+                <Button
+                    android:id="@+id/boton_cancelar_buscar_Organizacion"
+                    android:layout_width="150dp"
+                    android:layout_height="match_parent"
+                    android:text= "Cancelar"
+                    android:layout_gravity="center"
+                    app:fontFamily="sans-serif-smallcaps"
+                    android:textSize="20sp"
+                    android:background="@color/colorPrimary"
+                    android:layout_marginRight="20dp"
+                    android:elevation="10dp"/>
+
+                <Button
+                    android:id="@+id/boton_ingresar_Organizacion"
+                    android:layout_width="150dp"
+                    android:layout_height="match_parent"
+                    android:text= "Ingresar"
+                    android:layout_gravity="center"
+                    app:fontFamily="sans-serif-smallcaps"
+                    android:textSize="20sp"
+                    android:background="@color/colorNaranja"
+                    android:layout_marginRight="20dp"
+                    android:elevation="10dp"/>
+
+
+            </LinearLayout>
 
 
 

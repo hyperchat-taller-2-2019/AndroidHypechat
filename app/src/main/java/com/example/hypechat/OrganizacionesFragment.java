@@ -1,5 +1,6 @@
 package com.example.hypechat;
 
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -16,6 +17,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -30,14 +34,19 @@ import org.json.JSONObject;
 public class OrganizacionesFragment extends Fragment {
 
     private SharedPreferences sharedPref;
-    private Button crearOrganizacion;
+    private Button crearOrganizacion, buscarOrganizacion;
     private final String URL_ORGANIZACIONES = "https://secure-plateau-18239.herokuapp.com/organizations/";
     private final String URL_INFO_ORG = "https://secure-plateau-18239.herokuapp.com/organization/";
+    private String URL_CHECK_ID = "https://secure-plateau-18239.herokuapp.com/idOrganizationValid/";
+    private String URL_AGREGAR_USUARIO = "https://secure-plateau-18239.herokuapp.com/organization/user";
     private SharedPreferences.Editor sharedEditor;
     private String token;
     private View view;
     private ProgressDialog progressDialog;
     private RecyclerView rv_organizaciones;
+    private TextView error_busqueda, error_pass;
+    private EditText busqueda_id, pas_org_a_ingresar;
+    private Dialog pass_org;
     private AdapterOrganizaciones adaptador_para_organizaciones;
    // private JSONArray organizaciones;
 
@@ -66,7 +75,7 @@ public class OrganizacionesFragment extends Fragment {
 
         this.token = Usuario.getInstancia().getToken();
         System.out.printf(this.token.toString()+"\n");
-
+        this.pass_org= new Dialog(getContext());
         rv_organizaciones = (RecyclerView) view.findViewById(R.id.lista_organizaciones);
         adaptador_para_organizaciones = new AdapterOrganizaciones(getContext());
         LinearLayoutManager l = new LinearLayoutManager(getContext());
@@ -76,9 +85,13 @@ public class OrganizacionesFragment extends Fragment {
 
 
         getOrganizaciones();
-
+        error_busqueda = (TextView) view.findViewById(R.id.error_buscar_organizacion);
+        error_busqueda.setVisibility(View.INVISIBLE);
+        busqueda_id = (EditText) view.findViewById(R.id.text_ingresar_organizacion);
 
         crearOrganizacion = (Button)view.findViewById(R.id.boton_addOrganizacion);
+        buscarOrganizacion = (Button)view.findViewById(R.id.button_buscar_organizacion);
+
 
         crearOrganizacion.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -98,9 +111,158 @@ public class OrganizacionesFragment extends Fragment {
 
             }
         });
+
+        buscarOrganizacion.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i("INFO","Apretaste para buscar una organizacion");
+                error_busqueda.setVisibility(View.INVISIBLE);
+                chequearId();
+                //startActivity(launchactivity);
+
+
+
+            }
+        });
         return view;
     }
 
+    private void chequearId() {
+
+        Log.i("INFO", "Chequeo si el ID ya existe");
+
+        Log.i("INFO", "Json Request , check http status codes");
+        String URL = this.URL_CHECK_ID+this.busqueda_id.getText().toString();
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.GET, URL, null, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+
+                        System.out.println(response);
+                        //salta el popup de password
+                        error_busqueda.setVisibility(view.VISIBLE);
+
+                    }
+
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        //progressDialog.dismiss();
+
+                        switch (error.networkResponse.statusCode){
+                            case (400):
+                                mostrar_popup_pass_org();
+                                break;
+                            case (500):
+                                Toast.makeText(getActivity(),"No fue posible conectarse al servidor, por favor intente de nuevo mas tarde\"", Toast.LENGTH_LONG).show();
+                                break;
+
+                        }
+                    }
+                });
+
+        //Agrego la request a la cola para que se conecte con el server!
+        HttpConexionSingleton.getInstance(getContext()).addToRequestQueue(jsonObjectRequest);
+    }
+
+    private void mostrar_popup_pass_org() {
+        Log.i("INFO", "Apretaste para ingresar a una organizacion: "+this.busqueda_id.getText().toString());
+        pass_org.setContentView(R.layout.popup_pass_organizacion);
+
+        TextView id_a_ingresar = (TextView)  pass_org.findViewById(R.id.nombre_organizacion_ingresar);
+        pas_org_a_ingresar = (EditText)  pass_org.findViewById(R.id.password_organizacion_ingresar);
+        Button ingresar = (Button) pass_org.findViewById(R.id.ingreso_organizacion);
+        id_a_ingresar.setText(this.busqueda_id.getText().toString());
+        error_pass = (TextView) pass_org.findViewById(R.id.error_pass_organizacion);
+        error_pass.setVisibility(view.INVISIBLE);
+        ImageView b_cancelar_cambio = (ImageView) pass_org.findViewById(R.id.boton_cancelar_agregar_org);
+
+
+
+        b_cancelar_cambio.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pass_org.dismiss();
+            }
+        });
+        ingresar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                error_pass.setVisibility(view.INVISIBLE);
+                ingresar_a_organizacion(pas_org_a_ingresar.getText().toString());
+
+            }
+        });
+
+
+
+        pass_org.show();
+    }
+
+    private void ingresar_a_organizacion(String password){
+
+        progressDialog = ProgressDialog.show(
+                getActivity(),"Hypechat","Validando password...",true);
+
+        JSONObject requestBody = new JSONObject();
+        try {
+            requestBody.put("token",this.token );
+            requestBody.put("idOrganization", this.busqueda_id.getText().toString());
+            requestBody.put("email", Usuario.getInstancia().getEmail());
+            requestBody.put("psw", password);
+            Log.i("INFO", "PSW: "+password);
+        }
+        catch(JSONException except){
+            Toast.makeText(getActivity(), except.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+
+        Log.i("INFO", "Request body: "+requestBody.toString());
+        Log.i("INFO", "Json Request , check http status codes");
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.POST, URL_AGREGAR_USUARIO, requestBody, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        progressDialog.dismiss();
+                        System.out.println(response);
+                        Log.i("INFO", "Se agrego la organizacion "+busqueda_id.getText().toString()+" al usuario "+Usuario.getInstancia().getEmail());
+                        busqueda_id.getText().clear();
+                        pass_org.dismiss();
+                        Toast.makeText(getActivity(), "Se ingreso a la organizacion con exito.", Toast.LENGTH_LONG).show();
+
+
+                    }
+
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        progressDialog.dismiss();
+                        switch (error.networkResponse.statusCode){
+                            case (400):
+                                Toast.makeText(getActivity(),"El usuario ya se ha agregado a la organizacion", Toast.LENGTH_LONG).show();
+                                break;
+                            case (401):
+                                Toast.makeText(getActivity(),"No existe un usuario con ese email", Toast.LENGTH_LONG).show();
+                                break;
+                            case (404):
+                                error_pass.setVisibility(view.VISIBLE);
+
+                                break;
+                            case (500):
+                                Toast.makeText(getActivity(),"No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
+                                break;
+                        }
+                    }
+                });
+
+        //Agrego la request a la cola para que se conecte con el server!
+        HttpConexionSingleton.getInstance(getContext()).addToRequestQueue(jsonObjectRequest);
+
+    }
 
     private void getOrganizaciones (){
         Log.i("INFO", "Obtengo las organizaciones del usuario");
@@ -132,11 +294,13 @@ public class OrganizacionesFragment extends Fragment {
                         switch (error.networkResponse.statusCode){
                             case (404):
                                 Toast.makeText(getActivity(),"Usuario Invalido!", Toast.LENGTH_LONG).show();
+                                break;
                             case (500):
                                  Toast.makeText(getActivity(),"Server error!", Toast.LENGTH_LONG).show();
+                                break;
                             case (400):
                                 //Toast.makeText(LoginActivity.this,"No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
-
+                                break;
                         }
                     }
                 });
@@ -215,10 +379,11 @@ public class OrganizacionesFragment extends Fragment {
                         progressDialog.dismiss();
                         switch (error.networkResponse.statusCode){
                             case (400):
+                                break;
                                 //Toast.makeText(LoginActivity.this,"Usuario o Contraseña Invalidos!", Toast.LENGTH_LONG).show();
                             case (500):
                                 Toast.makeText(getActivity(),"No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
-
+                                break;
                         }
                     }
                 });

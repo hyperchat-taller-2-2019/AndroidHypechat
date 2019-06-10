@@ -17,8 +17,11 @@ public class AdapterOrganizaciones extends RecyclerView.Adapter<CardOrganizacion
     private View.OnClickListener mOnItemClickListener;
 
 
+
     public AdapterOrganizaciones(Context ctx) {
+
         this.ctx = ctx;
+
     }
 
     public void agregarOrganizacion(Organizacion organizacion){
