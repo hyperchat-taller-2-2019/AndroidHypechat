@@ -38,6 +38,8 @@ public class AgregarUsuarioOrganizacion extends Fragment {
     private Boolean creando_organizacion;
     private String token;
     private String psw;
+    private VerUsuariosOrganizacion ver_usuarios_fragment;
+
 
     @Nullable
     @Override
@@ -77,6 +79,8 @@ public class AgregarUsuarioOrganizacion extends Fragment {
                     //Linea clave para que el fragmento termine de ponerse si o si en la activity y poder editarla!
                     fragmentManager.executePendingTransactions();
                 }else{
+                    ver_usuarios_fragment.cargarMiembros();
+                    //ver_usuarios_fragment.actualizar_lista_members();
                     getFragmentManager().popBackStackImmediate();
                 }
 
@@ -154,10 +158,11 @@ public class AgregarUsuarioOrganizacion extends Fragment {
 
     }
 
-    public void completarOrganizacionID(String id,Boolean creandoOrg,String psw, String token) {
+    public void completarOrganizacionID(String id,Boolean creandoOrg,String psw, String token,VerUsuariosOrganizacion verUsuarios) {
         this.organizacion_id = id;
         this.creando_organizacion = creandoOrg;
         this.psw = psw;
         this.token = token;
+        this.ver_usuarios_fragment = verUsuarios;
     }
 }

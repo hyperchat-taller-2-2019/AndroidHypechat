@@ -1,7 +1,6 @@
 package com.example.hypechat;
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -26,6 +25,8 @@ import com.android.volley.toolbox.JsonObjectRequest;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.UnsupportedEncodingException;
 
 public class HomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -124,11 +125,62 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         String URL = this.URL_PERFIL+email;
         Log.i("INFO", "Se esta por consultar el perfil del mail: " + email);
         Log.i("INFO","En la ruta: "+URL);
-        this.progressDialog = ProgressDialog.show(
-                this,"Hypechat","Obteniendo datos del perfil...",true);
+        JSONObject requestBody = new JSONObject();
+        try {
+            requestBody.put("token",Usuario.getInstancia().getToken());
+            Log.i("INFO","En el body: "+requestBody.toString());
+        }
+        catch(JSONException except){
+            Toast.makeText(this, except.getMessage(), Toast.LENGTH_SHORT).show();
+        }
 
-                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.GET, URL, null, new Response.Listener<JSONObject>() {
+
+        this.progressDialog = ProgressDialog.show(this,"Hypechat","Obteniendo datos del perfil...",true);
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.POST, URL, requestBody, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        progressDialog.dismiss();
+                        //Por ahora siempre busca los datos en la base y siempre los guarda en SharedPref para
+                        //armar la vista en "setProfileFragment()"
+
+                        procesarDatosDeUsuarioRecibidos(response);
+
+
+                    }
+
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        progressDialog.dismiss();
+                        switch (error.networkResponse.statusCode){
+                            case (400):
+                                Toast.makeText(HomeActivity.this,"Token invalido",Toast.LENGTH_LONG).show();
+                                if(error.networkResponse.data!=null) {
+                                    String body;
+                                    try {
+                                        body = new String(error.networkResponse.data,"UTF-8");
+                                        Log.i("ERROR",body);
+                                    } catch (UnsupportedEncodingException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+
+                                break;
+
+                            case (500):
+                                Toast.makeText(HomeActivity.this,"No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
+                                break;
+                        }
+                    }
+                });
+
+        /*
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.GET, URL, requestBody, new Response.Listener<JSONObject>() {
 
                     @Override
                     public void onResponse(JSONObject response) {
@@ -145,7 +197,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                         progressDialog.dismiss();
                         Toast.makeText(HomeActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
                     }
-                });
+                });*/
         HttpConexionSingleton.getInstance(this).addToRequestQueue(jsonObjectRequest);
     }
 

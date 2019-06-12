@@ -1,10 +1,10 @@
 package com.example.hypechat;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.media.Image;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -42,18 +42,26 @@ public class OrganizacionFragment extends Fragment {
     private ImageButton editar_organizacion;
     private final String URL_CANALES = "https://secure-plateau-18239.herokuapp.com/channels/user";
     private final String URL_MSJ_PRIVADOS = "https://secure-plateau-18239.herokuapp.com/privateMsj";
+    private final String URL_INFO_ORG = "https://secure-plateau-18239.herokuapp.com/organization/";
     private SharedPreferences.Editor sharedEditor;
     private String token;
     private String organizacion_id;
     private String organizacion_name;
-    private TextView titulo;
+    private TextView titulo, mensaje;
     private View view;
     private ProgressDialog progressDialog;
-    private String owner_email;
+    private Boolean owner;
     private String user_email;
     private String password;
     // private JSONArray organizaciones;
     private ImageButton ubicacion_equipo;
+    private String mensaje_bienvenida;
+
+    @SuppressLint("ValidFragment")
+    public OrganizacionFragment(String id) {
+
+        this.organizacion_id = id;
+    }
 
 
     @Nullable
@@ -61,19 +69,22 @@ public class OrganizacionFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         //return inflater.inflate(R.layout.organizaciones,container,false);
         this.view = inflater.inflate(R.layout.organizacion,container,false);
-        this.sharedPref = getActivity().getSharedPreferences(getString(R.string.saved_data), Context.MODE_PRIVATE);
+        /*this.sharedPref = getActivity().getSharedPreferences(getString(R.string.saved_data), Context.MODE_PRIVATE);
         this.sharedEditor = sharedPref.edit();
 
         this.organizacion_name = sharedPref.getString("organizacion_name","no organizacion");
         this.organizacion_id = sharedPref.getString("organizacion_id","no id");
-
+*/
         this.user_email = Usuario.getInstancia().getEmail();
 
         this.token = Usuario.getInstancia().getToken();
 
         titulo = (TextView) view.findViewById(R.id.titulo_organizacion);
+        mensaje = (TextView) view.findViewById(R.id.msj_bienvenida_organizacion);
         this.titulo.setText(organizacion_name);
-        getCanales();
+        this.mensaje.setText(mensaje_bienvenida);
+        actualizarDatos();
+
 
 
 
@@ -81,6 +92,9 @@ public class OrganizacionFragment extends Fragment {
         crearMsjPrivado = (ImageButton)view.findViewById(R.id.crear_msj_privado);
         editar_organizacion = (ImageButton)view.findViewById(R.id.edit_Organizacion);
         ubicacion_equipo = (ImageButton) view.findViewById(R.id.btn_ubicacion_equipo);
+
+
+
 
         crearCanal.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -135,7 +149,7 @@ public class OrganizacionFragment extends Fragment {
 
                 //Me traigo el fragmento sabiendo que es el de EditarOrganizacion para cargarle la información
                 EditarOrganizacion editar_organization = (EditarOrganizacion) getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-                editar_organization.completarInformacionOrganizacion(organizacion_id);
+                editar_organization.completarInformacionOrganizacion(organizacion_id,OrganizacionFragment.this);
 
 
 
@@ -346,11 +360,73 @@ public class OrganizacionFragment extends Fragment {
         }
     }
 
-    public void completarInfoOrganizacion(String nombre, String id, String owner_email, String password) {
-        this.organizacion_name = nombre;
-        this.organizacion_id = id;
-        this.owner_email = owner_email;
-        this.password = password;
+    public void completarInfoOrganizacion(JSONObject orga) {
+        try {
+            JSONObject infoOrga = orga.getJSONObject("organization");
+            this.organizacion_name = infoOrga.getString("name");
+            this.titulo.setText(this.organizacion_name);
+            this.mensaje_bienvenida = infoOrga.getString("welcome");
+            this.mensaje.setText(mensaje_bienvenida);
+            this.organizacion_id = infoOrga.getString("id");
+            this.owner = false;
+            for (int i = 0; i < infoOrga.getJSONArray("owner").length(); i++){
+                if (infoOrga.getJSONArray("owner").getString(i).equals(Usuario.getInstancia().getEmail())){
+                    this.owner = true;
+                }
+            }
+            this.password = infoOrga.getString("psw");
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        getCanales();
 
     }
+
+    public void actualizarDatos(){
+        Log.i("INFO", "Obteniendo datos de la organizacion");
+        this.progressDialog = ProgressDialog.show(
+                getActivity(),"Hypechat","Obteniendo organizaciones del usuario...",true);
+
+        //Preparo Body del POST
+
+        String URL = URL_INFO_ORG + this.token+ "/" + organizacion_id;
+
+        Log.i("INFO", "Json Request getOrganizaciones, check http status codes");
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.GET, URL, null, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+
+                        progressDialog.dismiss();
+                        System.out.println(response);
+                        completarInfoOrganizacion(response);
+
+                    }
+
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        //progressDialog.dismiss();
+                        progressDialog.dismiss();
+                        switch (error.networkResponse.statusCode){
+                            case (400):
+                                break;
+                            //Toast.makeText(LoginActivity.this,"Usuario o Contraseña Invalidos!", Toast.LENGTH_LONG).show();
+                            case (500):
+                                Toast.makeText(getActivity(),"No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
+                                break;
+                        }
+                    }
+                });
+
+        //Agrego la request a la cola para que se conecte con el server!
+        HttpConexionSingleton.getInstance(getContext()).addToRequestQueue(jsonObjectRequest);
+    }
+
+
+
 }

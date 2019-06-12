@@ -36,7 +36,7 @@ public class OrganizacionesFragment extends Fragment {
     private SharedPreferences sharedPref;
     private Button crearOrganizacion, buscarOrganizacion;
     private final String URL_ORGANIZACIONES = "https://secure-plateau-18239.herokuapp.com/organizations/";
-    private final String URL_INFO_ORG = "https://secure-plateau-18239.herokuapp.com/organization/";
+
     private String URL_CHECK_ID = "https://secure-plateau-18239.herokuapp.com/idOrganizationValid/";
     private String URL_AGREGAR_USUARIO = "https://secure-plateau-18239.herokuapp.com/organization/user";
     private SharedPreferences.Editor sharedEditor;
@@ -58,7 +58,7 @@ public class OrganizacionesFragment extends Fragment {
             int position = viewHolder.getAdapterPosition();
             Organizacion organizacion_clickeada = adaptador_para_organizaciones.obtenerItemPorPosicion(position);
             //Toast.makeText(getContext(), "TOCASTE LA ORGANIZACION: " + organizacion_clickeada.getId(), Toast.LENGTH_SHORT).show();
-            obtenerDatosOrganizacion(organizacion_clickeada.getId());
+            mostrarOrganizacion(organizacion_clickeada.getId());
         }
     };
 
@@ -348,60 +348,13 @@ public class OrganizacionesFragment extends Fragment {
         }
     }
 
-    private void obtenerDatosOrganizacion(String id){
-        Log.i("INFO", "Obteniendo datos de la organizacion");
-        this.progressDialog = ProgressDialog.show(
-                getActivity(),"Hypechat","Obteniendo organizaciones del usuario...",true);
 
-        //Preparo Body del POST
+    private void mostrarOrganizacion(String id) {
 
-        String URL = URL_INFO_ORG + this.token+ "/" + id;
-
-        Log.i("INFO", "Json Request getOrganizaciones, check http status codes");
-
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.GET, URL, null, new Response.Listener<JSONObject>() {
-
-                    @Override
-                    public void onResponse(JSONObject response) {
-
-                        progressDialog.dismiss();
-                        System.out.println(response);
-                        mostrarOrganizacion(response);
-
-                    }
-
-                }, new Response.ErrorListener() {
-
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        //progressDialog.dismiss();
-                        progressDialog.dismiss();
-                        switch (error.networkResponse.statusCode){
-                            case (400):
-                                break;
-                                //Toast.makeText(LoginActivity.this,"Usuario o Contraseña Invalidos!", Toast.LENGTH_LONG).show();
-                            case (500):
-                                Toast.makeText(getActivity(),"No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
-                                break;
-                        }
-                    }
-                });
-
-        //Agrego la request a la cola para que se conecte con el server!
-        HttpConexionSingleton.getInstance(getContext()).addToRequestQueue(jsonObjectRequest);
-    }
-
-    private void mostrarOrganizacion(JSONObject response) {
-        try {
-            JSONObject orga = response.getJSONObject("organization");
-        this.sharedEditor.putString("organizacion_name",orga.getString("name"));
-        this.sharedEditor.putString("organizacion_id",orga.getString("id"));
-        this.sharedEditor.apply();
 
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.fragment_container,new OrganizacionFragment());
+        fragmentTransaction.replace(R.id.fragment_container,new OrganizacionFragment(id));
         //Esta es la linea clave para que vuelva al fragmento anterior!
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
@@ -411,10 +364,8 @@ public class OrganizacionesFragment extends Fragment {
         //Me traigo el fragmento sabiendo que es el de OrganizacionFragment para cargarle la información
         OrganizacionFragment org = (OrganizacionFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_container);
 
-            org.completarInfoOrganizacion(orga.getString("name"),orga.getString("id"),orga.getString("owner"),orga.getString("psw"));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+
+
 
     }
 
