@@ -2,7 +2,6 @@ package com.example.hypechat;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -37,12 +36,14 @@ import java.util.List;
 public class OrganizacionFragment extends Fragment {
 
     private SharedPreferences sharedPref;
-    private ImageButton crearCanal;;
-    private ImageButton crearMsjPrivado;
+    private ImageButton agregarCanal;;
+    private ImageButton agregarMsjPrivado;
     private ImageButton editar_organizacion;
     private final String URL_CANALES = "https://secure-plateau-18239.herokuapp.com/channels/user";
     private final String URL_MSJ_PRIVADOS = "https://secure-plateau-18239.herokuapp.com/privateMsj";
     private final String URL_INFO_ORG = "https://secure-plateau-18239.herokuapp.com/organization/";
+    private final String URL_INFO_CANAL = "https://secure-plateau-18239.herokuapp.com/channel/";
+    private final String URL_INFO_PRIVADO ="";
     private SharedPreferences.Editor sharedEditor;
     private String token;
     private String organizacion_id;
@@ -88,33 +89,33 @@ public class OrganizacionFragment extends Fragment {
 
 
 
-        crearCanal= (ImageButton)view.findViewById(R.id.crear_canal);
-        crearMsjPrivado = (ImageButton)view.findViewById(R.id.crear_msj_privado);
+        agregarCanal= (ImageButton)view.findViewById(R.id.crear_canal);
+        agregarMsjPrivado = (ImageButton)view.findViewById(R.id.crear_msj_privado);
         editar_organizacion = (ImageButton)view.findViewById(R.id.edit_Organizacion);
         ubicacion_equipo = (ImageButton) view.findViewById(R.id.btn_ubicacion_equipo);
 
 
 
 
-        crearCanal.setOnClickListener(new View.OnClickListener() {
+        agregarCanal.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i("INFO","Apretaste para crear un canal en la organizacion: "+organizacion_id);
-                Toast.makeText(getActivity(),"Crear Canal", Toast.LENGTH_LONG).show();
+                Log.i("INFO","Apretaste para agregar un canal en la organizacion: "+organizacion_id);
+                //Toast.makeText(getActivity(),"Crear Canal", Toast.LENGTH_LONG).show();
 
-                //FragmentManager fragmentManager = getFragmentManager();
-                //FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                //fragmentTransaction.replace(R.id.fragment_container,new CrearOrganizacion());
+                FragmentManager fragmentManager = getFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.fragment_container,new AgregarCanal(organizacion_id,password));
                 //Esta es la linea clave para que vuelva al fragmento anterior!
-                //fragmentTransaction.addToBackStack(null);
-                //fragmentTransaction.commit();
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
                 //Linea clave para que el fragmento termine de ponerse si o si en la activity y poder editarla!
-                //fragmentManager.executePendingTransactions();
+                fragmentManager.executePendingTransactions();
 
 
             }
         });
-        crearMsjPrivado.setOnClickListener(new View.OnClickListener() {
+        agregarMsjPrivado.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.i("INFO","Apretaste para crear una conversacion privada en la organizacion: "+organizacion_id);
@@ -304,8 +305,8 @@ public class OrganizacionFragment extends Fragment {
                     TextView text1 = (TextView) view;
                     Toast.makeText(getActivity(),text1.getText().toString(), Toast.LENGTH_LONG).show();
                     //Ir al chat de ese canal
-                    String nombre_sala = text1.getText().toString().replace("#","");
-                    irAlChat(nombre_sala);
+                    String nombre_sala = text1.getText().toString().replace("# ","");
+                    obtenerIDChat(nombre_sala);
 
                 }
             });
@@ -315,19 +316,69 @@ public class OrganizacionFragment extends Fragment {
         }
     }
 
-    private void irAlChat(String nombre_de_sala) {
-        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.fragment_container,new ChatFragment());
-        //Esta es la linea clave para que vuelva al fragmento anterior!
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
-        //Linea clave para que el fragmento termine de ponerse si o si en la activity y poder editarla!
-        fragmentManager.executePendingTransactions();
+    private void obtenerIDChat(String nombre_de_sala){
+        Log.i("INFO", "Obtengo id del canal");
+        progressDialog = ProgressDialog.show(getActivity(),"Hypechat","Obteniendo info del canal...",true);
 
-        //Me traigo el fragmento sabiendo que es el de ChatFragment para cargarle la información
-        ChatFragment chat = (ChatFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-        chat.setSalaDeChat(nombre_de_sala);
+        String URL = URL_INFO_CANAL +this.token+"/"+this.organizacion_id+"/"+nombre_de_sala;
+
+
+        Log.i("INFO", "Json Request get id de Canal, check http status codes:  ");
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.GET, URL, null, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        progressDialog.dismiss();
+                        System.out.println(response);
+                        irAlChat(response);
+
+                    }
+
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        //progressDialog.dismiss();
+                        progressDialog.dismiss();
+                        switch (error.networkResponse.statusCode){
+                            case (404):
+                                Toast.makeText(getActivity(),"Organizacion invalida!", Toast.LENGTH_LONG).show();
+                                break;
+                            case (500):
+                                Toast.makeText(getActivity(),"No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
+                                break;
+                        }
+                    }
+                });
+
+        //Agrego la request a la cola para que se conecte con el server!
+        HttpConexionSingleton.getInstance(getContext()).addToRequestQueue(jsonObjectRequest);
+    }
+
+    private void irAlChat(JSONObject res) {
+        JSONObject canal = null;
+        try {
+            canal = res.getJSONObject("channel");
+            String id = canal.getString("_id");
+            String name = canal.getString("name");
+            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.fragment_container,new ChatFragment());
+            //Esta es la linea clave para que vuelva al fragmento anterior!
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+            //Linea clave para que el fragmento termine de ponerse si o si en la activity y poder editarla!
+            fragmentManager.executePendingTransactions();
+
+            //Me traigo el fragmento sabiendo que es el de ChatFragment para cargarle la información
+            ChatFragment chat = (ChatFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+            chat.setSalaDeChat(id,name,this.organizacion_id);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
     }
 
     private void responseListaMsjPrivados(JSONObject response){

@@ -8,6 +8,30 @@
     android:background="@color/colorGrisClaro"
     android:padding="10dp">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@color/colorAzul"
+        android:layout_marginBottom="10dp">
+
+        <ImageButton
+            android:id="@+id/volver_a_organizacion"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:src="@drawable/ic_return"
+            android:background="@color/colorAzul"/>
+
+        <TextView
+            android:id="@+id/titulo_orga"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Orga Title"
+            android:textSize="25dp"
+            android:textStyle="bold"
+            android:textColor="@color/colorBlanco"
+            android:background="@color/colorAzul" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/titulo_chat"
@@ -26,7 +50,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:background="@color/colorGrisClaro"
-        android:layout_weight="1"/>
+        android:layout_weight="1" />
 
     <LinearLayout
         android:layout_width="match_parent"

@@ -1,6 +1,7 @@
 package com.example.hypechat;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -91,9 +92,17 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             case R.id.perfil:
                 goToProfile(Usuario.getInstancia().getEmail());
                 break;
+            case R.id.logout:
+                logout();
+                break;
         }
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void logout() {
+        Intent intent = new Intent(this,LoginActivity.class);
+        startActivity(intent);
     }
 
     public void irAChat(View view){
@@ -101,7 +110,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void goToChat(){
-        this.navigationView.setCheckedItem(R.id.msj_privados);
+        /*this.navigationView.setCheckedItem(R.id.msj_privados);
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.fragment_container,new ChatFragment());
@@ -113,7 +122,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
         //Me traigo el fragmento sabiendo que es el de perfil para cargarle la información
         ChatFragment chat = (ChatFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-        chat.setSalaDeChat("Chat Test");
+        chat.setSalaDeChat("Chat Test");*/
     }
 
     private void goToProfile(String email_del_perfil) {

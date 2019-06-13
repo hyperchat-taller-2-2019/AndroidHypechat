@@ -1,5 +1,6 @@
 package com.example.hypechat;
 
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -14,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,7 +39,10 @@ public class VerUsuariosOrganizacion extends Fragment {
     private JSONArray members;
     private AdapterMiembros adaptador_para_usuarios;
     private ProgressDialog progressDialog;
+    private Dialog eliminar_usuario;
     private final String URL_INFO_ORG = "https://secure-plateau-18239.herokuapp.com/organization/";
+    private final String URL_ELIMINAR_MEMBER = "https://secure-plateau-18239.herokuapp.com/member";
+
 
 
     //metodo que se ejecuta cuando tocamos algun tarjeta de la recycleview
@@ -46,8 +51,9 @@ public class VerUsuariosOrganizacion extends Fragment {
         public void onClick(View v) {
             RecyclerView.ViewHolder viewHolder = (RecyclerView.ViewHolder) v.getTag();
             int position = viewHolder.getAdapterPosition();
+            if(permiso_editar) confirma_eliminar_usuario(adaptador_para_usuarios.obtenerItemPorPosicion(position));
 
-            Toast.makeText(getContext(), "TOCASTE el usuario: " + position, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getContext(), "TOCASTE el usuario: " + position, Toast.LENGTH_SHORT).show();
 
         }
     };
@@ -66,6 +72,8 @@ public class VerUsuariosOrganizacion extends Fragment {
         lista_usuarios.setLayoutManager(l);
         lista_usuarios.setAdapter(adaptador_para_usuarios);
         adaptador_para_usuarios.setOnItemClickListener(this.onItemClickListener);
+
+        eliminar_usuario = new Dialog(getContext());
 
         volver.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -161,7 +169,89 @@ public class VerUsuariosOrganizacion extends Fragment {
         HttpConexionSingleton.getInstance(getContext()).addToRequestQueue(jsonObjectRequest);
     }
 
+    public void confirma_eliminar_usuario(final String email_a_eliminar){
+        Log.i("INFO", "Apretaste para eliminar un usuario");
+        eliminar_usuario.setContentView(R.layout.popup_eliminar_usuario);
 
+        TextView email = (TextView)  eliminar_usuario.findViewById(R.id.text_email_remove);
+        email.setText(email_a_eliminar);
+
+        Button confirmar_eliminar = (Button) eliminar_usuario.findViewById(R.id.eliminar_usuario);
+        ImageView b_cancelar = (ImageView) eliminar_usuario.findViewById(R.id.boton_cancelar_eliminar);
+
+
+
+        b_cancelar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                eliminar_usuario.dismiss();
+            }
+        });
+
+
+        confirmar_eliminar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                progressDialog = ProgressDialog.show(getContext(),"Hypechat","Eliminando usuario...",
+                        true);
+                eliminar_usuario(email_a_eliminar);
+            }
+        });
+        eliminar_usuario.show();
+    }
+
+    private void eliminar_usuario(String email_a_eliminar) {
+        Log.i("INFO", "Eliminando el miembro "+email_a_eliminar+" de la organizacion: "+this.id);
+        this.progressDialog = ProgressDialog.show(
+                getActivity(),"Hypechat","Eliminando el miembro de la organizacion...",true);
+
+        //Preparo Body del DELETE
+        JSONObject requestBody = new JSONObject();
+        try {
+            requestBody.put("token", this.token);
+            requestBody.put("organizationID", this.id);
+            requestBody.put("userEmail",email_a_eliminar);
+        } catch (JSONException except) {
+            Toast.makeText(getActivity(), except.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+
+
+        Log.i("INFO", "Json Request get info organization, check http status codes");
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.DELETE, URL_ELIMINAR_MEMBER, requestBody, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+
+                        progressDialog.dismiss();
+                        eliminar_usuario.dismiss();
+                        cargarMiembros();
+
+                    }
+
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        //progressDialog.dismiss();
+                        progressDialog.dismiss();
+                        switch (error.networkResponse.statusCode){
+                            case (404):
+                                Toast.makeText(getActivity(),"No existe la organizacion", Toast.LENGTH_LONG).show();
+                                break;
+                            //Toast.makeText(LoginActivity.this,"Usuario o Contraseña Invalidos!", Toast.LENGTH_LONG).show();
+                            case (500):
+                                Toast.makeText(getActivity(),"No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
+                                break;
+                        }
+                    }
+                });
+
+        //Agrego la request a la cola para que se conecte con el server!
+        HttpConexionSingleton.getInstance(getContext()).addToRequestQueue(jsonObjectRequest);
+
+    }
 
 
     public void actualizar_lista_members(JSONObject res) {
