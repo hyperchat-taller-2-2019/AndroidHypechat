@@ -104,9 +104,8 @@
         <ListView
             android:id="@+id/lista_canales"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="150dp"
             android:layout_margin="20sp"
-            android:layout_weight="1"
             android:background="@color/colorBlanco"
             android:cacheColorHint="#00000000"
             android:divider="@android:color/transparent"></ListView>
@@ -138,9 +137,8 @@
         <ListView
             android:id="@+id/lista_msj_privados"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="150dp"
             android:layout_margin="20sp"
-            android:layout_weight="1"
             android:background="@color/colorBlanco"
             android:cacheColorHint="#00000000"
             android:divider="@android:color/transparent"></ListView>
