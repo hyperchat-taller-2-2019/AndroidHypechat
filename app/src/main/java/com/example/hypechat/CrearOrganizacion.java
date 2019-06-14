@@ -202,7 +202,7 @@ public class CrearOrganizacion extends Fragment {
 
         //Me traigo el fragmento sabiendo que es el de perfil para cargarle la información
         AgregarUsuarioOrganizacion add_Usuario = (AgregarUsuarioOrganizacion) getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-        add_Usuario.completarOrganizacionID(this.id.getText().toString(),true,this.psw.getText().toString(),Usuario.getInstancia().getToken());
+        add_Usuario.completarOrganizacionID(this.id.getText().toString(),true,this.psw.getText().toString(),Usuario.getInstancia().getToken(),null);
 
     }
 

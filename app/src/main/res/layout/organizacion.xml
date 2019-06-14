@@ -39,14 +39,20 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
+            <ImageButton
+                android:id="@+id/btn_ubicacion_equipo"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:src="@drawable/ic_location"/>
+
             <TextView
                 android:id="@+id/titulo_organizacion"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_gravity="end"
+                android:layout_gravity="center"
                 android:layout_weight="1"
                 android:text="Organizacion"
-                android:textAlignment="viewEnd"
+                android:textAlignment="center"
                 android:textColor="@color/colorBlanco"
                 android:textSize="30dp"
                 app:fontFamily="@font/carter_one" />
@@ -62,7 +68,7 @@
         </LinearLayout>
 
         <TextView
-            android:id="@+id/msj_bienvenida_canal"
+            android:id="@+id/msj_bienvenida_organizacion"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
@@ -98,9 +104,8 @@
         <ListView
             android:id="@+id/lista_canales"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="150dp"
             android:layout_margin="20sp"
-            android:layout_weight="1"
             android:background="@color/colorBlanco"
             android:cacheColorHint="#00000000"
             android:divider="@android:color/transparent"></ListView>
@@ -132,9 +137,8 @@
         <ListView
             android:id="@+id/lista_msj_privados"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="150dp"
             android:layout_margin="20sp"
-            android:layout_weight="1"
             android:background="@color/colorBlanco"
             android:cacheColorHint="#00000000"
             android:divider="@android:color/transparent"></ListView>

@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -21,7 +23,6 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -39,10 +40,12 @@ import static android.app.Activity.RESULT_OK;
 public class ChatFragment extends Fragment {
 
     private EditText texto_mensaje;
-    private TextView titulo_chat;
+    private TextView titulo_chat, titulo_orga;
     private Button boton_enviar_mensaje;
+    private ImageButton volver;
     private RecyclerView chat;
     private ImageButton boton_enviar_imagen;
+    private String id,name,org_id;
 
     private AdapterChat adaptador_para_chat;
 
@@ -59,6 +62,8 @@ public class ChatFragment extends Fragment {
         View view =  inflater.inflate(R.layout.fragment_chat, container, false);
 
         titulo_chat = (TextView) view.findViewById(R.id.titulo_chat);
+        titulo_orga = (TextView) view.findViewById(R.id.titulo_orga);
+        volver = (ImageButton) view.findViewById(R.id.volver_a_organizacion);
         chat = (RecyclerView) view.findViewById(R.id.listado_chat_cards);
         texto_mensaje = (EditText) view.findViewById(R.id.texto_mensaje_a_enviar);
         boton_enviar_mensaje = (Button) view.findViewById(R.id.btn_enviar_mensaje);
@@ -70,18 +75,38 @@ public class ChatFragment extends Fragment {
         chat.setAdapter(adaptador_para_chat);
 
 
+        volver.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.fragment_container,new OrganizacionFragment(org_id));
+                //Esta es la linea clave para que vuelva al fragmento anterior!
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
+                //Linea clave para que el fragmento termine de ponerse si o si en la activity y poder editarla!
+                fragmentManager.executePendingTransactions();
+
+                //Me traigo el fragmento sabiendo que es el de OrganizacionFragment para cargarle la información
+                OrganizacionFragment org = (OrganizacionFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+
+            }
+        });
+
         boton_enviar_mensaje.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String texto = texto_mensaje.getText().toString();
                 if (!texto.isEmpty()) {
-                    reference.push().setValue(new ChatMensajeEnviar(Usuario.getInstancia().getNickname(),texto, ServerValue.TIMESTAMP,Usuario.getInstancia().getUrl_foto_perfil()));
+                    reference.push().setValue(new ChatMensajeEnviar(Usuario.getInstancia().getNickname(),texto,
+                            ServerValue.TIMESTAMP,Usuario.getInstancia().getUrl_foto_perfil(),Usuario.getInstancia().getEmail()));
                 }
                 else{
                     Toast.makeText(getContext(), "No podes mandar un mensaje Vacio!", Toast.LENGTH_LONG).show();
                 }
             }
         });
+
 
         boton_enviar_imagen.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -110,10 +135,14 @@ public class ChatFragment extends Fragment {
     }
 
 
-    public void setSalaDeChat(String nombre_de_sala) {
+    public void setSalaDeChat(String id, String name, String orga_id) {
+
+        this.id = id;
+        this.name = name;
+        this.org_id = orga_id;
         //Aca se decide a que nodo de la base de datos voy a buscar y escribir los mensajes
         database = FirebaseDatabase.getInstance();
-        reference = database.getReference(nombre_de_sala);
+        reference = database.getReference(id);
         reference.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
@@ -142,7 +171,7 @@ public class ChatFragment extends Fragment {
 
             }
         });
-        titulo_chat.setText(nombre_de_sala.toUpperCase());
+        titulo_chat.setText(this.name.toUpperCase());
 
         //Seteo de la configuracion para manejar Imagenes en la base de datos
         storage = FirebaseStorage.getInstance();
@@ -172,7 +201,7 @@ public class ChatFragment extends Fragment {
                         Uri downloadUri = task.getResult();
                         Log.i("INFO","La url de la foto es: " + downloadUri.toString());
                         ChatMensajeEnviar mensajeEnviar = new ChatMensajeEnviar(Usuario.getInstancia().getNickname(), "Te ha enviado una imagen...",
-                                Usuario.getInstancia().getUrl_foto_perfil(), downloadUri.toString(), ServerValue.TIMESTAMP);
+                                Usuario.getInstancia().getUrl_foto_perfil(), downloadUri.toString(), ServerValue.TIMESTAMP,Usuario.getInstancia().getEmail());
                         reference.push().setValue(mensajeEnviar);
                     } else {
                         Toast.makeText(getActivity(), "Fallo la carga de la imagen" + task.getException().getMessage(), Toast.LENGTH_LONG).show();

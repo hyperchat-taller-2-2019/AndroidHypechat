@@ -38,12 +38,14 @@ public class AgregarUsuarioOrganizacion extends Fragment {
     private Boolean creando_organizacion;
     private String token;
     private String psw;
+    private VerUsuariosOrganizacion ver_usuarios_fragment;
+
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         //return inflater.inflate(R.layout.organizaciones,container,false);
-        View view = inflater.inflate(R.layout.activity_add_users,container,false);
+        View view = inflater.inflate(R.layout.activity_agregar_usuarios_organizacion,container,false);
 
         validador = new ValidadorDeCampos();
         this.email = (EditText) view.findViewById(R.id.edit_email);
@@ -77,6 +79,8 @@ public class AgregarUsuarioOrganizacion extends Fragment {
                     //Linea clave para que el fragmento termine de ponerse si o si en la activity y poder editarla!
                     fragmentManager.executePendingTransactions();
                 }else{
+                    ver_usuarios_fragment.cargarMiembros();
+                    //ver_usuarios_fragment.actualizar_lista_members();
                     getFragmentManager().popBackStackImmediate();
                 }
 
@@ -154,10 +158,11 @@ public class AgregarUsuarioOrganizacion extends Fragment {
 
     }
 
-    public void completarOrganizacionID(String id,Boolean creandoOrg,String psw, String token) {
+    public void completarOrganizacionID(String id,Boolean creandoOrg,String psw, String token,VerUsuariosOrganizacion verUsuarios) {
         this.organizacion_id = id;
         this.creando_organizacion = creandoOrg;
         this.psw = psw;
         this.token = token;
+        this.ver_usuarios_fragment = verUsuarios;
     }
 }

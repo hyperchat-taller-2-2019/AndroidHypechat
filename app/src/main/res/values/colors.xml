@@ -11,5 +11,6 @@
     <color name="colorGrisClaro">#D3D1D1</color>
     <color name="colorBlanco">#FFFFFF</color>
     <color name="transparent">#00FFFFFF</color>
+    <color name="colorRojo">#F44336</color>
 
 </resources>

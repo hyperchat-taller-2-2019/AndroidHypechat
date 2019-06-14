@@ -23,6 +23,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -42,8 +43,12 @@ public class EditarOrganizacion extends Fragment {
     private String URL_INFO = "https://secure-plateau-18239.herokuapp.com/organization/";
     private String URL_CAMBIO_NOMBRE = "https://secure-plateau-18239.herokuapp.com/organization/name";
     private String URL_CAMBIO_PASSWORD = "https://secure-plateau-18239.herokuapp.com/organization/password";
+    private String URL_CAMBIO_MENSAJE = "https://secure-plateau-18239.herokuapp.com/welcomeOrganization";
     private Dialog dialog_cambiar_psw;
     private ProgressDialog progressDialog;
+    private JSONArray members;
+    private JSONArray moderators;
+    private OrganizacionFragment orga;
 
 
     @Nullable
@@ -62,6 +67,7 @@ public class EditarOrganizacion extends Fragment {
         nombre_titulo = (TextView) view.findViewById(R.id.titulo_organizacion);
         dialog_cambiar_psw = new Dialog(getActivity());
 
+
         cancelar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -79,13 +85,13 @@ public class EditarOrganizacion extends Fragment {
                 Log.i("INFO", "Apretaste para guardar cambios de una organizacion");
                 //Intent launchactivity = new Intent(getActivity(),CrearOrganizacion.class);
                 //startActivity(launchactivity);
-                if (!nombre_titulo.equals(nombre.getText().toString())) {
-                    if (validador.isValidName(nombre.getText().toString(), getContext())) {
+
+                if (validador.isValidName(nombre.getText().toString(), getContext()) && validador.isNotCampoVacio(bienvenida.getText().toString(),getContext(),"mensaje de bienvenida")) {
                         enviarCambioNombre();
-                    }
-                } else {
-                    getFragmentManager().popBackStackImmediate();
+
                 }
+
+
 
 
             }
@@ -169,7 +175,22 @@ public class EditarOrganizacion extends Fragment {
 
                 //Me traigo el fragmento sabiendo que es el de perfil para cargarle la información
                 VerUsuariosOrganizacion usuarios = (VerUsuariosOrganizacion) getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-                usuarios.completarinfo(id.getText().toString(), password, token, owner);
+
+                Boolean permiso_agregar_usuarios = false;
+                if(owner) permiso_agregar_usuarios = true;
+                else {
+                    for (int i = 0; i < moderators.length(); i++) {
+                        try {
+                            if (moderators.getString(i).equals(Usuario.getInstancia().getEmail())) {
+                                permiso_agregar_usuarios = true;
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+
+                usuarios.completarinfo(id.getText().toString(), password, token, permiso_agregar_usuarios);
 
 
 
@@ -198,6 +219,56 @@ public class EditarOrganizacion extends Fragment {
                     public void onResponse(JSONObject response) {
 
                         System.out.println(response);
+                        enviarCambioMensaje();
+                    }
+
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        //progressDialog.dismiss();
+
+                        switch (error.networkResponse.statusCode) {
+                            case (500):
+                                Toast.makeText(getActivity(), "No fue posible conectarse al servidor, por favor intente de nuevo mas tarde!", Toast.LENGTH_LONG).show();
+                                break;
+                            case (405):
+                                Toast.makeText(getActivity(), "Server error!", Toast.LENGTH_LONG).show();
+                                break;
+                            case (404):
+                                //Toast.makeText(LoginActivity.this,"No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
+                                break;
+
+                        }
+                    }
+                });
+
+        //Agrego la request a la cola para que se conecte con el server!
+        HttpConexionSingleton.getInstance(getContext()).addToRequestQueue(jsonObjectRequest);
+
+    }
+
+
+    private void enviarCambioMensaje() {
+        Log.i("INFO", "Envio de cambios del mensaje de bienvenida de la organizacion:  "+this.id.getText().toString());
+        JSONObject requestBody = new JSONObject();
+        try {
+            requestBody.put("token", this.token);
+            requestBody.put("organizationID", this.id.getText().toString());
+            requestBody.put("welcome", this.bienvenida.getText().toString());
+        } catch (JSONException except) {
+            Toast.makeText(getActivity(), except.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+        Log.i("INFO", "Json Request , check http status codes");
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.PUT, URL_CAMBIO_MENSAJE, requestBody, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+
+                        System.out.println(response);
+                        //orga.actualizarDatos();
                         getFragmentManager().popBackStackImmediate();
 
                     }
@@ -211,9 +282,13 @@ public class EditarOrganizacion extends Fragment {
                         switch (error.networkResponse.statusCode) {
                             case (500):
                                 Toast.makeText(getActivity(), "No fue posible conectarse al servidor, por favor intente de nuevo mas tarde!", Toast.LENGTH_LONG).show();
+                                break;
                             case (405):
                                 Toast.makeText(getActivity(), "Server error!", Toast.LENGTH_LONG).show();
+                                break;
                             case (404):
+                                Toast.makeText(getActivity(), "Organizacion id no existe", Toast.LENGTH_LONG).show();
+                                break;
                                 //Toast.makeText(LoginActivity.this,"No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
 
                         }
@@ -226,11 +301,11 @@ public class EditarOrganizacion extends Fragment {
     }
 
 
-
     private void procesarInfo(JSONObject response) {
         try {
             JSONObject orga = response.getJSONObject("organization");
-
+            this.moderators = orga.getJSONArray("moderators");
+            this.members = orga.getJSONArray("members");
             this.nombre_titulo.setText(orga.getString("name"));
             this.nombre.setText(orga.getString("name"));
             this.id.setText(orga.getString("id"));
@@ -297,12 +372,15 @@ public class EditarOrganizacion extends Fragment {
                             case (404):
                                 Toast.makeText(getActivity(),
                                         "Usuario o Contraseña Invalidos!", Toast.LENGTH_LONG).show();
+                                break;
                             case (400):
                                 Toast.makeText(getActivity(),
                                         "Server error!", Toast.LENGTH_LONG).show();
+                                break;
                             case (500):
                                 Toast.makeText(getActivity(),
                                         "No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
+                                break;
 
                         }
                     }
@@ -313,8 +391,8 @@ public class EditarOrganizacion extends Fragment {
     }
 
 
-    public void completarInformacionOrganizacion(String id) {
-
+    public void completarInformacionOrganizacion(String id, OrganizacionFragment organizacion) {
+        this.orga = organizacion;
         this.token = Usuario.getInstancia().getToken();
 
         String URL = URL_INFO + this.token + "/" + id;

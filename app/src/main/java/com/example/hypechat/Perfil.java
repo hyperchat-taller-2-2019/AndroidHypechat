@@ -1,13 +1,17 @@
 package com.example.hypechat;
 
 
+import android.Manifest;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,10 +29,12 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.bumptech.glide.Glide;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.database.ServerValue;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -43,16 +49,20 @@ public class Perfil extends Fragment {
 
     private View vista;
 
-    private EditText nombre_perfil, apodo_perfil, email_perfil;
+    private EditText nombre_perfil, apodo_perfil;
+    private TextView email_perfil;
     private Button cambiarContraseña, modificarPerfil;
     private Dialog dialog_cambiar_psw;
     private ValidadorDeCampos validador;
     private ProgressDialog progressDialog;
     private ImageButton btn_cambiar_foto_perfil;
     private ImageView perfil_foto;
+    private ImageButton btn_actualizar_ubicacion;
     private static final int PHOTO_PERFIL = 2;
     StorageReference storageReference;
     FirebaseStorage storage;
+    private final int REQUEST_CODE = 123;
+    private FusedLocationProviderClient fusedLocationClient;
 
 
     private View header;
@@ -60,50 +70,53 @@ public class Perfil extends Fragment {
 
     private final String URL_CAMBIAR_PASSWORD = "https://secure-plateau-18239.herokuapp.com/psw";
     private final String URL_CAMBIAR_PERFIL = "https://secure-plateau-18239.herokuapp.com/profile";
+    private final String URL_ACTUALIZAR_UBICACION = "https://secure-plateau-18239.herokuapp.com/location";
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        final View view = inflater.inflate(R.layout.perfil,container,false);
+        final View view = inflater.inflate(R.layout.perfil, container, false);
 
         dialog_cambiar_psw = new Dialog(getActivity());
-        modificarPerfil = (Button)view.findViewById(R.id.boton_modificar_perfil);
+        modificarPerfil = (Button) view.findViewById(R.id.boton_modificar_perfil);
         cambiarContraseña = (Button) view.findViewById(R.id.boton_cambiar_contraseña);
         btn_cambiar_foto_perfil = (ImageButton) view.findViewById(R.id.boton_cambiar_foto_perfil);
+        btn_actualizar_ubicacion = (ImageButton) view.findViewById(R.id.btn_actualizar_ubicacion);
         storage = FirebaseStorage.getInstance();
+        ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE);
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
 
         validador = new ValidadorDeCampos();
 
         modificarPerfil.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i("INFO","Apretaste para modificar perfil");
+                Log.i("INFO", "Apretaste para modificar perfil");
                 nombre_perfil = (EditText) view.findViewById(R.id.nombre_perfil);
                 apodo_perfil = (EditText) view.findViewById(R.id.apodo_perfil);
-                email_perfil = (EditText) view.findViewById(R.id.email_perfil);
+                email_perfil = (TextView) view.findViewById(R.id.email_perfil);
 
                 String nombre_perfil_string = nombre_perfil.getText().toString();
                 String apodo_perfil_string = apodo_perfil.getText().toString();
                 String email_perfil_string = email_perfil.getText().toString();
 
-                if (validador.isValidProfileChange(nombre_perfil_string,apodo_perfil_string,email_perfil_string,getActivity())){
+                if (validador.isValidProfileChange(nombre_perfil_string, apodo_perfil_string, email_perfil_string, getActivity())) {
                     Log.i("TO DO:", "Se puede mandar el request para modificar los datos del usuario!");
 
                     JSONObject cambiar_perfil_body = new JSONObject();
-                    try{
+                    try {
                         String user_token = Usuario.getInstancia().getToken();
 
-                        cambiar_perfil_body.put("token",user_token);
-                        cambiar_perfil_body.put("name",nombre_perfil_string);
-                        cambiar_perfil_body.put("nickname",apodo_perfil_string);
-                        cambiar_perfil_body.put("email",email_perfil_string);
+                        cambiar_perfil_body.put("token", user_token);
+                        cambiar_perfil_body.put("name", nombre_perfil_string);
+                        cambiar_perfil_body.put("nickname", apodo_perfil_string);
+                        cambiar_perfil_body.put("email", email_perfil_string);
 
-                    }
-                    catch(JSONException except){
+                    } catch (JSONException except) {
                         Toast.makeText(getActivity(), except.getMessage(), Toast.LENGTH_SHORT).show();
                     }
-                    progressDialog = ProgressDialog.show(getContext(),"Hypechat","Modificando Perfil...",
+                    progressDialog = ProgressDialog.show(getContext(), "Hypechat", "Modificando Perfil...",
                             true);
                     cambiarPerfilRequest(cambiar_perfil_body);
                 }
@@ -113,7 +126,7 @@ public class Perfil extends Fragment {
         cambiarContraseña.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i("INFO","Apretaste para cambiar contraseña");
+                Log.i("INFO", "Apretaste para cambiar contraseña");
                 dialog_cambiar_psw.setContentView(R.layout.popup_cambiar_password);
 
                 Button b_cambiar_contrasenia = (Button) dialog_cambiar_psw.findViewById(R.id.aceptar_cambio_contrasenia);
@@ -142,10 +155,10 @@ public class Perfil extends Fragment {
                         Log.i("INFO:", "passwordNuevoInsertado:" + pass_nuevo.getText().toString());
                         Log.i("INFO:", "passwordNuevoRepetido:" + pass_nuevo_bis.getText().toString());
 
-                        if (validador.isValidPasswordChange(password,pass_viejo.getText().toString(),pass_nuevo.getText().toString(),pass_nuevo_bis.getText().toString(), getActivity())){
+                        if (validador.isValidPasswordChange(password, pass_viejo.getText().toString(), pass_nuevo.getText().toString(), pass_nuevo_bis.getText().toString(), getActivity())) {
 
                             Log.i("INFO: ", "Los datos son correctos!");
-                            Log.i("INFO","hacer el request para cambiar el password!");
+                            Log.i("INFO", "hacer el request para cambiar el password!");
 
                             String token_usuario = Usuario.getInstancia().getToken();
 
@@ -153,19 +166,17 @@ public class Perfil extends Fragment {
                             try {
                                 cambiar_psw_body.put("token", token_usuario);
                                 cambiar_psw_body.put("psw", pass_nuevo.getText().toString());
-                            }
-                            catch(JSONException except){
+                            } catch (JSONException except) {
                                 Toast.makeText(getActivity(), except.getMessage(), Toast.LENGTH_SHORT).show();
                             }
 
-                            progressDialog = ProgressDialog.show(getContext(),"Hypechat","Cambiando Contraseña...",
+                            progressDialog = ProgressDialog.show(getContext(), "Hypechat", "Cambiando Contraseña...",
                                     true);
 
                             cambiarPswRequest(cambiar_psw_body);
                         }
                     }
                 });
-
 
 
                 dialog_cambiar_psw.show();
@@ -178,15 +189,46 @@ public class Perfil extends Fragment {
                 Log.i("INFO", "APRETASTE PARA CAMBIAR UNA FOTO DE PERFIL!");
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
                 intent.setType("image/*");
-                intent.putExtra(Intent.EXTRA_LOCAL_ONLY,true);
-                startActivityForResult(Intent.createChooser(intent,"Seleccionar una foto de perfil"),PHOTO_PERFIL);
+                intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+                startActivityForResult(Intent.createChooser(intent, "Seleccionar una foto de perfil"), PHOTO_PERFIL);
+            }
+        });
+
+        btn_actualizar_ubicacion.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    // TODO: Consider calling
+                    //    ActivityCompat#requestPermissions
+                    // here to request the missing permissions, and then overriding
+                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                    //                                          int[] grantResults)
+                    // to handle the case where the user grants the permission. See the documentation
+                    // for ActivityCompat#requestPermissions for more details.
+                    return;
+                }
+                fusedLocationClient.getLastLocation()
+                        .addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
+                            @Override
+                            public void onSuccess(Location location) {
+                                // Got last known location. In some rare situations this can be null.
+                                if (location != null) {
+                                    // Logic to handle location object
+                                    requestActualizarUbicacion(location.getLatitude(),location.getLongitude());
+
+                                }else{
+                                    Toast.makeText(getActivity(), "No fue posible obtener la ubicacion!", Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        });
             }
         });
 
 
         this.nombre_perfil = (EditText) view.findViewById(R.id.nombre_perfil);
         this.apodo_perfil = (EditText) view.findViewById(R.id.apodo_perfil);
-        this.email_perfil = (EditText) view.findViewById(R.id.email_perfil);
+        this.email_perfil = (TextView) view.findViewById(R.id.email_perfil);
         this.perfil_foto = (ImageView) view.findViewById(R.id.perfil_foto);
 
         if (!Usuario.getInstancia().getUrl_foto_perfil().equals("")){
@@ -196,6 +238,57 @@ public class Perfil extends Fragment {
 
         return view;
 
+    }
+
+    private void requestActualizarUbicacion(double latitude, double longitude) {
+        //Preparo el body con la informacion de la ubicacion actual del usuario
+        JSONObject requestBody = new JSONObject();
+        try {
+            requestBody.put("token",Usuario.getInstancia().getToken());
+            //requestBody.put("email",Usuario.getInstancia().getEmail());
+            requestBody.put("latitud", latitude);
+            requestBody.put("longitud", longitude);
+        }catch (JSONException exception){
+            Toast.makeText(getActivity(), exception.getMessage(), Toast.LENGTH_LONG).show();
+        }
+        //Ejecuto la request contra nuestro server
+        progressDialog = ProgressDialog.show(getContext(), "Hypechat", "Actualizando Ubicacion...",
+                true);
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.PUT, URL_ACTUALIZAR_UBICACION , requestBody, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        progressDialog.dismiss();
+                        Toast.makeText(getContext(), "La Ubicacion se actualizó Correctamente!", Toast.LENGTH_LONG).show();
+
+                    }
+
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        progressDialog.dismiss();
+
+                        switch (error.networkResponse.statusCode){
+                            case (400):
+                                Toast.makeText(getContext(),
+                                        "Usuario o Contraseña Invalidos!", Toast.LENGTH_LONG).show();
+                            case (500):
+                                Toast.makeText(getContext(),
+                                        "Server error!", Toast.LENGTH_LONG).show();
+                            case (404):
+                                Toast.makeText(getContext(),
+                                        "No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
+                            default:
+                                Toast.makeText(getContext(), "Ocurrio un error!!!", Toast.LENGTH_LONG).show();
+
+                        }
+                    }
+                });
+
+        //Agrego la request a la cola para que se conecte con el server!
+        HttpConexionSingleton.getInstance(getContext()).addToRequestQueue(jsonObjectRequest);
     }
 
     @Override
@@ -363,13 +456,11 @@ public class Perfil extends Fragment {
     private void setearEditTextComoNoEditables() {
         this.nombre_perfil.setEnabled(false);
         this.apodo_perfil.setEnabled(false);
-        this.email_perfil.setEnabled(false);
     }
 
     private void setEditTextNormales() {
         this.nombre_perfil.setEnabled(true);
         this.apodo_perfil.setEnabled(true);
-        this.email_perfil.setEnabled(false);
     }
 
     private void mostrarBotones() {

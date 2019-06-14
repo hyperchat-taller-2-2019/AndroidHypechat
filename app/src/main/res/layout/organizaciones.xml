@@ -52,7 +52,42 @@
                 android:background="@color/colorNaranja"
                 android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginTop="5dp">
 
+                <EditText
+                    android:id="@+id/text_ingresar_organizacion"
+                    android:layout_width="250dp"
+                    android:layout_height="match_parent"
+                    android:hint="ORGANIZACION ID"
+                    android:textColor="@color/colorBar"
+                    android:drawableLeft="@drawable/ic_search"
+                    android:drawableTint="@color/colorGrisClaro"
+                    android:background="@color/colorBlanco"
+                    app:fontFamily="sans-serif-smallcaps"
+                    android:textSize="20sp" />
+
+                <Button
+                    android:id="@+id/button_buscar_organizacion"
+                    android:layout_width="100dp"
+                    android:layout_height="match_parent"
+                    android:text="buscar"/>
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/error_buscar_organizacion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="    No se encontraron resultados para esa busqueda"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:textSize="15sp"
+                android:textColor="@color/colorBlack" />
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/lista_organizaciones"
@@ -63,19 +98,21 @@
                 android:cacheColorHint="#00000000"
                 android:divider="@android:color/transparent"/>
 
-
             <Button
                 android:id="@+id/boton_addOrganizacion"
-                android:layout_width="wrap_content"
+                android:layout_width="200dp"
                 android:layout_height="wrap_content"
-                android:text= " Nueva Organizacion"
+                android:text= " Nueva"
                 android:layout_gravity="center"
-                android:padding="10dp"
                 app:fontFamily="sans-serif-smallcaps"
                 android:drawableLeft="@drawable/ic_add"
-                android:textSize="18sp"
+                android:textSize="20sp"
                 android:background="@color/colorBar"
+                android:layout_marginRight="10dp"
                 android:elevation="10dp"/>
+
+
+
 
 
 

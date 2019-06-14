@@ -21,9 +21,9 @@
                 <item android:title="Mi Perfil"
                     android:id="@+id/perfil"
                     android:icon="@drawable/ic_profile"></item>
-                <item android:title="Configuracion"
-                    android:id="@+id/config"
-                    android:icon="@drawable/ic_build"></item>
+                <item android:title="Cerrar sesion"
+                    android:id="@+id/logout"
+                    android:icon="@drawable/ic_logout"></item>
             </group>
         </menu>
     </item>

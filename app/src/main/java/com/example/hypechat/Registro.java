@@ -2,9 +2,11 @@ package com.example.hypechat;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -19,8 +21,18 @@ import org.json.JSONObject;
 public class Registro extends AppCompatActivity {
 
     private EditText textName, textDisplayName, textEmail, textPass;
+    private EditText preg_sec_1, preg_sec_2, res_preg_1, res_preg_2;
     private ValidadorDeCampos validador;
     private ProgressDialog progress;
+    private Button volver, cancelar;
+    String nombre;
+    String apodo;
+    String email;
+    String contraseña;
+    String pregunta1;
+    String respuesta1;
+    String pregunta2;
+    String respuesta2;
 
     //CONSTANTES!!!
     private final String URL_REGISTRO = "https://secure-plateau-18239.herokuapp.com/signUp";
@@ -37,18 +49,59 @@ public class Registro extends AppCompatActivity {
         this.textDisplayName = (EditText) findViewById(R.id.displayName_registro);
         this.textEmail = (EditText) findViewById(R.id.email_registro);
         this.textPass = (EditText) findViewById(R.id.pass_registro);
+        this.cancelar = (Button) findViewById(R.id.button_registro_cancelar);
         this.validador = new ValidadorDeCampos();
 
+        cancelar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i("INFO", "Volver al login ");
+
+                Intent launchactivity= new Intent(Registro.this,LoginActivity.class);
+                startActivity(launchactivity);
+
+
+            }
+        });
+    }
+
+    public void  preguntasSecretas(View view){
+        nombre = this.textName.getText().toString();
+        apodo = this.textDisplayName.getText().toString();
+        email = this.textEmail.getText().toString();
+        contraseña = this.textPass.getText().toString();
+
+        if (this.validador.areValidRegisterFields(nombre,apodo,email,contraseña,this)){
+            setContentView(R.layout.seteo_preg_secretas);
+            this.preg_sec_1 = (EditText) findViewById(R.id.preg_sec_1);
+            this.preg_sec_2 = (EditText) findViewById(R.id.preg_sec_2);
+            this.res_preg_1 = (EditText) findViewById(R.id.res_preg_1);
+            this.res_preg_2 = (EditText) findViewById(R.id.res_preg_2);
+            this.volver = (Button) findViewById(R.id.button_preg_cancelar);
+            volver.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.i("INFO", "Volver al ingreso de datos personales del registro");
+
+                    Intent launchactivity= new Intent(Registro.this,LoginActivity.class);
+                    startActivity(launchactivity);
+
+
+                }
+            });
+        }
 
     }
 
-    public void registrarse (View view){
-        String nombre = this.textName.getText().toString();
-        String apodo = this.textDisplayName.getText().toString();
-        String email = this.textEmail.getText().toString();
-        String contraseña = this.textPass.getText().toString();
+    public void registrarse(View view){
 
-        if (this.validador.areValidRegisterFields(nombre,apodo,email,contraseña,this)){
+
+        pregunta1 = this.preg_sec_1.getText().toString();
+        pregunta2 = this.preg_sec_2.getText().toString();
+        respuesta1 = this.res_preg_1.getText().toString();
+        respuesta2 = this.res_preg_2.getText().toString();
+
+        if (this.validador.isNotCampoVacio(pregunta1,this,"pregunta 1")&& this.validador.isNotCampoVacio(pregunta2,this,"pregunta 2") && this.validador.isNotCampoVacio(respuesta1,this,"respuesta 1") && this.validador.isNotCampoVacio(respuesta2,this,"respuesta 2")){
             //Aviso al usuario lo que pasa
             this.progress = ProgressDialog.show(this,"Hypechat","Registrando usuario...",
                     true);
@@ -60,6 +113,11 @@ public class Registro extends AppCompatActivity {
                 requestBody.put("nickname",apodo);
                 requestBody.put("email",email);
                 requestBody.put("psw",contraseña);
+                requestBody.put("question1",pregunta1);
+                requestBody.put("question2",pregunta2);
+                requestBody.put("asw1",respuesta1);
+                requestBody.put("asw2",respuesta2);
+
             }
             catch (JSONException except){
                 Toast.makeText(this, except.getMessage(), Toast.LENGTH_SHORT).show();
@@ -71,7 +129,7 @@ public class Registro extends AppCompatActivity {
 
                         @Override
                         public void onResponse(JSONObject response) {
-                            System.out.println("REGISTRO HOlLAAAAAA\n");
+                            //System.out.println("REGISTRO HOlLAAAAAA\n");
                             System.out.println(response);
                             progress.dismiss();
                             procesarResponseDeRegistro(response);
@@ -98,7 +156,6 @@ public class Registro extends AppCompatActivity {
             //Agrego request de registro a la cola
             HttpConexionSingleton.getInstance(this).addToRequestQueue(jsonObjectRequest);
         }
-
     }
 
     private void procesarResponseDeRegistro(JSONObject response) {
