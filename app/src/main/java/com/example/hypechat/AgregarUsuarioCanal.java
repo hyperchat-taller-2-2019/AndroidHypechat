@@ -115,10 +115,9 @@ class AgregarUsuarioCanal extends Fragment {
         progressDialog = ProgressDialog.show(
                 getActivity(),"Hypechat","Actualizando los usuarios del canal...",true);
 
-        ArrayList<String> usuarios_a_agregar =  adaptador_para_usuarios_canal.getChequeados();
         JSONArray array = new JSONArray();
-        for(int i=0;i<usuarios_a_agregar.size();i++){
-            array.put(usuarios_a_agregar.get(i));
+        for(int i=0;i<currentSelectedItems.size();i++){
+            array.put(currentSelectedItems.get(i));
         }
 
         JSONObject requestBody = new JSONObject();
