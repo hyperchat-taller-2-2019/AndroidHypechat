@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:windowSoftInputMode="adjustPan">
+    android:weightSum="100">
 
 
 
@@ -12,7 +12,7 @@
         android:id="@+id/layout_ppal"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
-        android:layout_weight="70"
+        android:layout_weight="100"
         android:weightSum="100"
         android:clickable="false"
         android:gravity="center"
@@ -20,56 +20,47 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/canales_texto"
+            android:id="@+id/titulo_integrantes_org"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="40"
+            android:layout_weight="10"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="20dp"
             android:gravity="center"
-            android:text="Haga click en el canal para agregarlo"
+            android:text="Agrega miembros de la organizacion al canal"
             android:textColor="@color/colorAccent"
-            android:textSize="20dp"
+            android:textSize="25dp"
             app:fontFamily="@font/carter_one" />
 
 
 
 
         <android.support.v7.widget.RecyclerView
-            android:id="@+id/lista_canales_agregar"
+            android:id="@+id/lista_organizacion_usuarios_a_agregar"
             android:layout_width="match_parent"
-            android:layout_height="250dp"
+            android:layout_height="wrap_content"
             android:background="#ffffff"
-            android:layout_weight="40"
+            android:layout_weight="60"
             android:cacheColorHint="#00000000"
             android:divider="@android:color/transparent"/>
 
 
 
-        <Button
-            android:id="@+id/crear_canal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="10"
-            android:layout_marginTop="20dp"
-            android:text="Nuevo canal"
-            android:textColor="@color/colorAzulLink"
-            android:background="@color/colorBlanco"
-            android:textSize="20sp" />
 
         <Button
-            android:id="@+id/button_volverOrganizacion"
+            android:id="@+id/button_finalizar_crear_canal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="40dp"
+            android:layout_height="30dp"
             android:layout_weight="10"
             android:layout_gravity="center_horizontal"
             android:background="@color/colorPrimary"
             android:gravity="center"
-            android:text="Volver"
+            android:text="Finalizar"
+            android:layout_marginTop="20dp"
             android:textColor="@android:color/background_dark"
             />
+
+
 
 
 

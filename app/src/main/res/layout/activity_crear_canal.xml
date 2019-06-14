@@ -6,7 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:weightSum="100">
+    android:weightSum="100"
+    android:windowSoftInputMode="adjustPan">
 
 
     <LinearLayout
@@ -44,7 +45,7 @@
             android:textStyle="bold" />
 
         <EditText
-            android:id="@+id/name_organizacion"
+            android:id="@+id/name_canal"
             style="@style/Widget.AppCompat.EditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -105,7 +106,7 @@
             android:textStyle="bold" />
 
         <EditText
-            android:id="@+id/msj_bienvenida"
+            android:id="@+id/msj_bienvenida_canal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="20"
@@ -140,7 +141,7 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/button_crearOrg_cancelar"
+                android:id="@+id/button_crearCanal_cancelar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="10"
@@ -154,7 +155,7 @@
 
 
             <Button
-                android:id="@+id/button_crearOrg_siguiente"
+                android:id="@+id/button_crearCanal_siguiente"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="10"

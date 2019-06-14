@@ -45,7 +45,7 @@ public class AgregarUsuarioOrganizacion extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         //return inflater.inflate(R.layout.organizaciones,container,false);
-        View view = inflater.inflate(R.layout.activity_add_users,container,false);
+        View view = inflater.inflate(R.layout.activity_agregar_usuarios_organizacion,container,false);
 
         validador = new ValidadorDeCampos();
         this.email = (EditText) view.findViewById(R.id.edit_email);

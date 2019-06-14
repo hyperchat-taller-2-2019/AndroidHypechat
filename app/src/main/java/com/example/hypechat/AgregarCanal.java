@@ -1,7 +1,6 @@
 package com.example.hypechat;
 
 import android.annotation.SuppressLint;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -16,8 +15,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -99,11 +96,11 @@ public class AgregarCanal extends Fragment {
             public void onClick(View v) {
                 Log.i("INFO", "Apretaste para crear un canal");
 
-                /*//Intent launchactivity = new Intent(getActivity(),CrearOrganizacion.class);
+                //Intent launchactivity = new Intent(getActivity(),CrearOrganizacion.class);
                 //startActivity(launchactivity);
                 FragmentManager fragmentManager = getFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.fragment_container, new CrearCanal());
+                fragmentTransaction.replace(R.id.fragment_container, new CrearCanal(id));
                 //Esta es la linea clave para que vuelva al fragmento anterior!
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();
@@ -112,7 +109,7 @@ public class AgregarCanal extends Fragment {
 
                 //Me traigo el fragmento sabiendo que es el de perfil para cargarle la información
                 //AgregarUsuarioOrganizacion add_Usuario = (AgregarUsuarioOrganizacion) getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-*/
+
             }
 
         });
