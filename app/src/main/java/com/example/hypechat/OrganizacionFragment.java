@@ -140,7 +140,7 @@ public class OrganizacionFragment extends Fragment {
                 //Toast.makeText(getActivity(),"Editar OrganizacionFragment", Toast.LENGTH_LONG).show();
                 FragmentManager fragmentManager = getFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.fragment_container,new EditarOrganizacion());
+                fragmentTransaction.replace(R.id.fragment_container,new EditarOrganizacion(organizacion_id));
                 //Esta es la linea clave para que vuelva al fragmento anterior!
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();
@@ -150,7 +150,6 @@ public class OrganizacionFragment extends Fragment {
 
                 //Me traigo el fragmento sabiendo que es el de EditarOrganizacion para cargarle la información
                 EditarOrganizacion editar_organization = (EditarOrganizacion) getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-                editar_organization.completarInformacionOrganizacion(organizacion_id,OrganizacionFragment.this);
 
 
 

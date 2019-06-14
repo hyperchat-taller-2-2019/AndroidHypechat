@@ -40,6 +40,7 @@ public class EditarOrganizacion extends Fragment {
     private Button usuarios;
     private String password, token;
     private Boolean owner;
+    private String org_id, org_nombre;
     private String URL_INFO = "https://secure-plateau-18239.herokuapp.com/organization/";
     private String URL_CAMBIO_NOMBRE = "https://secure-plateau-18239.herokuapp.com/organization/name";
     private String URL_CAMBIO_PASSWORD = "https://secure-plateau-18239.herokuapp.com/organization/password";
@@ -48,7 +49,10 @@ public class EditarOrganizacion extends Fragment {
     private ProgressDialog progressDialog;
     private JSONArray members;
     private JSONArray moderators;
-    private OrganizacionFragment orga;
+
+    public EditarOrganizacion(String organizacion_id) {
+        this.org_id = organizacion_id;
+    }
 
 
     @Nullable
@@ -56,6 +60,7 @@ public class EditarOrganizacion extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         //return inflater.inflate(R.layout.organizaciones,container,false);
         View view = inflater.inflate(R.layout.activity_editar_organizacion, container, false);
+
         validador = new ValidadorDeCampos();
         cancelar = (Button) view.findViewById(R.id.button_editarOrg_cancelar);
         guardar_cambio = (Button) view.findViewById(R.id.button_editarOrg_guardar);
@@ -65,8 +70,11 @@ public class EditarOrganizacion extends Fragment {
         id = (EditText) view.findViewById(R.id.id_organizacion);
         bienvenida = (EditText) view.findViewById(R.id.welcome_organizacion);
         nombre_titulo = (TextView) view.findViewById(R.id.titulo_organizacion);
-        dialog_cambiar_psw = new Dialog(getActivity());
+        nombre_titulo.setText(org_nombre);
+        disableButtons();
 
+        dialog_cambiar_psw = new Dialog(getActivity());
+        completarInformacionOrganizacion();
 
         cancelar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -197,6 +205,8 @@ public class EditarOrganizacion extends Fragment {
             }
         });
 
+
+
         return view;
 
     }
@@ -308,6 +318,7 @@ public class EditarOrganizacion extends Fragment {
             this.members = orga.getJSONArray("members");
             this.nombre_titulo.setText(orga.getString("name"));
             this.nombre.setText(orga.getString("name"));
+            this.org_nombre = orga.getString("name");
             this.id.setText(orga.getString("id"));
             this.password = orga.getString("psw");
             this.bienvenida.setText(orga.getString("welcome"));
@@ -391,11 +402,11 @@ public class EditarOrganizacion extends Fragment {
     }
 
 
-    public void completarInformacionOrganizacion(String id, OrganizacionFragment organizacion) {
-        this.orga = organizacion;
+    public void completarInformacionOrganizacion() {
+
         this.token = Usuario.getInstancia().getToken();
 
-        String URL = URL_INFO + this.token + "/" + id;
+        String URL = URL_INFO + this.token + "/" + this.org_id;
 
         Log.i("INFO", "Json Request , check http status codes");
 
