@@ -33,16 +33,33 @@
             android:background="@color/colorAzul" />
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/titulo_chat"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Chat Title"
-        android:textSize="25dp"
-        android:textStyle="bold"
-        android:textColor="@color/colorBlack"
-        android:background="@color/colorNaranja"
-        android:textAlignment="center"/>
+        android:orientation="horizontal"
+        android:background="@color/colorAzul"
+        android:layout_marginBottom="10dp"
+        android:weightSum="100">
+        <TextView
+            android:id="@+id/titulo_chat"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="80"
+            android:text="Chat Title"
+            android:textSize="25dp"
+            android:textStyle="bold"
+            android:textColor="@color/colorBlack"
+            android:background="@color/colorNaranja"
+            android:textAlignment="center"/>
+
+        <ImageButton
+            android:id="@+id/info_canal"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:layout_weight="20"
+            android:src="@drawable/ic_search"
+            android:background="@color/colorNaranja"/>
+    </LinearLayout>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/listado_chat_cards"

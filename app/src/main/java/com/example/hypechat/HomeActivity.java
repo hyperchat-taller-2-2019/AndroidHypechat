@@ -110,10 +110,10 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void goToChat(){
-        /*this.navigationView.setCheckedItem(R.id.msj_privados);
+        //this.navigationView.setCheckedItem(R.id.msj_privados);
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.fragment_container,new ChatFragment());
+        fragmentTransaction.replace(R.id.fragment_container,new MensajesPrivados());
         //Esta es la linea clave para que vuelva al fragmento anterior!
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
@@ -122,7 +122,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
         //Me traigo el fragmento sabiendo que es el de perfil para cargarle la información
         ChatFragment chat = (ChatFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-        chat.setSalaDeChat("Chat Test");*/
+
     }
 
     private void goToProfile(String email_del_perfil) {

@@ -391,7 +391,7 @@ public class AgregarCanal extends Fragment {
             String name = canal.getString("name");
             FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.replace(R.id.fragment_container,new ChatFragment());
+            fragmentTransaction.replace(R.id.fragment_container,new ChatFragment(true));
             //Esta es la linea clave para que vuelva al fragmento anterior!
             fragmentTransaction.addToBackStack(null);
             fragmentTransaction.commit();

@@ -1,6 +1,5 @@
 package com.example.hypechat;
 
-
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.net.Uri;
@@ -37,17 +36,17 @@ import com.google.firebase.storage.UploadTask;
 
 import static android.app.Activity.RESULT_OK;
 
+class ChatPrivateFragment extends Fragment {
 
-public class ChatFragment extends Fragment {
 
     private EditText texto_mensaje;
     private TextView titulo_chat, titulo_orga;
     private Button boton_enviar_mensaje;
-    private ImageButton volver;
+    private ImageButton volver, look;
     private RecyclerView chat;
-    private ImageButton boton_enviar_imagen, editar_canal;
-    private String id,name,org_id;
-    private Boolean es_canal;
+    private ImageButton boton_enviar_imagen;
+    private String id_chat,email_chat;
+
 
     private AdapterChat adaptador_para_chat;
 
@@ -58,9 +57,10 @@ public class ChatFragment extends Fragment {
 
     private static final int PHOTO_SEND = 1;
 
-    @SuppressLint("ValidFragment")
-    public ChatFragment(boolean canal) {
-        this.es_canal = canal;
+    public ChatPrivateFragment(String id, String name) {
+        this.id_chat = id;
+        this.email_chat = name;
+
     }
 
     @Override
@@ -68,60 +68,33 @@ public class ChatFragment extends Fragment {
         // Inflate the layout for this fragment
         View view =  inflater.inflate(R.layout.fragment_chat, container, false);
 
-
         titulo_chat = (TextView) view.findViewById(R.id.titulo_chat);
+        titulo_chat.setText(email_chat);
         titulo_orga = (TextView) view.findViewById(R.id.titulo_orga);
+        titulo_orga.setText("Chats privados");
         volver = (ImageButton) view.findViewById(R.id.volver_a_organizacion);
         chat = (RecyclerView) view.findViewById(R.id.listado_chat_cards);
         texto_mensaje = (EditText) view.findViewById(R.id.texto_mensaje_a_enviar);
         boton_enviar_mensaje = (Button) view.findViewById(R.id.btn_enviar_mensaje);
         boton_enviar_imagen = (ImageButton) view.findViewById(R.id.boton_enviar_imagen);
-        editar_canal = (ImageButton) view.findViewById(R.id.info_canal);
+        look = (ImageButton) view.findViewById(R.id.info_canal);
+        look.setVisibility(View.INVISIBLE);
+        look.setEnabled(false);
 
-        if(!es_canal){
-            editar_canal.setVisibility(View.INVISIBLE);
-            editar_canal.setEnabled(false);
-        }
+        texto_mensaje.setText("");
 
         adaptador_para_chat = new AdapterChat(getContext());
         LinearLayoutManager l = new LinearLayoutManager(getContext());
         chat.setLayoutManager(l);
         chat.setAdapter(adaptador_para_chat);
 
-        editar_canal.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.fragment_container,new EditarCanal(org_id,name));
-                //Esta es la linea clave para que vuelva al fragmento anterior!
-                fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit();
-                //Linea clave para que el fragmento termine de ponerse si o si en la activity y poder editarla!
-                fragmentManager.executePendingTransactions();
-
-                //Me traigo el fragmento sabiendo que es el de OrganizacionFragment para cargarle la información
-                OrganizacionFragment org = (OrganizacionFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-
-            }
-        });
-
 
         volver.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.fragment_container,new OrganizacionFragment(org_id));
-                //Esta es la linea clave para que vuelva al fragmento anterior!
-                fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit();
-                //Linea clave para que el fragmento termine de ponerse si o si en la activity y poder editarla!
-                fragmentManager.executePendingTransactions();
+                Log.i("INFO", "Volver a los chats privados");
 
-                //Me traigo el fragmento sabiendo que es el de OrganizacionFragment para cargarle la información
-                OrganizacionFragment org = (OrganizacionFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-
+                getFragmentManager().popBackStackImmediate();
             }
         });
 
@@ -160,21 +133,12 @@ public class ChatFragment extends Fragment {
         return view;
     }
 
-
-    //para que cuando se llene la pantalla de mensajes siempre vaya al ultimo
-    private void setScrollBar() {
-        chat.scrollToPosition(adaptador_para_chat.getItemCount()-1);
-    }
+    public void setSalaDeChat() {
 
 
-    public void setSalaDeChat(String id, String name, String orga_id) {
-
-        this.id = id;
-        this.name = name;
-        this.org_id = orga_id;
         //Aca se decide a que nodo de la base de datos voy a buscar y escribir los mensajes
         database = FirebaseDatabase.getInstance();
-        reference = database.getReference(id);
+        reference = database.getReference(this.id_chat);
         reference.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
@@ -203,13 +167,19 @@ public class ChatFragment extends Fragment {
 
             }
         });
-        titulo_chat.setText(this.name.toUpperCase());
-        titulo_orga.setText(this.org_id);
+
 
         //Seteo de la configuracion para manejar Imagenes en la base de datos
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference("imagenes_chat");
     }
+
+    //para que cuando se llene la pantalla de mensajes siempre vaya al ultimo
+    private void setScrollBar() {
+        chat.scrollToPosition(adaptador_para_chat.getItemCount()-1);
+    }
+
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -244,3 +214,4 @@ public class ChatFragment extends Fragment {
         }
     }
 }
+
