@@ -84,6 +84,8 @@ public class OrganizacionFragment extends Fragment {
         mensaje = (TextView) view.findViewById(R.id.msj_bienvenida_organizacion);
         this.titulo.setText(organizacion_name);
         this.mensaje.setText(mensaje_bienvenida);
+        progressDialog = ProgressDialog.show(getActivity(),"Hypechat","Obteniendo informacion...",true);
+
         actualizarDatos();
 
 
@@ -191,7 +193,6 @@ public class OrganizacionFragment extends Fragment {
 
     private void getCanales(){
         Log.i("INFO", "Obtengo los canales del usuario en la organizacion: "+organizacion_id);
-        progressDialog = ProgressDialog.show(getActivity(),"Hypechat","Obteniendo canales del usuario...",true);
 
         JSONObject request = get_json_Request_Body();
 
@@ -202,7 +203,7 @@ public class OrganizacionFragment extends Fragment {
 
                     @Override
                     public void onResponse(JSONObject response) {
-                        progressDialog.dismiss();
+                       // progressDialog.dismiss();
                         System.out.println(response);
                         responseListaCanales(response);
                         getMsjPrivados();
@@ -214,7 +215,7 @@ public class OrganizacionFragment extends Fragment {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         //progressDialog.dismiss();
-                        progressDialog.dismiss();
+                       // progressDialog.dismiss();
                         switch (error.networkResponse.statusCode){
                             case (400):
                                 Toast.makeText(getActivity(),"Usuario  Invalido!", Toast.LENGTH_LONG).show();
@@ -239,8 +240,6 @@ public class OrganizacionFragment extends Fragment {
 
     private void getMsjPrivados(){
         Log.i("INFO", "Obtengo los msj privados del usuario en la organizacion: "+organizacion_id);
-        progressDialog = ProgressDialog.show(
-                getActivity(),"Hypechat","Obteniendo msj privados del usuario...",true);
 
 
         String URL = URL_MSJ_PRIVADOS + this.token+"/"+this.organizacion_id;
@@ -253,7 +252,7 @@ public class OrganizacionFragment extends Fragment {
 
                     @Override
                     public void onResponse(JSONObject response) {
-                        progressDialog.dismiss();
+                        //progressDialog.dismiss();
                         System.out.println(response);
                         responseListaMsjPrivados(response);
 
@@ -264,7 +263,7 @@ public class OrganizacionFragment extends Fragment {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         //progressDialog.dismiss();
-                        progressDialog.dismiss();
+                        //progressDialog.dismiss();
                         switch (error.networkResponse.statusCode){
                             case (400):
                                 //Toast.makeText(LoginActivity.this,"Usuario o Contraseña Invalidos!", Toast.LENGTH_LONG).show();
@@ -455,6 +454,7 @@ public class OrganizacionFragment extends Fragment {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        progressDialog.dismiss();
     }
 
     public void completarInfoOrganizacion(JSONObject orga) {
@@ -482,8 +482,6 @@ public class OrganizacionFragment extends Fragment {
 
     public void actualizarDatos(){
         Log.i("INFO", "Obteniendo datos de la organizacion");
-        this.progressDialog = ProgressDialog.show(
-                getActivity(),"Hypechat","Obteniendo organizaciones del usuario...",true);
 
         //Preparo Body del POST
 
@@ -497,7 +495,7 @@ public class OrganizacionFragment extends Fragment {
                     @Override
                     public void onResponse(JSONObject response) {
 
-                        progressDialog.dismiss();
+                       // progressDialog.dismiss();
                         System.out.println(response);
                         completarInfoOrganizacion(response);
 
@@ -508,7 +506,7 @@ public class OrganizacionFragment extends Fragment {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         //progressDialog.dismiss();
-                        progressDialog.dismiss();
+                       // progressDialog.dismiss();
                         switch (error.networkResponse.statusCode){
                             case (400):
                                 break;

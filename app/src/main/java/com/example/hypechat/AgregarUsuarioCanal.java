@@ -36,10 +36,11 @@ class AgregarUsuarioCanal extends Fragment {
     private ProgressDialog progressDialog;
     private String URL_AGREGAR_USUARIOS_CANAL = "https://secure-plateau-18239.herokuapp.com/channel/users";
     private String URL_INFO_ORG = "https://secure-plateau-18239.herokuapp.com/organization/";
+    private String URL_INFO_CANAL = "https://secure-plateau-18239.herokuapp.com/channel/";
     private String token;
     private String id, nombre;
     private RecyclerView lista_miembros;
-    private JSONArray members;
+    private JSONArray members_org, members_canal;
     private AdapterMiembrosCanal adaptador_para_usuarios_canal;
     private List<String> currentSelectedItems;
 
@@ -211,7 +212,16 @@ class AgregarUsuarioCanal extends Fragment {
 
                         progressDialog.dismiss();
                         System.out.println(response);
-                        actualizar_lista_members(response);
+                        JSONObject orga = null;
+                        try {
+                            orga = response.getJSONObject("organization");
+                            members_org = orga.getJSONArray("members");
+                            adaptador_para_usuarios_canal.vaciar_lista();
+                            completarInfoCanal();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
 
                     }
 
@@ -235,26 +245,70 @@ class AgregarUsuarioCanal extends Fragment {
         //Agrego la request a la cola para que se conecte con el server!
         HttpConexionSingleton.getInstance(getContext()).addToRequestQueue(jsonObjectRequest);
     }
+    public void completarInfoCanal() {
 
-    public void actualizar_lista_members(JSONObject res) {
+        this.token = Usuario.getInstancia().getToken();
 
+        String URL = URL_INFO_CANAL + this.token + "/" + this.id +"/"+ this.nombre;
 
+        Log.i("INFO", "Json Request , check http status codes");
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.GET, URL, null, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+
+                        System.out.println(response);
+                        procesarInfoCanal(response);
+
+                    }
+
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        //progressDialog.dismiss();
+
+                        switch (error.networkResponse.statusCode) {
+                            case (404):
+                                //Toast.makeText(LoginActivity.this,"Usuario o Contraseña Invalidos!", Toast.LENGTH_LONG).show();
+                            case (500):
+                                Toast.makeText(getActivity(), "No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
+
+                        }
+                    }
+                });
+
+        //Agrego la request a la cola para que se conecte con el server!
+        HttpConexionSingleton.getInstance(getContext()).addToRequestQueue(jsonObjectRequest);
+    }
+
+    private void procesarInfoCanal(JSONObject response) {
         Log.i("INFO", "Actualizo lista de miembros");
         try {
             Log.i("INFO","Actualizo los miembros del listado para mostrar");
-            JSONObject orga = res.getJSONObject("organization");
-            members = orga.getJSONArray("members");
-            adaptador_para_usuarios_canal.vaciar_lista();
+            JSONObject orga = response.getJSONObject("channel");
+            members_canal = orga.getJSONArray("members");
 
-            for(int i=0;i< members.length();i++){
-                String email = members.getString(i);
-                adaptador_para_usuarios_canal.agregarMiembro(email);
+
+
+            for(int i=0;i< members_org.length();i++){
+                String email = members_org.getString(i);
+
+                MiembroCanal miembro = new MiembroCanal(email,false);
+                if(this.members_canal.toString().contains(email)){
+                    miembro.setPertenece(true);
+                    currentSelectedItems.add(email);
+                }
+                adaptador_para_usuarios_canal.agregarMiembro(miembro);
             }
 
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
     }
 
 

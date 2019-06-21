@@ -12,6 +12,7 @@ import java.util.List;
 
 public class AdapterMiembros extends RecyclerView.Adapter<CardMiembroInfo> {
 
+
     private List<String> lista_usuarios = new ArrayList<>();
     private Context ctx;
     private View.OnClickListener mOnItemClickListener;

@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:weightSum="100"
+    android:windowSoftInputMode="adjustPan">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="15"
+        android:orientation="horizontal"></LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layout_ppal"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="70"
+        android:weightSum="100"
+        android:clickable="false"
+        android:gravity="center"
+        android:layout_gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/imageView2"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_weight="25"
+            app:srcCompat="@drawable/icon" />
+
+        <TextView
+            android:id="@+id/text_nombre_canal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="5"
+            android:text="#CANAL"
+            android:textColor="@color/colorAzul"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:gravity="center"/>
+
+
+        <TextView
+            android:id="@+id/text_descripcion_canal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="5"
+            android:text="Descripcion"
+            android:textColor="@android:color/background_dark"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginTop="20dp"/>
+
+
+        <EditText
+            android:id="@+id/descripcion_canal"
+            style="@style/Widget.AppCompat.EditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="30"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/textview_border"
+            android:ems="10"
+            android:gravity="center"
+            android:hint="Descripcion"
+            android:inputType="textPersonName"
+            android:selectAllOnFocus="false"
+            android:singleLine="false"
+            android:textSize="15sp" />
+
+
+
+        <TextView
+            android:id="@+id/text_msj_bienvenida"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="5"
+            android:layout_marginTop="20dp"
+            android:text="Mensaje de bienvenida"
+            android:textColor="@android:color/background_dark"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/msj_bienvenida_canal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="20"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/textview_border"
+            android:ems="10"
+            android:gravity="center"
+            android:hint="Mensaje"
+            android:inputType="textPersonName"
+            android:textSize="15sp"/>
+
+        <Switch
+            android:id="@+id/boton_privado"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            android:text="Privado   "
+            android:layout_centerHorizontal="true"
+            android:textOn="On"
+            android:textOff="Off"
+            android:gravity="center"
+            android:layout_marginTop="20dp"
+            android:textColor="@color/colorAzul"/>
+
+        <Button
+            android:id="@+id/button_editarCanal_guardar"
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:layout_weight="10"
+            android:layout_gravity="center_horizontal"
+            android:background="@color/colorNaranja"
+            android:gravity="center"
+            android:text="Guardar cambios"
+            android:layout_marginTop="40dp"
+            android:textColor="@android:color/background_dark" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="10"
+            android:layout_marginTop="20dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/button_crearCanal_cancelar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="10"
+                android:layout_gravity="center_horizontal"
+                android:background="@color/colorPrimary"
+                android:gravity="center"
+                android:text="Cancelar"
+                android:textColor="@android:color/background_dark"
+                android:layout_marginRight="10dp"/>
+
+
+
+            <Button
+                android:id="@+id/button_crearCanal_siguiente"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="10"
+                android:layout_gravity="center_horizontal"
+                android:background="@color/colorAzul"
+                android:gravity="center"
+                android:text="Miembros"
+                android:layout_marginLeft="10dp"
+                android:textColor="@android:color/background_dark" />
+
+        </LinearLayout>
+
+
+
+    </LinearLayout>
+
+
+
+</LinearLayout>

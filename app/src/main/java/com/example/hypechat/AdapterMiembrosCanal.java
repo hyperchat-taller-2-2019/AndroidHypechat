@@ -13,7 +13,7 @@ import java.util.List;
 
 public class AdapterMiembrosCanal extends RecyclerView.Adapter<CardAgregarMiembroCanal> {
 
-    private List<String> lista_usuarios = new ArrayList<>();
+    private List<MiembroCanal> lista_usuarios = new ArrayList<>();
     private Context ctx;
     //private View.OnClickListener mOnItemClickListener;
 
@@ -31,8 +31,8 @@ public class AdapterMiembrosCanal extends RecyclerView.Adapter<CardAgregarMiembr
 
     }
 
-    public void agregarMiembro(String user_email){
-        lista_usuarios.add(user_email);
+    public void agregarMiembro(MiembroCanal usuario){
+        lista_usuarios.add(usuario);
         notifyItemInserted(lista_usuarios.size());
     }
 
@@ -50,18 +50,19 @@ public class AdapterMiembrosCanal extends RecyclerView.Adapter<CardAgregarMiembr
 
     @Override
     public void onBindViewHolder(@NonNull final CardAgregarMiembroCanal cardUsuarioInfo, int i) {
-        final String usuario_actual = lista_usuarios.get(i);
+        final MiembroCanal usuario_actual = lista_usuarios.get(i);
 
-        cardUsuarioInfo.getEmail().setText(usuario_actual);
+        cardUsuarioInfo.getEmail().setText(usuario_actual.getEmail());
+        if(usuario_actual.perteneceAlCanal()) cardUsuarioInfo.email.setChecked(true);
 
         cardUsuarioInfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 cardUsuarioInfo.email.setChecked(!cardUsuarioInfo.email.isChecked());
                 if (cardUsuarioInfo.email.isChecked()) {
-                    onItemCheckListener.onItemCheck(usuario_actual);
+                    onItemCheckListener.onItemCheck(usuario_actual.getEmail());
                 } else {
-                    onItemCheckListener.onItemUncheck(usuario_actual);
+                    onItemCheckListener.onItemUncheck(usuario_actual.getEmail());
                 }
             }
         });
@@ -74,7 +75,7 @@ public class AdapterMiembrosCanal extends RecyclerView.Adapter<CardAgregarMiembr
         return lista_usuarios.size();
     }
 
-    public String obtenerItemPorPosicion(int position) {
+    public MiembroCanal obtenerItemPorPosicion(int position) {
         return lista_usuarios.get(position);
     }
 
