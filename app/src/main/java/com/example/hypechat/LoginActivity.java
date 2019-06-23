@@ -5,7 +5,6 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -18,15 +17,21 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.example.hypechat.Service.MyFirebaseInstanceService;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 
 public class LoginActivity extends AppCompatActivity {
@@ -441,6 +446,18 @@ public class LoginActivity extends AppCompatActivity {
         this.olvido_pass= new Dialog(this);
         this.preguntas = new Dialog(this);
         this.restaura_pass= new Dialog(this);
+
+        String token_fb = MyFirebaseInstanceService.getToken(this);
+        Log.i("INFO","TOKEN FIREBASE: "+ token_fb);
+        FirebaseInstanceId.getInstance().getInstanceId().addOnSuccessListener(new OnSuccessListener<InstanceIdResult>() {
+            @Override
+            public void onSuccess(InstanceIdResult instanceIdResult) {
+                String token = instanceIdResult.getToken();
+                // send it to server
+                Log.i("INFO","TOKEN FIREBASE: "+ token);
+            }
+        });
+
 
         callbackManager = CallbackManager.Factory.create();
         facebookLogin = (LoginButton) findViewById(R.id.b_facebook);
