@@ -1,8 +1,5 @@
 package com.example.hypechat;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-
 public class Usuario {
 
     private static Usuario instancia;
@@ -12,6 +9,7 @@ public class Usuario {
     private String nickname;
     private String token;
     private String nombre;
+    private String token_notification;
 
 
     private Usuario() {
@@ -21,6 +19,7 @@ public class Usuario {
         password = "";
         url_foto_perfil = "";
         nickname = "";
+        token_notification = "";
     }
 
     public static  Usuario getInstancia() {
@@ -36,6 +35,14 @@ public class Usuario {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getTokenPush() {
+        return token_notification;
+    }
+
+    public void setTokenPush(String token_push) {
+        this.token_notification = token_push;
     }
 
     public String getPassword() {

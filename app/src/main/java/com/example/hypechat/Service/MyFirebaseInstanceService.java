@@ -10,6 +10,7 @@ import android.os.Build;
 import android.util.Log;
 
 import com.example.hypechat.R;
+import com.example.hypechat.Usuario;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -25,26 +26,15 @@ public class MyFirebaseInstanceService extends FirebaseMessagingService {
     public void onNewToken(String s) {
         super.onNewToken(s);
         Log.d("newToken", s);
+        actualizarTokenServer(s);
         getSharedPreferences("_", MODE_PRIVATE).edit().putString("fb", s).apply();
+        Usuario.getInstancia().setTokenPush(s);
     }
 
-    /*@Override
-    public void onMessageReceived(RemoteMessage remoteMessage) {
-        Log.d("INFO", "From: " + remoteMessage.getFrom());
+    private void actualizarTokenServer(String s) {
 
-        // Check if message contains a data payload.
-        if (remoteMessage.getData().size() > 0) {
-            Log.d("INFO", "Message data payload: " + remoteMessage.getData());
+    }
 
-
-        }
-
-        // Check if message contains a notification payload.
-        if (remoteMessage.getNotification() != null) {
-            Log.d("INFO", "Message Notification Body: " + remoteMessage.getNotification().getBody());
-        }
-        super.onMessageReceived(remoteMessage);
-    }*/
 
     public static String getToken(Context context) {
         return context.getSharedPreferences("_", MODE_PRIVATE).getString("fb", "empty");
@@ -104,14 +94,12 @@ public class MyFirebaseInstanceService extends FirebaseMessagingService {
                 .setDefaults(Notification.DEFAULT_ALL)
                 .setWhen(System.currentTimeMillis())
                 .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.slack_icon))
-                .setSmallIcon(R.drawable.slack_icon,40)
+                .setSmallIcon(R.drawable.slack_icon)
                 .setContentTitle(messageTitle)
                 .setContentText(messageBody)
                 .setContentInfo("Info");
 
         notificationManager.notify(new Random().nextInt(),notificationBuilder.build());
-
-
 
     }
 }

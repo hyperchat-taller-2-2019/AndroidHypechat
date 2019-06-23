@@ -17,7 +17,6 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.example.hypechat.Service.MyFirebaseInstanceService;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -76,6 +75,7 @@ public class LoginActivity extends AppCompatActivity {
 
                 requestBody.put("email", email);
                 requestBody.put("psw", password);
+                requestBody.put("tokenPush",Usuario.getInstancia().getTokenPush());
             }
             catch(JSONException except){
                 Toast.makeText(this, except.getMessage(), Toast.LENGTH_SHORT).show();
@@ -365,14 +365,18 @@ public class LoginActivity extends AppCompatActivity {
                             case (400):
                                 Toast.makeText(LoginActivity.this,
                                         "Usuario o Contraseña Invalidos!", Toast.LENGTH_LONG).show();
+                                break;
                             case (500):
                                 Toast.makeText(LoginActivity.this,
                                         "Server error!", Toast.LENGTH_LONG).show();
+                                break;
                             case (404):
                                 Toast.makeText(LoginActivity.this,
                                         "No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
+                                break;
                             default:
                                 Toast.makeText(LoginActivity.this, "Ocurrio un error!!!", Toast.LENGTH_LONG).show();
+                                break;
 
                         }
                     }
@@ -447,13 +451,14 @@ public class LoginActivity extends AppCompatActivity {
         this.preguntas = new Dialog(this);
         this.restaura_pass= new Dialog(this);
 
-        String token_fb = MyFirebaseInstanceService.getToken(this);
-        Log.i("INFO","TOKEN FIREBASE: "+ token_fb);
+       /* String token_fb = MyFirebaseInstanceService.getToken(this);
+        Log.i("INFO","TOKEN FIREBASE: "+ token_fb); */
         FirebaseInstanceId.getInstance().getInstanceId().addOnSuccessListener(new OnSuccessListener<InstanceIdResult>() {
             @Override
             public void onSuccess(InstanceIdResult instanceIdResult) {
                 String token = instanceIdResult.getToken();
                 // send it to server
+                Usuario.getInstancia().setTokenPush(token);
                 Log.i("INFO","TOKEN FIREBASE: "+ token);
             }
         });
