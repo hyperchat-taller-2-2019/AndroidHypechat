@@ -395,6 +395,7 @@ public class LoginActivity extends AppCompatActivity {
             Usuario.getInstancia().setNombre(response.getString("name"));
             Usuario.getInstancia().setNickname(response.getString("nickname"));
             Usuario.getInstancia().setToken(response.getString("token"));
+            Usuario.getInstancia().setUrl_foto_perfil(response.getString("photo"));
 
             goHomeActivity();
 
