@@ -325,12 +325,49 @@ public class Perfil extends Fragment {
                         Glide.with(getContext()).load(Usuario.getInstancia().getUrl_foto_perfil()).into(header_foto_perfil);
                         progressDialog.dismiss();
                         Toast.makeText(getActivity(), "La foto de perfil se modificó con exito!", Toast.LENGTH_LONG).show();
+                        subirFotoPerfil(downloadUri.toString());
                     } else {
                         Toast.makeText(getActivity(), "Fallo la carga de la imagen" + task.getException().getMessage(), Toast.LENGTH_LONG).show();
                     }
                 }
             });
         }
+    }
+
+    private void subirFotoPerfil(String url_foto) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("token", Usuario.getInstancia().getToken());
+            jsonObject.put("photo", url_foto);
+        } catch (JSONException except) {
+            Toast.makeText(getActivity(), except.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.PUT, URL_CAMBIAR_PERFIL, jsonObject, new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        System.out.println(response);
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        progressDialog.dismiss();
+
+                        switch (error.networkResponse.statusCode){
+                            case (400):
+                                Toast.makeText(getActivity(),
+                                        "Usuario o Contraseña Invalidos!", Toast.LENGTH_LONG).show();
+                            case (500):
+                                Toast.makeText(getActivity(),
+                                        "Server error!", Toast.LENGTH_LONG).show();
+                            case (404):
+                                Toast.makeText(getActivity(),
+                                        "No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+        //Agrego la request a la cola para que se conecte con el server!
+        HttpConexionSingleton.getInstance(getContext()).addToRequestQueue(jsonObjectRequest);
     }
 
     private void cambiarPerfilRequest(final JSONObject cambiar_perfil_body) {

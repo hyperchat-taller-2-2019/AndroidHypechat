@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
+
+import com.bumptech.glide.Glide;
 import com.google.android.material.navigation.NavigationView;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -16,6 +18,7 @@ import androidx.appcompat.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -57,6 +60,8 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         //Setea el header de la navigation bar para que tenga el nombre de usuario (podria ser apodo o mail)
         this.header = navigationView.getHeaderView(0);
         setHeaderUserName(Usuario.getInstancia().getNombre());
+        setHeaderProfilePic(Usuario.getInstancia().getUrl_foto_perfil());
+
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this,drawer,toolbar,R.string.navigation_drawer_open,R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
@@ -66,6 +71,13 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,new PPrincipal()).commit();
             navigationView.setCheckedItem(R.id.pag_ppal);
         }
+    }
+
+    private void setHeaderProfilePic(String url_foto_perfil) {
+        //Tomo la referencia de la imagen del header
+        ImageView header_foto_perfil = (ImageView) this.header.findViewById(R.id.header_foto_perfil);
+        //Cargo la foto en el perfil y en el header
+        Glide.with(getApplicationContext()).load(url_foto_perfil).into(header_foto_perfil);
     }
 
     private void setHeaderUserName(String name) {
