@@ -3,11 +3,6 @@ package com.example.hypechat;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +13,10 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -31,7 +30,17 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import static android.app.Activity.RESULT_OK;
+
 
 class ChatPrivateFragment extends Fragment {
 
@@ -77,6 +86,7 @@ class ChatPrivateFragment extends Fragment {
         look = (ImageButton) view.findViewById(R.id.info_canal);
         look.setVisibility(View.INVISIBLE);
         look.setEnabled(false);
+
 
         texto_mensaje.setText("");
 
@@ -129,6 +139,7 @@ class ChatPrivateFragment extends Fragment {
         });
         return view;
     }
+
 
     public void setSalaDeChat() {
 

@@ -5,13 +5,6 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +15,10 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -34,6 +31,17 @@ import com.google.firebase.database.ServerValue;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -57,6 +65,7 @@ public class ChatFragment extends Fragment {
     private StorageReference storageReference;
 
     private static final int PHOTO_SEND = 1;
+    private static final String URL_PALABRAS_PRO =  "https://secure-plateau-18239.herokuapp.com/message";
 
     @SuppressLint("ValidFragment")
     public ChatFragment(boolean canal) {
@@ -130,8 +139,8 @@ public class ChatFragment extends Fragment {
             public void onClick(View v) {
                 String texto = texto_mensaje.getText().toString();
                 if (!texto.isEmpty()) {
-                    reference.push().setValue(new ChatMensajeEnviar(Usuario.getInstancia().getNickname(),texto,
-                            ServerValue.TIMESTAMP,Usuario.getInstancia().getUrl_foto_perfil(),Usuario.getInstancia().getEmail()));
+                    filtro_mensaje_palabras_prohibidas(texto);
+
                 }
                 else{
                     Toast.makeText(getContext(), "No podes mandar un mensaje Vacio!", Toast.LENGTH_LONG).show();
@@ -147,6 +156,7 @@ public class ChatFragment extends Fragment {
                 intent.setType("image/*");
                 intent.putExtra(Intent.EXTRA_LOCAL_ONLY,true);
                 startActivityForResult(Intent.createChooser(intent,"Seleccionar una foto a enviar"),PHOTO_SEND);
+                filtro_mensaje_palabras_prohibidas("");
             }
         });
 
@@ -158,6 +168,67 @@ public class ChatFragment extends Fragment {
             }
         });
         return view;
+    }
+
+    private void filtro_mensaje_palabras_prohibidas(String texto) {
+
+        JSONObject requestBody = new JSONObject();
+        try {
+            requestBody.put("userToken", Usuario.getInstancia().getToken());
+            requestBody.put("organizationID", this.org_id);
+            requestBody.put("channelName", this.name);
+            requestBody.put("message", texto);
+
+        }
+        catch(JSONException except){
+            Toast.makeText(getActivity(), except.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+        Log.i("INFO", "Envio el mensaje para chequear palabras prohibidas de la organizacion");
+
+        Log.i("INFO", "Json Request , check http status codes" + requestBody);
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.POST, URL_PALABRAS_PRO, requestBody, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+
+                        System.out.println(response);
+                        try {
+                            String mensaje = response.getString("message");
+                            if(mensaje.compareTo("") != 0){
+                                reference.push().setValue(new ChatMensajeEnviar(Usuario.getInstancia().getNickname(),mensaje,
+                                        ServerValue.TIMESTAMP,Usuario.getInstancia().getUrl_foto_perfil(),Usuario.getInstancia().getEmail()));
+                            }
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        //agregarUser();
+
+                    }
+
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        switch (error.networkResponse.statusCode){
+                            case (500):
+                                Toast.makeText(getActivity(),"No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
+                                break;
+                            case (400):
+                                Toast.makeText(getActivity(),"El ID ya existe, intente con otro.", Toast.LENGTH_LONG).show();
+                                break;
+                            case (404):
+                                Toast.makeText(getActivity(),"El usuario o organizacion es invalido", Toast.LENGTH_LONG).show();
+                                break;
+                        }
+                    }
+                });
+
+        //Agrego la request a la cola para que se conecte con el server!
+        HttpConexionSingleton.getInstance(getContext()).addToRequestQueue(jsonObjectRequest);
     }
 
 
