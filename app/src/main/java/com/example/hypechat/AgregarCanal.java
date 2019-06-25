@@ -31,7 +31,7 @@ public class AgregarCanal extends Fragment {
     private Button crear_canal;
     private Button volver;
     private String id, password, token;
-    private Boolean permiso_editar;
+    private Boolean permiso_editar =false;
     private RecyclerView lista_canales;
     private JSONArray channels;
     private AdapterCanal adaptador_para_canales;
@@ -69,6 +69,7 @@ public class AgregarCanal extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.activity_agregar_canal, container, false);
         crear_canal = (Button) view.findViewById(R.id.crear_canal);
+
         volver = (Button) view.findViewById(R.id.button_volverOrganizacion);
         lista_canales = (RecyclerView) view.findViewById(R.id.lista_canales_agregar);
 
@@ -78,7 +79,8 @@ public class AgregarCanal extends Fragment {
         lista_canales.setAdapter(adaptador_para_canales);
         adaptador_para_canales.setOnItemClickListener(this.onItemClickListener);
 
-
+        if(permiso_editar) enableButtons();
+        else disableButtons();
 
         volver.setOnClickListener(new View.OnClickListener() {
             @Override

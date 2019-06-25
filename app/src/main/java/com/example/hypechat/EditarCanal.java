@@ -38,7 +38,8 @@ class EditarCanal extends Fragment {
     private TextView nombre;
     private EditText descripcion;
     private EditText mensaje;
-    private Boolean edit_permision, is_privado, error_guardar_cambios;
+    private Boolean edit_permision = false;
+    private Boolean is_privado, error_guardar_cambios;
     private JSONArray usuarios_canal;
     private ProgressDialog progressDialog;
     private String URL_INFO_CANAL = "https://secure-plateau-18239.herokuapp.com/channel/";
@@ -70,6 +71,11 @@ class EditarCanal extends Fragment {
         mensaje = (EditText) view.findViewById(R.id.msj_bienvenida_canal);
         privado = (Switch) view.findViewById(R.id.boton_privado);
         error_guardar_cambios  =false;
+        if (this.edit_permision) {
+            enableButtons();
+        } else {
+            disableButtons();
+        }
         completarInformacionOrganizacion();
 
 
@@ -85,7 +91,7 @@ class EditarCanal extends Fragment {
                     Log.i("INFO","Se va a agregar usuarios al canal ya que es privado");
                     FragmentManager fragmentManager = getFragmentManager();
                     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                    fragmentTransaction.replace(R.id.fragment_container, new AgregarUsuarioCanal(organization_id,nombre_canal));
+                    fragmentTransaction.replace(R.id.fragment_container, new AgregarUsuarioCanal(organization_id,nombre_canal,edit_permision));
                     //Esta es la linea clave para que vuelva al fragmento anterior!
                     fragmentTransaction.addToBackStack(null);
                     fragmentTransaction.commit();

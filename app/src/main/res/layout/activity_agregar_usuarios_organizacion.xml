@@ -29,7 +29,7 @@
 
 
         <TextView
-            android:id="@+id/textView3"
+            android:id="@+id/nombre_org_add_user"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"

@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:weightSum="100"
-    android:windowSoftInputMode="adjustPan">
+    android:windowSoftInputMode="adjustNothing">
 
 
     <LinearLayout
@@ -25,7 +25,8 @@
         android:clickable="false"
         android:gravity="center"
         android:layout_gravity="center_horizontal"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:windowSoftInputMode="adjustNothing">
 
         <ImageView
             android:id="@+id/imageView2"

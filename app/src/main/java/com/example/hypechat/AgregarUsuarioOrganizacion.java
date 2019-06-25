@@ -2,17 +2,13 @@ package com.example.hypechat;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -23,6 +19,12 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+
 
 
 
@@ -32,9 +34,10 @@ public class AgregarUsuarioOrganizacion extends Fragment {
     private Button agregarUser;
     private Button finalizar;
     private EditText email;
+    private TextView nombre_org;
     private ProgressDialog progressDialog;
     private String URL_AGREGAR_USUARIO = "https://secure-plateau-18239.herokuapp.com/organization/user";
-    private String organizacion_id;
+    private String organizacion_id = "Organizacion";
     private Boolean creando_organizacion;
     private String token;
     private String psw;
@@ -49,6 +52,8 @@ public class AgregarUsuarioOrganizacion extends Fragment {
 
         validador = new ValidadorDeCampos();
         this.email = (EditText) view.findViewById(R.id.edit_email);
+        nombre_org = (TextView) view.findViewById(R.id.nombre_org_add_user);
+        nombre_org.setText(organizacion_id);
 
         agregarUser = (Button)view.findViewById(R.id.r_invitar_usuario);
 
@@ -160,6 +165,7 @@ public class AgregarUsuarioOrganizacion extends Fragment {
 
     public void completarOrganizacionID(String id,Boolean creandoOrg,String psw, String token,VerUsuariosOrganizacion verUsuarios) {
         this.organizacion_id = id;
+        nombre_org.setText(organizacion_id);
         this.creando_organizacion = creandoOrg;
         this.psw = psw;
         this.token = token;

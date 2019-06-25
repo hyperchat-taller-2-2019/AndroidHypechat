@@ -7,7 +7,7 @@
     android:orientation="vertical"
     tools:context=".CrearOrganizacion"
     android:weightSum="100"
-    android:windowSoftInputMode="adjustPan">
+    android:windowSoftInputMode="adjustNothing">
 
 
     <LinearLayout

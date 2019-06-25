@@ -3,15 +3,11 @@ package com.example.hypechat;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Switch;
@@ -24,6 +20,12 @@ import com.android.volley.toolbox.JsonObjectRequest;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 public class CrearCanal extends Fragment {
 
@@ -52,6 +54,7 @@ public class CrearCanal extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         //return inflater.inflate(R.layout.organizaciones,container,false);
         View view = inflater.inflate(R.layout.activity_crear_canal,container,false);
+        getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
         validador = new ValidadorDeCampos();
         cancelar = (Button)view.findViewById(R.id.button_crearCanal_cancelar);
         siguiente = (Button) view.findViewById(R.id.button_crearCanal_siguiente);
@@ -228,7 +231,7 @@ public class CrearCanal extends Fragment {
             Log.i("INFO","Se va a agregar usuarios al canal ya que es privado");
             FragmentManager fragmentManager = getFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.replace(R.id.fragment_container, new AgregarUsuarioCanal(this.id,this.nombre.getText().toString()));
+            fragmentTransaction.replace(R.id.fragment_container, new AgregarUsuarioCanal(this.id,this.nombre.getText().toString(),true));
             //Esta es la linea clave para que vuelva al fragmento anterior!
             fragmentTransaction.addToBackStack(null);
             fragmentTransaction.commit();

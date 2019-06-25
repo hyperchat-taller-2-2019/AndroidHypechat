@@ -1,14 +1,15 @@
 package com.example.hypechat;
 
 import android.content.Context;
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 
 public class AdapterMiembrosCanal extends RecyclerView.Adapter<CardAgregarMiembroCanal> {
@@ -53,14 +54,16 @@ public class AdapterMiembrosCanal extends RecyclerView.Adapter<CardAgregarMiembr
         final MiembroCanal usuario_actual = lista_usuarios.get(i);
 
         cardUsuarioInfo.getEmail().setText(usuario_actual.getEmail());
+        cardUsuarioInfo.setClickeable(usuario_actual.getPermitions());
         if(usuario_actual.perteneceAlCanal()) cardUsuarioInfo.email.setChecked(true);
 
         cardUsuarioInfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                cardUsuarioInfo.email.setChecked(!cardUsuarioInfo.email.isChecked());
+                if(usuario_actual.getPermitions()) cardUsuarioInfo.email.setChecked(!cardUsuarioInfo.email.isChecked());
                 if (cardUsuarioInfo.email.isChecked()) {
-                    onItemCheckListener.onItemCheck(usuario_actual.getEmail());
+                    onItemCheckListener.onItemCheck(
+                            usuario_actual.getEmail());
                 } else {
                     onItemCheckListener.onItemUncheck(usuario_actual.getEmail());
                 }

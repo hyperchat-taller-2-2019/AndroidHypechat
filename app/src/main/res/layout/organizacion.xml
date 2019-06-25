@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:weightSum="100"
     tools:context=".Organizacion"
     android:orientation="vertical"
     android:background="@color/colorGrisClaro">
@@ -11,7 +12,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="20dp"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_weight="1">
 
         <ImageView
             android:id="@+id/imageView1"
@@ -32,36 +34,43 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorGrisClaro"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_weight="98"
+        android:weightSum="100">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_height="70dp"
+            android:orientation="horizontal"
+            android:weightSum="10"
+            android:layout_weight="10">
 
             <ImageButton
                 android:id="@+id/btn_ubicacion_equipo"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:src="@drawable/ic_location"/>
+                android:src="@drawable/ic_location"
+                android:layout_weight="2"/>
 
             <TextView
                 android:id="@+id/titulo_organizacion"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
-                android:layout_weight="1"
+                android:gravity="center"
+                android:layout_weight="6"
                 android:text="Organizacion"
                 android:textAlignment="center"
                 android:textColor="@color/colorBlanco"
                 android:textSize="30dp"
-                app:fontFamily="@font/carter_one" />
+                app:fontFamily="@font/carter_one"
+                android:autoSizeTextType="uniform"/>
 
             <ImageButton
                 android:id="@+id/edit_Organizacion"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
+                android:layout_weight="2"
                 android:src="@drawable/ic_search" />
 
 
@@ -70,17 +79,21 @@
         <TextView
             android:id="@+id/msj_bienvenida_organizacion"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:gravity="center"
             android:text="Mensaje de bienvenida"
             android:textColor="@color/colorAzul"
-            android:textSize="20dp"
-            android:textStyle="bold" />
+            android:textSize="15dp"
+            android:textStyle="bold"
+            android:autoSizeTextType="uniform"
+            android:layout_weight="10" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_weight="10">
 
             <TextView
                 android:id="@+id/canales"
@@ -105,6 +118,7 @@
             android:id="@+id/lista_canales"
             android:layout_width="wrap_content"
             android:layout_height="150dp"
+            android:layout_weight="30"
             android:layout_margin="20sp"
             android:background="@color/colorBlanco"
             android:cacheColorHint="#00000000"
@@ -113,7 +127,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_weight="10">
 
             <TextView
                 android:id="@+id/msj_privados"
@@ -139,6 +154,7 @@
             android:layout_width="match_parent"
             android:layout_height="150dp"
             android:layout_margin="20sp"
+            android:layout_weight="30"
             android:background="@color/colorBlanco"
             android:cacheColorHint="#00000000"
             android:divider="@android:color/transparent"></ListView>
@@ -148,19 +164,23 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="20dp"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_weight="1"
+        android:layout_marginTop="10dp">
 
         <ImageView
             android:id="@+id/imageView9"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            app:srcCompat="@color/colorAccent" />
+            app:srcCompat="@color/colorAccent"
+            android:layout_weight="1"/>
 
         <ImageView
             android:id="@+id/imageView10"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            app:srcCompat="@color/colorPrimary" />
+            app:srcCompat="@color/colorPrimary"
+            android:layout_weight="1"/>
     </LinearLayout>
 
 

@@ -43,13 +43,15 @@ class AgregarUsuarioCanal extends Fragment {
     private JSONArray members_org, members_canal;
     private AdapterMiembrosCanal adaptador_para_usuarios_canal;
     private List<String> currentSelectedItems;
+    private Boolean edit_permition =false;
 
 
 
-    public AgregarUsuarioCanal(String id, String canal_nombre) {
+    public AgregarUsuarioCanal(String id, String canal_nombre,Boolean permisos) {
         this.token = Usuario.getInstancia().getToken();
         this.id = id;
         this.nombre = canal_nombre;
+        this.edit_permition = permisos;
     }
 
     //metodo que se ejecuta cuando tocamos algun tarjeta de la recycleview
@@ -82,6 +84,9 @@ class AgregarUsuarioCanal extends Fragment {
         LinearLayoutManager l = new LinearLayoutManager(getContext());
         lista_miembros.setLayoutManager(l);
         lista_miembros.setAdapter(adaptador_para_usuarios_canal);
+        if(edit_permition) lista_miembros.setEnabled(true);
+        else lista_miembros.setEnabled(false);
+
         adaptador_para_usuarios_canal.setOnItemClickListener(new AdapterMiembrosCanal.OnItemCheckListener() {
             @Override
             public void onItemCheck(String item) {
@@ -99,7 +104,13 @@ class AgregarUsuarioCanal extends Fragment {
             @Override
             public void onClick(View v) {
                 Log.i("INFO","Finaliza la actividad de agregar usuarios al canal.");
-                agregarUsuarios_al_Canal();
+                if(edit_permition) {
+                    agregarUsuarios_al_Canal();
+                }
+                else{
+                    Log.i("INFO", "Volviendo a la organizacion ");
+                    irAOrganizacion();
+                }
 
 
             }
@@ -287,7 +298,7 @@ class AgregarUsuarioCanal extends Fragment {
     private void procesarInfoCanal(JSONObject response) {
         Log.i("INFO", "Actualizo lista de miembros");
         try {
-            Log.i("INFO","Actualizo los miembros del listado para mostrar");
+            Log.i("INFO","Actualizo los miembros del listado para mostrar con permiso de edicion: "+edit_permition);
             JSONObject orga = response.getJSONObject("channel");
             members_canal = orga.getJSONArray("members");
 
@@ -296,7 +307,7 @@ class AgregarUsuarioCanal extends Fragment {
             for(int i=0;i< members_org.length();i++){
                 String email = members_org.getString(i);
 
-                MiembroCanal miembro = new MiembroCanal(email,false);
+                MiembroCanal miembro = new MiembroCanal(email,false,edit_permition);
                 if(this.members_canal.toString().contains(email)){
                     miembro.setPertenece(true);
                     currentSelectedItems.add(email);

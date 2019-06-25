@@ -1,9 +1,10 @@
 package com.example.hypechat;
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 import android.widget.CheckBox;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 
 public class CardAgregarMiembroCanal extends RecyclerView.ViewHolder {
@@ -29,6 +30,8 @@ public class CardAgregarMiembroCanal extends RecyclerView.ViewHolder {
     public void setEmail(CheckBox email) {
         this.email = email;
     }
+
+    public void setClickeable(Boolean edit_permition){this.email.setEnabled(edit_permition);}
 
     public void setOnClickListener(View.OnClickListener onClickListener) {
         itemView.setOnClickListener(onClickListener);

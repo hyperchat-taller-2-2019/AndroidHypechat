@@ -54,7 +54,7 @@ public class ChatFragment extends Fragment {
     private ImageButton volver;
     private RecyclerView chat;
     private ImageButton boton_enviar_imagen, editar_canal;
-    private String id,name,org_id;
+    private String id,name = "canal",org_id = "organizacion";
     private Boolean es_canal;
 
     private AdapterChat adaptador_para_chat;
@@ -88,6 +88,8 @@ public class ChatFragment extends Fragment {
         boton_enviar_mensaje = (Button) view.findViewById(R.id.btn_enviar_mensaje);
         boton_enviar_imagen = (ImageButton) view.findViewById(R.id.boton_enviar_imagen);
         editar_canal = (ImageButton) view.findViewById(R.id.info_canal);
+        titulo_chat.setText(this.name.toUpperCase());
+        titulo_orga.setText(this.org_id);
 
         if(!es_canal){
             editar_canal.setVisibility(View.INVISIBLE);

@@ -7,14 +7,15 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:weightSum="100"
-    android:windowSoftInputMode="adjustPan">
+    android:windowSoftInputMode="adjustNothing">
 
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="15"
-        android:orientation="horizontal"></LinearLayout>
+        android:orientation="horizontal"
+        ></LinearLayout>
 
     <LinearLayout
         android:id="@+id/layout_ppal"
@@ -25,7 +26,8 @@
         android:clickable="false"
         android:gravity="center"
         android:layout_gravity="center_horizontal"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:windowSoftInputMode="adjustNothing">
 
         <ImageView
             android:id="@+id/imageView2"
