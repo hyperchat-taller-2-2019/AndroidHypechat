@@ -62,6 +62,7 @@ class ChatPrivateFragment extends Fragment {
     private StorageReference storageReference;
 
     private static final int PHOTO_SEND = 1;
+    private static final String URL_PRIVADO_MENCIONES = "https://secure-plateau-18239.herokuapp.com/privateChat/mention";
 
     public ChatPrivateFragment(String id, String name) {
         this.id_chat = id;
@@ -112,6 +113,7 @@ class ChatPrivateFragment extends Fragment {
                 if (!texto.isEmpty()) {
                     reference.push().setValue(new ChatMensajeEnviar(Usuario.getInstancia().getNickname(),texto,
                             ServerValue.TIMESTAMP,Usuario.getInstancia().getUrl_foto_perfil(),Usuario.getInstancia().getEmail()));
+                    mandar_menciones(texto);
                 }
                 else{
                     Toast.makeText(getContext(), "No podes mandar un mensaje Vacio!", Toast.LENGTH_LONG).show();
@@ -140,6 +142,53 @@ class ChatPrivateFragment extends Fragment {
         return view;
     }
 
+    private void mandar_menciones(String mensaje) {
+        JSONObject requestBody = new JSONObject();
+
+        try {
+            requestBody.put("token", Usuario.getInstancia().getToken());
+            requestBody.put("message", mensaje);
+            requestBody.put("email", this.email_chat);
+
+        }
+        catch(JSONException except){
+            Toast.makeText(getActivity(), except.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+        Log.i("INFO", "Envio el mensaje para chequear menciones y enviar notificaciones");
+
+        Log.i("INFO", "Json Request , check http status codes" + requestBody);
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.POST, URL_PRIVADO_MENCIONES, requestBody, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.i("INFO", "Notificaciones enviadas");
+                        //agregarUser();
+
+                    }
+
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        switch (error.networkResponse.statusCode){
+                            case (500):
+                                Toast.makeText(getActivity(),"No fue posible enviar las notificaciones, por favor intente mas tarde", Toast.LENGTH_LONG).show();
+                                break;
+                            case (400):
+                                Toast.makeText(getActivity(),"El ID ya existe, intente con otro.", Toast.LENGTH_LONG).show();
+                                break;
+                            case (404):
+                                Toast.makeText(getActivity(),"El usuario o organizacion es invalido", Toast.LENGTH_LONG).show();
+                                break;
+                        }
+                    }
+                });
+
+        //Agrego la request a la cola para que se conecte con el server!
+        HttpConexionSingleton.getInstance(getContext()).addToRequestQueue(jsonObjectRequest);
+    }
 
     public void setSalaDeChat() {
 
