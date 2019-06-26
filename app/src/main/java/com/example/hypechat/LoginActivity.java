@@ -48,7 +48,7 @@ public class LoginActivity extends AppCompatActivity {
 
     //ESTA DESPUES DEBERIA SER LA DIRECCION DE DONDE ESTE EL SERVER REAL Y EL ENDPOINT CORRESPONDIENTE!
     private final String URL_LOGIN = "https://secure-plateau-18239.herokuapp.com/login";
-    private final String URL_LOGIN_FACE = "https://virtserver.swaggerhub.com/taller2-hypechat/Hypechat/1.0.0/logFacebook";
+    private final String URL_LOGIN_FACE = "https://secure-plateau-18239.herokuapp.com/logFacebook";
     private final String URL_PREGUNTAS= "https://secure-plateau-18239.herokuapp.com/secretQuestions/";
     private final String URL_CHECK_RESPUESTAS = "https://secure-plateau-18239.herokuapp.com/answerQuestions/";
     private final String URL_CHANGE_PASS = "https://secure-plateau-18239.herokuapp.com/recoveredPassword";
@@ -421,7 +421,9 @@ public class LoginActivity extends AppCompatActivity {
                 true);
         JSONObject requestBody = new JSONObject();
         try {
+            Log.i("INFO","token facebook: "+ AccessToken.getCurrentAccessToken().getToken());
             requestBody.put("token", AccessToken.getCurrentAccessToken().getToken());
+            requestBody.put("tokenPush",Usuario.getInstancia().getTokenPush());
 
         }
         catch(JSONException except){
