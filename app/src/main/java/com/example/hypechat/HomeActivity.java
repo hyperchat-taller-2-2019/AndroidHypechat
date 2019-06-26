@@ -1,6 +1,7 @@
 package com.example.hypechat;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -49,6 +50,8 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+        this.sharedPref = this.getSharedPreferences(getString(R.string.saved_data), Context.MODE_PRIVATE);
+        this.sharedEditor = sharedPref.edit();
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -127,6 +130,12 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
                     @Override
                     public void onResponse(JSONObject response) {
+                        sharedEditor.putString("token","");
+                        sharedEditor.putString("email","");
+                        sharedEditor.putString("nickname","");
+                        sharedEditor.putString("token","");
+                        sharedEditor.putString("photo","");
+                        sharedEditor.apply();
                         Intent intent = new Intent(HomeActivity.this,LoginActivity.class);
                         startActivity(intent);
                         //agregarUser();

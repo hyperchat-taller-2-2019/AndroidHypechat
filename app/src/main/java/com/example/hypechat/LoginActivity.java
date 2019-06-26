@@ -3,7 +3,9 @@ package com.example.hypechat;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -44,7 +46,8 @@ public class LoginActivity extends AppCompatActivity {
     private LoginButton facebookLogin;
     private Dialog olvido_pass, preguntas, restaura_pass;
     private String token_recuperacion;
-
+    private SharedPreferences sharedPref;
+    private SharedPreferences.Editor sharedEditor;
 
     //ESTA DESPUES DEBERIA SER LA DIRECCION DE DONDE ESTE EL SERVER REAL Y EL ENDPOINT CORRESPONDIENTE!
     private final String URL_LOGIN = "https://secure-plateau-18239.herokuapp.com/login";
@@ -142,12 +145,16 @@ public class LoginActivity extends AppCompatActivity {
                             case (400):
                                 Toast.makeText(LoginActivity.this,
                                         "No existe ese mail en el sistema.", Toast.LENGTH_LONG).show();
+                                break;
                             case (500):
                                 Toast.makeText(LoginActivity.this,
                                         "Server error!", Toast.LENGTH_LONG).show();
-                            case (404):
+                                break;
+                            case (401):
+                                olvido_pass.dismiss();
                                 Toast.makeText(LoginActivity.this,
-                                        "No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
+                                        "Se ha registrado con facebook!", Toast.LENGTH_LONG).show();
+                                break;
                             default:
                                 Toast.makeText(LoginActivity.this, "Ocurrio un error!!!", Toast.LENGTH_LONG).show();
 
@@ -341,7 +348,7 @@ public class LoginActivity extends AppCompatActivity {
 
     public void JsonRequest_login(String URL, JSONObject requestBody) {
         // SE PUEDE HACER EL REQUEST AL SERVER PARA LOGUEARSE !
-        Log.i("INFO", "Json Request login, check http status codes");
+        Log.i("INFO", "Json Request login, check http status codes con request: "+ requestBody);
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.POST, URL, requestBody, new Response.Listener<JSONObject>() {
@@ -397,6 +404,13 @@ public class LoginActivity extends AppCompatActivity {
             Usuario.getInstancia().setToken(response.getString("token"));
             Usuario.getInstancia().setUrl_foto_perfil(response.getString("photo"));
 
+            sharedEditor.putString("token",response.getString("token"));
+            sharedEditor.putString("email",response.getString("email"));
+            sharedEditor.putString("nickname",response.getString("nickname"));
+            sharedEditor.putString("token",response.getString("token"));
+            sharedEditor.putString("photo",response.getString("photo"));
+            sharedEditor.apply();
+
             goHomeActivity();
 
         }
@@ -447,6 +461,19 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         Log.i("INFO","Se esta iniciando la aplicación");
         //Referencias del layout
+        this.sharedPref = this.getSharedPreferences(getString(R.string.saved_data), Context.MODE_PRIVATE);
+        this.sharedEditor = sharedPref.edit();
+
+        if(sharedPref.getString("token","").compareTo("") != 0){
+            Usuario.getInstancia().setEmail(sharedPref.getString("email",""));
+            Usuario.getInstancia().setNombre(sharedPref.getString("name",""));
+            Usuario.getInstancia().setNickname(sharedPref.getString("nickname",""));
+            Usuario.getInstancia().setToken(sharedPref.getString("token",""));
+            Usuario.getInstancia().setUrl_foto_perfil(sharedPref.getString("photo",""));
+            goHomeActivity();
+        }
+
+
         this.validador = new ValidadorDeCampos();
         this.textoEmail = (EditText) findViewById(R.id.et_email);
         this.textoPassword = (EditText) findViewById(R.id.et_password);

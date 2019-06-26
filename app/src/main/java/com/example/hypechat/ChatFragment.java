@@ -68,6 +68,7 @@ public class ChatFragment extends Fragment {
     private static final String URL_PALABRAS_PRO =  "https://secure-plateau-18239.herokuapp.com/message";
     private static final String URL_CANAL_MENCIONES =  "https://secure-plateau-18239.herokuapp.com/channel/mention";
     private static final String URL_PRIVADO_MENCIONES = "https://secure-plateau-18239.herokuapp.com/privateChat/mention";
+    private static final String URL_TITO = "https://secure-plateau-18239.herokuapp.com/tito";
 
     @SuppressLint("ValidFragment")
     public ChatFragment(boolean canal) {
@@ -143,8 +144,8 @@ public class ChatFragment extends Fragment {
             public void onClick(View v) {
                 String texto = texto_mensaje.getText().toString();
                 if (!texto.isEmpty()) {
-                    filtro_mensaje_palabras_prohibidas(texto);
-
+                    if(es_canal) envio_tito(texto);
+                    else filtro_mensaje_palabras_prohibidas(texto);
                 }
                 else{
                     Toast.makeText(getContext(), "No podes mandar un mensaje Vacio!", Toast.LENGTH_LONG).show();
@@ -172,6 +173,60 @@ public class ChatFragment extends Fragment {
             }
         });
         return view;
+    }
+
+    private void envio_tito(String texto) {
+        final JSONObject requestBody = new JSONObject();
+        try {
+            requestBody.put("token", Usuario.getInstancia().getToken());
+            requestBody.put("id", this.org_id);
+            requestBody.put("channel", this.name);
+            requestBody.put("message", texto);
+
+        }
+        catch(JSONException except){
+            Toast.makeText(getActivity(), except.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+        Log.i("INFO", "Envio el mensaje para chequeo de mencion de tito");
+
+        Log.i("INFO", "Json Request , check http status codes" + requestBody);
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.POST, URL_TITO, requestBody, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            String mensaje = response.getString("message");
+                            filtro_mensaje_palabras_prohibidas(mensaje);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        //agregarUser();
+
+                    }
+
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        switch (error.networkResponse.statusCode){
+                            case (500):
+                                Toast.makeText(getActivity(),"No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
+                                break;
+                            case (400):
+                                Toast.makeText(getActivity(),"El ID ya existe, intente con otro.", Toast.LENGTH_LONG).show();
+                                break;
+                            case (404):
+                                Toast.makeText(getActivity(),"El usuario o organizacion es invalido", Toast.LENGTH_LONG).show();
+                                break;
+                        }
+                    }
+                });
+
+        //Agrego la request a la cola para que se conecte con el server!
+        HttpConexionSingleton.getInstance(getContext()).addToRequestQueue(jsonObjectRequest);
     }
 
     private void filtro_mensaje_palabras_prohibidas(String texto) {
