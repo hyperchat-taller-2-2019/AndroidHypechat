@@ -68,7 +68,6 @@
         android:layout_margin="10dp"
         android:background="@color/colorGrisClaro"
         android:layout_weight="1" />
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -81,6 +80,31 @@
             android:layout_height="wrap_content"
             android:background="@android:drawable/ic_menu_gallery"
             android:layout_gravity="center"/>
+
+        <ImageButton
+            android:id="@+id/boton_enviar_archivo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="30dp"
+            android:background="@drawable/ic_attached_file" />
+
+        <ImageButton
+            android:id="@+id/boton_snippet"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="30dp"
+            android:background="@drawable/ic_snippet" />
+
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@color/colorBlanco">
+
 
         <EditText
             android:id="@+id/texto_mensaje_a_enviar"

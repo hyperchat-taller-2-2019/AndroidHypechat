@@ -53,7 +53,7 @@ public class ChatFragment extends Fragment {
     private Button boton_enviar_mensaje;
     private ImageButton volver;
     private RecyclerView chat;
-    private ImageButton boton_enviar_imagen, editar_canal;
+    private ImageButton boton_enviar_imagen, editar_canal, boton_enviar_archivo, boton_enviar_snippet;
     private String id,name = "canal",org_id = "organizacion";
     private Boolean es_canal;
 
@@ -65,6 +65,7 @@ public class ChatFragment extends Fragment {
     private StorageReference storageReference;
 
     private static final int PHOTO_SEND = 1;
+    private static final int FILE_SEND = 2;
     private static final String URL_PALABRAS_PRO =  "https://secure-plateau-18239.herokuapp.com/message";
     private static final String URL_CANAL_MENCIONES =  "https://secure-plateau-18239.herokuapp.com/channel/mention";
     private static final String URL_PRIVADO_MENCIONES = "https://secure-plateau-18239.herokuapp.com/privateChat/mention";
@@ -91,6 +92,8 @@ public class ChatFragment extends Fragment {
         texto_mensaje = (EditText) view.findViewById(R.id.texto_mensaje_a_enviar);
         boton_enviar_mensaje = (Button) view.findViewById(R.id.btn_enviar_mensaje);
         boton_enviar_imagen = (ImageButton) view.findViewById(R.id.boton_enviar_imagen);
+        boton_enviar_archivo = (ImageButton) view.findViewById(R.id.boton_enviar_archivo);
+        boton_enviar_snippet = (ImageButton) view.findViewById(R.id.boton_snippet);
         editar_canal = (ImageButton) view.findViewById(R.id.info_canal);
         titulo_chat.setText(this.name.toUpperCase());
         titulo_orga.setText(this.org_id);
@@ -168,6 +171,29 @@ public class ChatFragment extends Fragment {
             }
         });
 
+        boton_enviar_archivo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("application/pdf");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                //intent.putExtra(Intent.EXTRA_LOCAL_ONLY,true);
+                startActivityForResult(Intent.createChooser(intent,"Seleccionar una foto a enviar"),FILE_SEND);
+                filtro_mensaje_palabras_prohibidas("");
+            }
+        });
+
+        boton_enviar_snippet.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("image/*");
+                intent.putExtra(Intent.EXTRA_LOCAL_ONLY,true);
+                startActivityForResult(Intent.createChooser(intent,"Seleccionar una foto a enviar"),PHOTO_SEND);
+                filtro_mensaje_palabras_prohibidas("");
+            }
+        });
+
         adaptador_para_chat.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
             public void onItemRangeInserted(int positionStart, int itemCount) {
@@ -176,7 +202,9 @@ public class ChatFragment extends Fragment {
             }
         });
 
+
         setSalaDeChat();
+
         return view;
     }
 
@@ -396,12 +424,13 @@ public class ChatFragment extends Fragment {
         //Seteo de la configuracion para manejar Imagenes en la base de datos
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference("imagenes_chat");
+
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.i("INFO","Se va a cargar la foto a la base de datos!");
+        Log.i("INFO","Se va a cargar el archivo a la base de datos!");
         if (requestCode == PHOTO_SEND && resultCode == RESULT_OK){
             Uri url_foto = data.getData();
             final StorageReference foto_referencia = storageReference.child(url_foto.getLastPathSegment());
@@ -421,6 +450,34 @@ public class ChatFragment extends Fragment {
                         Uri downloadUri = task.getResult();
                         Log.i("INFO","La url de la foto es: " + downloadUri.toString());
                         ChatMensajeEnviar mensajeEnviar = new ChatMensajeEnviar(Usuario.getInstancia().getNickname(), "Te ha enviado una imagen...",
+                                Usuario.getInstancia().getUrl_foto_perfil(), downloadUri.toString(), ServerValue.TIMESTAMP,Usuario.getInstancia().getEmail());
+                        reference.push().setValue(mensajeEnviar);
+                    } else {
+                        Toast.makeText(getActivity(), "Fallo la carga de la imagen" + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
+        }
+        if (requestCode == FILE_SEND && resultCode == RESULT_OK){
+            Uri url_foto = data.getData();
+
+            final StorageReference foto_referencia = storage.getReference("Archivos").child(url_foto.getLastPathSegment());
+            //MAGIA QUE PIDE LA NUEVA DOCUMENTACION PARA OBTENER LA DOWNLOAD URL
+            foto_referencia.putFile(url_foto).continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                @Override
+                public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                    if (!task.isSuccessful()) {
+                        throw task.getException();
+                    }
+                    return foto_referencia.getDownloadUrl();
+                }
+            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                @Override
+                public void onComplete(@NonNull Task<Uri> task) {
+                    if (task.isSuccessful()) {
+                        Uri downloadUri = task.getResult();
+                        Log.i("INFO","La url del archivo es: " + downloadUri.toString());
+                        ChatMensajeEnviar mensajeEnviar = new ChatMensajeEnviar(Usuario.getInstancia().getNickname(), "Te ha enviado un archivo...",
                                 Usuario.getInstancia().getUrl_foto_perfil(), downloadUri.toString(), ServerValue.TIMESTAMP,Usuario.getInstancia().getEmail());
                         reference.push().setValue(mensajeEnviar);
                     } else {

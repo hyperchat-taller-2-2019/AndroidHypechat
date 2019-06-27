@@ -1,8 +1,9 @@
 package com.example.hypechat;
 
 import android.content.Context;
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,12 +17,16 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
 public class AdapterChat extends RecyclerView.Adapter<CardChatMensajes> {
 
     private List<ChatMensajeRecibir> listado_de_mensajes = new ArrayList<>();
     private Context ctx;
     private final static int MENSAJE_PROPIO = 1;
     private static final int MENSAJE_DE_OTRO = -1;
+
 
     public AdapterChat(Context ctx) {
         this.ctx = ctx;
@@ -55,8 +60,21 @@ public class AdapterChat extends RecyclerView.Adapter<CardChatMensajes> {
 
         //Aca veo si es un mensaje de texto o una imagen y en funcion de eso seteo los parametros de la card
         if (mensaje.getUrl_foto_mensaje() != null){
+
             cardChatMensajes.getImagen_mensaje().setVisibility(View.VISIBLE);
             Glide.with(ctx).load(mensaje.getUrl_foto_mensaje()).into(cardChatMensajes.getImagen_mensaje());
+
+            if(mensaje.getUrl_foto_mensaje().toString().contains("Archivos")) {
+                String dynamicUrl = mensaje.getUrl_foto_mensaje().toString();
+                String linkedText = mensaje.getTexto() + "\n" +
+                        String.format("<a href=\"%s\">ARCHIVO</a> ", dynamicUrl);
+
+                Log.i("LinkedText:", linkedText);
+                cardChatMensajes.getMensaje_chat().setMovementMethod(LinkMovementMethod.getInstance());
+                cardChatMensajes.getMensaje_chat().setText(Html.fromHtml(linkedText));
+
+            }
+
         }
         else{
             //solo el mensaje de texto!
