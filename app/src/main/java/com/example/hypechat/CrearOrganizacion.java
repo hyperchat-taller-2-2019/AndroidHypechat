@@ -2,11 +2,6 @@ package com.example.hypechat;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +17,12 @@ import com.android.volley.toolbox.JsonObjectRequest;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 public class CrearOrganizacion extends Fragment {
 
@@ -86,7 +87,7 @@ public class CrearOrganizacion extends Fragment {
         String nombre_org = this.nombre.getText().toString();
         String id_org = this.id.getText().toString();
         String psw_org = this.psw.getText().toString();
-        if(validador.isNotCampoVacio(nombre_org,getContext(),"Nombre") && validador.isNotCampoVacio(id_org,getContext(),"ID") && validador.isValidPassword(psw_org,getContext())){
+        if(validador.isNotCampoVacio(nombre_org,getContext(),"Nombre") && validador.isNotCampoVacio(id_org,getContext(),"ID") && validador.isValidPassword(psw_org,getContext())&&validador.noContieneEspacios(id_org,getContext(),"id")){
             return true;
 
         }else{
