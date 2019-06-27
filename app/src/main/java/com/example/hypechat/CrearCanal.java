@@ -99,7 +99,7 @@ public class CrearCanal extends Fragment {
         String nombre_canal = this.nombre.getText().toString();
         String desc_canal = this.descripcion.getText().toString();
         String mensaje_canal = this.mensaje.getText().toString();
-        if(validador.isNotCampoVacio(nombre_canal,getContext(),"nombre del canal")){
+        if(validador.isNotCampoVacio(nombre_canal,getContext(),"nombre del canal")&&validador.noContieneEspacios(nombre_canal,getContext(),"nombre")){
             return true;
 
         }else{

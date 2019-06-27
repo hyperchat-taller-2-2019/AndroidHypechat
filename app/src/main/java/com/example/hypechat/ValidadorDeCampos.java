@@ -24,6 +24,15 @@ public class ValidadorDeCampos {
         return true;
     }
 
+    public boolean noContieneEspacios(String campo, Context ctx, String nombre_campo){
+        if (campo.contains(" ")){
+            Toast.makeText(ctx, "El "+nombre_campo+" no puede tener espacios!", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        return true;
+
+    }
+
     public boolean isNotCampoVacio(String campo, Context ctx,String nombre_campo){
         if (campo.isEmpty()){
             Toast.makeText(ctx, "Olvidó completar el campo "+nombre_campo+"!", Toast.LENGTH_SHORT).show();
