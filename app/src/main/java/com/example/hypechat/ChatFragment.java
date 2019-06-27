@@ -144,8 +144,8 @@ public class ChatFragment extends Fragment {
             public void onClick(View v) {
                 String texto = texto_mensaje.getText().toString();
                 if (!texto.isEmpty()) {
-                    if(es_canal) envio_tito(texto);
-                    else filtro_mensaje_palabras_prohibidas(texto);
+
+                    filtro_mensaje_palabras_prohibidas(texto);
                 }
                 else{
                     Toast.makeText(getContext(), "No podes mandar un mensaje Vacio!", Toast.LENGTH_LONG).show();
@@ -196,12 +196,7 @@ public class ChatFragment extends Fragment {
 
                     @Override
                     public void onResponse(JSONObject response) {
-                        try {
-                            String mensaje = response.getString("message");
-                            filtro_mensaje_palabras_prohibidas(mensaje);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
+                        Log.i("INFO", "Chequeo de tito enviado");
 
                         //agregarUser();
 
@@ -316,6 +311,14 @@ public class ChatFragment extends Fragment {
                     @Override
                     public void onResponse(JSONObject response) {
                         Log.i("INFO", "Notificaciones enviadas");
+
+                        try {
+                            String mensaje = mensaje = response.getString("message");
+                            if(es_canal) envio_tito(mensaje);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
 
                     }
 
