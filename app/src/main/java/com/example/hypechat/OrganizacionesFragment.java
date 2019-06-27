@@ -5,13 +5,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,6 +23,14 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class OrganizacionesFragment extends Fragment {
 
@@ -231,7 +232,9 @@ public class OrganizacionesFragment extends Fragment {
                         Log.i("INFO", "Se agrego la organizacion "+busqueda_id.getText().toString()+" al usuario "+Usuario.getInstancia().getEmail());
                         busqueda_id.getText().clear();
                         pass_org.dismiss();
+
                         Toast.makeText(getActivity(), "Se ingreso a la organizacion con exito.", Toast.LENGTH_LONG).show();
+                        actualizar();
 
 
                     }
@@ -262,6 +265,11 @@ public class OrganizacionesFragment extends Fragment {
         //Agrego la request a la cola para que se conecte con el server!
         HttpConexionSingleton.getInstance(getContext()).addToRequestQueue(jsonObjectRequest);
 
+    }
+
+    public void actualizar() {
+
+        getOrganizaciones();
     }
 
     private void getOrganizaciones (){
@@ -313,6 +321,7 @@ public class OrganizacionesFragment extends Fragment {
     private void responseOrganizaciones(JSONObject response) {
 
         try {
+            adaptador_para_organizaciones.clear();
             Log.i("INFO",response.toString());
             JSONArray organizaciones = response.getJSONArray("organizations");
             for(int i=0;i< organizaciones.length();i++){

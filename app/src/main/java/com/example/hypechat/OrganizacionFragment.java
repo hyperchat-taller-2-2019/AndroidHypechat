@@ -57,6 +57,8 @@ public class OrganizacionFragment extends Fragment {
     // private JSONArray organizaciones;
     private ImageButton ubicacion_equipo;
     private String mensaje_bienvenida;
+    private ArrayAdapter<String> adapterMsjPriv;
+    private ArrayAdapter<String> adapterCanales;
 
     @SuppressLint("ValidFragment")
     public OrganizacionFragment(String id) {
@@ -287,7 +289,7 @@ public class OrganizacionFragment extends Fragment {
             JSONArray canales = response.getJSONArray("channel");
             ListView list = (ListView) view.findViewById(R.id.lista_canales);
             List<String> array = new ArrayList<>();
-            ArrayAdapter<String> adapter =new ArrayAdapter<String>(getContext(), R.layout.text_list_canales, array);
+            adapterCanales =new ArrayAdapter<String>(getContext(), R.layout.text_list_canales, array);
             for(int i = 0; i< canales.length(); i++){
 
 
@@ -296,7 +298,7 @@ public class OrganizacionFragment extends Fragment {
             }
 
             //ArrayAdapter<String> adapter =new ArrayAdapter<String>(getContext(), R.layout.text_list_orga, array);
-            list.setAdapter(adapter);
+            list.setAdapter(adapterCanales);
             list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -429,7 +431,7 @@ public class OrganizacionFragment extends Fragment {
             JSONArray msjPrivados = response.getJSONArray("msjs");
             ListView list = (ListView) view.findViewById(R.id.lista_msj_privados);
             List<String> array = new ArrayList<>();
-            ArrayAdapter<String> adapter =new ArrayAdapter<String>(getContext(), R.layout.text_list_canales, array);
+            adapterMsjPriv =new ArrayAdapter<String>(getContext(), R.layout.text_list_canales, array);
 
             for(int i = 0; i< msjPrivados.length(); i++){
 
@@ -440,7 +442,7 @@ public class OrganizacionFragment extends Fragment {
             }
 
             //ArrayAdapter<String> adapter =new ArrayAdapter<String>(getContext(), R.layout.text_list_orga, array);
-            list.setAdapter(adapter);
+            list.setAdapter(adapterMsjPriv);
             list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -455,6 +457,10 @@ public class OrganizacionFragment extends Fragment {
             e.printStackTrace();
         }
         progressDialog.dismiss();
+    }
+    public void actualizar(){
+        getCanales();
+
     }
 
     public void completarInfoOrganizacion(JSONObject orga) {

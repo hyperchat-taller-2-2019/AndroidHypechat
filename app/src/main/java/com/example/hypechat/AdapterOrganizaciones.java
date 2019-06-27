@@ -1,14 +1,15 @@
 package com.example.hypechat;
 
 import android.content.Context;
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class AdapterOrganizaciones extends RecyclerView.Adapter<CardOrganizacionInfo> {
 
@@ -59,4 +60,12 @@ public class AdapterOrganizaciones extends RecyclerView.Adapter<CardOrganizacion
         return lista_organizaciones.get(position);
     }
 
+
+    public void clear() {
+        for(int i=0;i< lista_organizaciones.size();i++) {
+            lista_organizaciones.remove(i);
+            notifyItemRemoved(i);
+        }
+
+    }
 }
