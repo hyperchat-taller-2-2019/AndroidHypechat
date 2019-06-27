@@ -37,6 +37,7 @@ import org.json.JSONObject;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -56,6 +57,7 @@ public class ChatFragment extends Fragment {
     private ImageButton boton_enviar_imagen, editar_canal, boton_enviar_archivo, boton_enviar_snippet;
     private String id,name = "canal",org_id = "organizacion";
     private Boolean es_canal;
+    private Boolean snippet = false;
 
     private AdapterChat adaptador_para_chat;
 
@@ -178,7 +180,7 @@ public class ChatFragment extends Fragment {
                 intent.setType("application/pdf");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 //intent.putExtra(Intent.EXTRA_LOCAL_ONLY,true);
-                startActivityForResult(Intent.createChooser(intent,"Seleccionar una foto a enviar"),FILE_SEND);
+                startActivityForResult(Intent.createChooser(intent,"Seleccionar un archivo a enviar"),FILE_SEND);
                 filtro_mensaje_palabras_prohibidas("");
             }
         });
@@ -186,11 +188,14 @@ public class ChatFragment extends Fragment {
         boton_enviar_snippet.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.setType("image/*");
-                intent.putExtra(Intent.EXTRA_LOCAL_ONLY,true);
-                startActivityForResult(Intent.createChooser(intent,"Seleccionar una foto a enviar"),PHOTO_SEND);
-                filtro_mensaje_palabras_prohibidas("");
+                if(!snippet){
+                    snippet = true;
+                    boton_enviar_snippet.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.ic_snippet_selected));
+                }else{
+                    snippet = false;
+                    boton_enviar_snippet.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.ic_snippet));
+                }
+
             }
         });
 
@@ -241,7 +246,7 @@ public class ChatFragment extends Fragment {
                     public void onErrorResponse(VolleyError error) {
                         switch (error.networkResponse.statusCode){
                             case (500):
-                                Toast.makeText(getActivity(),"No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
+                               // Toast.makeText(getActivity(),"No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
                                 break;
                             case (400):
                                 Toast.makeText(getActivity(),"El ID ya existe, intente con otro.", Toast.LENGTH_LONG).show();
@@ -249,6 +254,10 @@ public class ChatFragment extends Fragment {
                             case (404):
                                 Toast.makeText(getActivity(),"El usuario o organizacion es invalido", Toast.LENGTH_LONG).show();
                                 break;
+                            default:
+                                Toast.makeText(getActivity(),"No fue posible conectarse al servidor, por favor intente de nuevo mas tarde", Toast.LENGTH_LONG).show();
+                                break;
+
                         }
                     }
                 });

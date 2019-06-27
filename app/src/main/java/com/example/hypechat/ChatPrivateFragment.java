@@ -35,6 +35,7 @@ import org.json.JSONObject;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -50,8 +51,9 @@ class ChatPrivateFragment extends Fragment {
     private Button boton_enviar_mensaje;
     private ImageButton volver, look;
     private RecyclerView chat;
-    private ImageButton boton_enviar_imagen;
+    private ImageButton boton_enviar_imagen, boton_enviar_archivo, boton_enviar_snippet;;
     private String id_chat,email_chat;
+    private Boolean snippet = false;
 
 
     private AdapterChat adaptador_para_chat;
@@ -62,6 +64,7 @@ class ChatPrivateFragment extends Fragment {
     private StorageReference storageReference;
 
     private static final int PHOTO_SEND = 1;
+    private static final int FILE_SEND = 2;
     private static final String URL_PRIVADO_MENCIONES = "https://secure-plateau-18239.herokuapp.com/privateChat/mention";
 
     public ChatPrivateFragment(String id, String name) {
@@ -84,6 +87,8 @@ class ChatPrivateFragment extends Fragment {
         texto_mensaje = (EditText) view.findViewById(R.id.texto_mensaje_a_enviar);
         boton_enviar_mensaje = (Button) view.findViewById(R.id.btn_enviar_mensaje);
         boton_enviar_imagen = (ImageButton) view.findViewById(R.id.boton_enviar_imagen);
+        boton_enviar_archivo = (ImageButton) view.findViewById(R.id.boton_enviar_archivo);
+        boton_enviar_snippet = (ImageButton) view.findViewById(R.id.boton_snippet);
         look = (ImageButton) view.findViewById(R.id.info_canal);
         look.setVisibility(View.INVISIBLE);
         look.setEnabled(false);
@@ -129,6 +134,31 @@ class ChatPrivateFragment extends Fragment {
                 intent.setType("image/*");
                 intent.putExtra(Intent.EXTRA_LOCAL_ONLY,true);
                 startActivityForResult(Intent.createChooser(intent,"Seleccionar una foto a enviar"),PHOTO_SEND);
+            }
+        });
+        boton_enviar_archivo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("application/pdf");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                //intent.putExtra(Intent.EXTRA_LOCAL_ONLY,true);
+                startActivityForResult(Intent.createChooser(intent,"Seleccionar un archivo a enviar"),FILE_SEND);
+
+            }
+        });
+
+        boton_enviar_snippet.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!snippet){
+                    snippet = true;
+                    boton_enviar_snippet.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.ic_snippet_selected));
+                }else{
+                    snippet = false;
+                    boton_enviar_snippet.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.ic_snippet));
+                }
+
             }
         });
 
@@ -261,6 +291,34 @@ class ChatPrivateFragment extends Fragment {
                         Uri downloadUri = task.getResult();
                         Log.i("INFO","La url de la foto es: " + downloadUri.toString());
                         ChatMensajeEnviar mensajeEnviar = new ChatMensajeEnviar(Usuario.getInstancia().getNickname(), "Te ha enviado una imagen...",
+                                Usuario.getInstancia().getUrl_foto_perfil(), downloadUri.toString(), ServerValue.TIMESTAMP,Usuario.getInstancia().getEmail());
+                        reference.push().setValue(mensajeEnviar);
+                    } else {
+                        Toast.makeText(getActivity(), "Fallo la carga de la imagen" + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
+        }
+        if (requestCode == FILE_SEND && resultCode == RESULT_OK){
+            Uri url_foto = data.getData();
+
+            final StorageReference foto_referencia = storage.getReference("Archivos").child(url_foto.getLastPathSegment());
+            //MAGIA QUE PIDE LA NUEVA DOCUMENTACION PARA OBTENER LA DOWNLOAD URL
+            foto_referencia.putFile(url_foto).continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                @Override
+                public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                    if (!task.isSuccessful()) {
+                        throw task.getException();
+                    }
+                    return foto_referencia.getDownloadUrl();
+                }
+            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                @Override
+                public void onComplete(@NonNull Task<Uri> task) {
+                    if (task.isSuccessful()) {
+                        Uri downloadUri = task.getResult();
+                        Log.i("INFO","La url del archivo es: " + downloadUri.toString());
+                        ChatMensajeEnviar mensajeEnviar = new ChatMensajeEnviar(Usuario.getInstancia().getNickname(), "Te ha enviado un archivo...",
                                 Usuario.getInstancia().getUrl_foto_perfil(), downloadUri.toString(), ServerValue.TIMESTAMP,Usuario.getInstancia().getEmail());
                         reference.push().setValue(mensajeEnviar);
                     } else {
