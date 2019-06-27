@@ -285,7 +285,7 @@ public class AgregarPrivado extends Fragment {
                 String name = canal.getString("name");
                 FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.fragment_container, new ChatFragment(false));
+                fragmentTransaction.replace(R.id.fragment_container, new ChatFragment(false,id, name, this.id));
                 //Esta es la linea clave para que vuelva al fragmento anterior!
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();
@@ -294,7 +294,7 @@ public class AgregarPrivado extends Fragment {
 
                 //Me traigo el fragmento sabiendo que es el de ChatFragment para cargarle la información
                 ChatFragment chat = (ChatFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-                chat.setSalaDeChat(id, name, this.id);
+                //chat.setSalaDeChat(id, name, this.id);
             }else{
                 canal = res.getJSONObject("private_msj");
                 String id = canal.getString("_id");

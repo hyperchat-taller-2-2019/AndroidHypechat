@@ -119,6 +119,7 @@ public class OrganizacionesFragment extends Fragment {
                 Log.i("INFO","Apretaste para buscar una organizacion");
                 error_busqueda.setVisibility(View.INVISIBLE);
                 chequearId();
+
                 //startActivity(launchactivity);
 
 
@@ -154,6 +155,8 @@ public class OrganizacionesFragment extends Fragment {
 
                         switch (error.networkResponse.statusCode){
                             case (400):
+                                error_busqueda.setVisibility(view.INVISIBLE);
+                                busqueda_id.getText().clear();
                                 mostrar_popup_pass_org();
                                 break;
                             case (500):

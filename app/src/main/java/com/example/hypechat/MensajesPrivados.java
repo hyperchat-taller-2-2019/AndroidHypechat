@@ -2,13 +2,6 @@ package com.example.hypechat;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,6 +19,14 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class MensajesPrivados extends Fragment {
 
@@ -81,6 +82,7 @@ public class MensajesPrivados extends Fragment {
                 if(validador.isNotCampoVacio(buscar.getText().toString(),getContext(),"email")){
                     crearPrivado(buscar.getText().toString());
                 }
+
 
 
 
@@ -248,6 +250,8 @@ public class MensajesPrivados extends Fragment {
                     public void onResponse(JSONObject response) {
 
                         progressDialog.dismiss();
+                        buscar.getText().clear();
+                        error_msj .setVisibility(View.INVISIBLE);
                         obtenerIDChatPrivado(email);
 
                     }
@@ -263,7 +267,7 @@ public class MensajesPrivados extends Fragment {
                                 Toast.makeText(getActivity(),"Token invalido", Toast.LENGTH_LONG).show();
                                 break;
                             case (404):
-                                error_msj.setText("No existe el email ingreado en el sistema");
+                                error_msj.setText("No existe el email ingresado en el sistema");
                                 error_msj .setVisibility(View.VISIBLE);
                                 break;
                             case (406):

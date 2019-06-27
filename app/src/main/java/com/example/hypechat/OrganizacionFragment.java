@@ -409,7 +409,7 @@ public class OrganizacionFragment extends Fragment {
             String name = canal.getString("name");
             FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.replace(R.id.fragment_container,new ChatFragment(is_canal));
+            fragmentTransaction.replace(R.id.fragment_container,new ChatFragment(is_canal,id,name,this.organizacion_id));
             //Esta es la linea clave para que vuelva al fragmento anterior!
             fragmentTransaction.addToBackStack(null);
             fragmentTransaction.commit();
@@ -418,7 +418,7 @@ public class OrganizacionFragment extends Fragment {
 
             //Me traigo el fragmento sabiendo que es el de ChatFragment para cargarle la información
             ChatFragment chat = (ChatFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-            chat.setSalaDeChat(id,name,this.organizacion_id);
+
         } catch (JSONException e) {
             e.printStackTrace();
         }

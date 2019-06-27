@@ -393,7 +393,7 @@ public class AgregarCanal extends Fragment {
             String name = canal.getString("name");
             FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.replace(R.id.fragment_container,new ChatFragment(true));
+            fragmentTransaction.replace(R.id.fragment_container,new ChatFragment(true,id,name,this.id));
             //Esta es la linea clave para que vuelva al fragmento anterior!
             fragmentTransaction.addToBackStack(null);
             fragmentTransaction.commit();
@@ -402,7 +402,7 @@ public class AgregarCanal extends Fragment {
 
             //Me traigo el fragmento sabiendo que es el de ChatFragment para cargarle la información
             ChatFragment chat = (ChatFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-            chat.setSalaDeChat(id,name,this.id);
+            //chat.setSalaDeChat(id,name,this.id);
         } catch (JSONException e) {
             e.printStackTrace();
         }

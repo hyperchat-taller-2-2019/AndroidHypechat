@@ -71,8 +71,11 @@ public class ChatFragment extends Fragment {
     private static final String URL_TITO = "https://secure-plateau-18239.herokuapp.com/tito";
 
     @SuppressLint("ValidFragment")
-    public ChatFragment(boolean canal) {
+    public ChatFragment(boolean canal,String id, String name, String orga_id) {
         this.es_canal = canal;
+        this.id = id;
+        this.name = name;
+        this.org_id = orga_id;
     }
 
     @Override
@@ -172,6 +175,8 @@ public class ChatFragment extends Fragment {
                 setScrollBar();
             }
         });
+
+        setSalaDeChat();
         return view;
     }
 
@@ -351,11 +356,9 @@ public class ChatFragment extends Fragment {
     }
 
 
-    public void setSalaDeChat(String id, String name, String orga_id) {
+    public void setSalaDeChat() {
 
-        this.id = id;
-        this.name = name;
-        this.org_id = orga_id;
+
         //Aca se decide a que nodo de la base de datos voy a buscar y escribir los mensajes
         database = FirebaseDatabase.getInstance();
         reference = database.getReference(id);
